@@ -69,8 +69,8 @@ def play_the_game(how_many, steps, epoch, is_test_set=False):
         os.path.join(tools.get_working_dir(), '../saved_nets/neural_net_' + str(epoch) + '_' + str(
             steps)))
     print("path: "+str(net_name))
-    model = neural_net_lib.ThreeByThreeSig()
-    neural_net = model.load_state_dict(torch.load(net_name))
+    neural_net = neural_net_lib.ThreeByThreeSig()
+    neural_net.load_state_dict(torch.load(net_name))
 
     for i_episode in range(how_many):
         # click on a start location
@@ -88,19 +88,21 @@ def play_the_game(how_many, steps, epoch, is_test_set=False):
             action = select_action(neural_net, state)
             counter += 1
             for k in range(0, 64):
+                print("this is k "+str(k))
                 min_int.move_and_click_to_ij(action[k][0], action[k][1])
                 gui.moveTo(1490, 900)
                 # if hit a mine
                 sleep(0.5)
                 new_state = dg.get_state_from_screen()
                 if dg.get_status():
-                    # print('hit mine')
+                    print('hit mine')
                     # TODO check indices
                     sub_state = tools.grab_sub_state(state, action[k][1] + 1, action[k][0] + 1)
                     tools.save_action_neg(-10, sub_state, is_test_set)
                     print(sub_state)
                     tools.move_and_click(1490, 900)
                     counter += 1
+                    print("DEBUG 1")
                     break
 
                 # compute reward
@@ -113,16 +115,16 @@ def play_the_game(how_many, steps, epoch, is_test_set=False):
                     # save data from transition
                     if reward > 0:
                         tools.save_action(reward, sub_state, is_test_set)
-                        # print("reward is positive")
 
                     elif reward <= 0:
                         tools.save_action_neg(reward, sub_state, is_test_set)
-                        # print("reward is negative")
 
                     state = new_state
                     state = min_int.mark_game(state)
+                    counter += 1
                     # print(reward)
-                    break
+                    # print("DEBUG 2")
+                    # break
 
                 if has_won:
                     # print("has won")
@@ -130,6 +132,7 @@ def play_the_game(how_many, steps, epoch, is_test_set=False):
                     tools.move_and_click(1490, 900)
                     tools.move_and_click(739, 320)
                     gui.click()
+                    # print("DEBUG 3")
                     break
 
                 state = new_state
