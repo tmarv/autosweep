@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
 # Tim Marvel
 import math
+import os
 from time import sleep
 import random
+
+import numpy as np
 import pyautogui as gui
 import torch
 # self made classes
 from src import data_gathering_histgrm as dg
 from src import reward_manager
 from src import minesweeper_interface as min_int
+from src import neural_net_lib
 from src import tools
 
 #  Global variables
+
+
 NUM_ACTIONS = 64  # size of an 8 by 8 minefield
 
 pos_location, neg_location = tools.get_save_location()
@@ -28,18 +34,44 @@ tools.move_and_click(739, 320)
 # init
 gui.click()
 
-
-def select_action():
-    random_action = random.randrange(NUM_ACTIONS)
-    # print('this is random action ', random_action)
-    return torch.tensor([[math.floor(random_action / 8), random_action % 8]], device=device, dtype=torch.int)
-
-
 total_reward = 0.0
 reward_counter = 0
 
 
-def play_the_game(how_many, is_test_set=False):
+def select_action(neural_net, state):
+    state = tools.extend_state(state)
+    print("state")
+    print(state)
+    score_board = np.zeros((8, 8))
+    for i in range(1, 9):
+        for j in range(1, 9):
+            local_cpy = tools.grab_sub_state_noext(state, j, i)
+            local_tensor = torch.from_numpy(local_cpy).to(dtype=torch.float)
+            local_tensor = local_tensor.unsqueeze(0)
+            score_board[i - 1, j - 1] = neural_net.forward(local_tensor)
+
+    print("score board " + str(score_board))
+    flat = score_board.flatten()
+    flat.sort()
+    flat = np.flipud(flat)
+    return_values = []
+    total_len = len(flat)
+    for i in range(0, total_len):
+        local_range = np.where(score_board == flat[i])
+        local_sz = len(local_range[0])
+        for j in range(0, local_sz):
+            return_values.append([local_range[0][j], local_range[1][j]])
+    return return_values
+
+
+def play_the_game(how_many, steps, epoch, is_test_set=False):
+    net_name = os.path.abspath(
+        os.path.join(tools.get_working_dir(), '../saved_nets/neural_net_' + str(epoch) + '_' + str(
+            steps)))
+    print("path: "+str(net_name))
+    model = neural_net_lib.ThreeByThreeSig()
+    neural_net = model.load_state_dict(torch.load(net_name))
+
     for i_episode in range(how_many):
         # click on a start location
         sleep(0.3)
@@ -53,36 +85,27 @@ def play_the_game(how_many, is_test_set=False):
         counter = 0
         has_won = False
         while not dg.get_status() and counter < 100:
-            action = select_action()
+            action = select_action(neural_net, state)
             counter += 1
-            # print(action)
-            # print(action[0])
-            # TODO Fix this mess!
-            for action_ind in action[0]:
-                action_num = action[0][0] * 8 + action[0][1]
-                # print('-----')
-                # print(action_num)
-                ii = math.floor(action_num / 8)
-                jj = math.floor(action_num % 8)
-                # print('i ', math.floor(action_num / 8))
-                # print('j ', action_num % 8)
-                min_int.move_and_click_to_ij(action_num % 8, math.floor(action_num / 8))
+            for k in range(0, 64):
+                min_int.move_and_click_to_ij(action[k][0], action[k][1])
                 gui.moveTo(1490, 900)
                 # if hit a mine
                 sleep(0.5)
                 new_state = dg.get_state_from_screen()
                 if dg.get_status():
                     # print('hit mine')
-                    sub_state = tools.grab_sub_state(state, ii + 1, jj + 1)
+                    # TODO check indices
+                    sub_state = tools.grab_sub_state(state, action[k][1] + 1, action[k][0] + 1)
                     tools.save_action_neg(-10, sub_state, is_test_set)
-                    # print(sub_state)
+                    print(sub_state)
                     tools.move_and_click(1490, 900)
                     counter += 1
                     break
 
                 # compute reward
                 reward, has_won = reward_manager.compute_reward(state, new_state)
-                sub_state = tools.grab_sub_state(state, ii + 1, jj + 1)
+                sub_state = tools.grab_sub_state(state, action[k][1] + 1, action[k][0] + 1)
                 # print("reward " + str(reward))
                 # print(sub_state)
                 if not has_won:
