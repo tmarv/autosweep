@@ -83,6 +83,10 @@ def start_minesweeper_game():
     pyautogui.click()
 
 
+def get_working_dir():
+    return dir_path
+
+
 real_path = os.path.realpath(__file__)
 dir_path = os.path.dirname(real_path)
 
