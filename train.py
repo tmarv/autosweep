@@ -11,4 +11,4 @@ import learn_from_data
 # learn_from_data.train_the_net(0, 100)
 # learn_from_data.train_the_net(0, 200)
 # learn_from_data.train_the_net(0, 500)
-collect_data_with_ml.play_the_game(2, 500, 0, False)
+collect_data_with_ml.play_the_game(2, 0, 500, False)

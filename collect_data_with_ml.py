@@ -64,7 +64,7 @@ def select_action(neural_net, state):
     return return_values
 
 
-def play_the_game(how_many, steps, epoch, is_test_set=False):
+def play_the_game(how_many, epoch, steps, is_test_set=False):
     net_name = os.path.abspath(
         os.path.join(tools.get_working_dir(), '../saved_nets/neural_net_' + str(epoch) + '_' + str(
             steps)))
