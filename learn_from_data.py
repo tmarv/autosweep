@@ -102,7 +102,25 @@ def get_test_set_pos():
 
 
 def get_test_set_neg():
-    print("hello again")
+    r = random.randint(0, neg_size_test - 1)
+    # r = r - r % 2
+    original = np.load((neg_location_test + "/" + list_neg_test[2 * r + 1]))
+    # print(original)
+    reward = np.load((neg_location_test + "/" + list_neg_test[2 * r + 2]))
+    # reward shaping
+    if original[1, 1] == 90:
+        # nonlocal reward
+        reward = -10.0
+    elif original[1, 1] == 0:
+        # nonlocal reward
+        reward = -10.0
+    else:
+        # nonlocal reward
+        reward = -2.0
+    rot1 = tools.rotate_by_90(original)
+    rot2 = tools.rotate_by_90(rot1)
+    rot3 = tools.rotate_by_90(rot2)
+    return reward, original, rot1, rot2, rot3
 
 
 # SAME bug as before with Gitignore file at 0th index
@@ -130,20 +148,26 @@ def get_training_set_neg():
     return reward, original, rot1, rot2, rot3
 
 
-def get_random_set():
+def get_random_set(is_test):
     toggle = random.random()
     if toggle > 0.5:
-        return get_training_set_pos()
+        if is_test:
+            return get_test_set_pos()
+        else:
+            return get_training_set_pos()
     else:
-        return get_training_set_neg()
+        if is_test:
+            return get_test_set_neg()
+        else:
+            return get_training_set_neg()
 
 
-def load_batch_to_torch():
+def load_batch_to_torch(is_test):
     states = []
     reward = []
 
     for i in range(0, BATCH_SIZE):
-        r, s1, s2, s3, s4 = get_random_set()
+        r, s1, s2, s3, s4 = get_random_set(is_test)
         reward.append(r)
         reward.append(r)
         reward.append(r)
@@ -172,7 +196,7 @@ def train_the_net(current_epoch, training_steps):
     print(backup_graph_name)
 
     for i in range(0, training_steps):
-        loaded_s, loaded_rewards = load_batch_to_torch()
+        loaded_s, loaded_rewards = load_batch_to_torch(False)
         result = neural_net.forward(loaded_s)
         loaded_rewards = loaded_rewards.unsqueeze(1)
         # TODO investigate different error functions
