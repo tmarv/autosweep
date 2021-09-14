@@ -34,20 +34,32 @@ pos_location, neg_location = tools.get_save_location()
 print("neg_location")
 print(neg_location)
 # location of test samples
-test_pos_location, test_pos_location = tools.get_save_test_location()
+pos_location_test, neg_location_test = tools.get_save_test_location()
 
 list_pos = os.listdir(pos_location)
 list_neg = os.listdir(neg_location)
+
+list_pos_test = os.listdir(pos_location_test)
+list_neg_test = os.listdir(neg_location_test)
 
 # for each sample there is a state and a reward
 neg_size = math.floor(len(list_neg) / 2)
 pos_size = math.floor(len(list_pos) / 2)
 
+neg_size_test = math.floor(len(list_neg_test) / 2)
+pos_size_test = math.floor(len(list_pos_test) / 2)
+
 print("there are: " + str(pos_size) + " positive training samples")
 print("there are: " + str(neg_size) + " negative training samples")
 
+print("there are: " + str(pos_size_test) + " positive test samples")
+print("there are: " + str(neg_size_test) + " negative test samples")
+
 list_pos.sort()
 list_neg.sort()
+
+list_pos_test.sort()
+list_neg_test.sort()
 
 
 # BUG -> gitignore counts as 0th element
@@ -77,7 +89,16 @@ def get_training_set_pos():
 
 
 def get_test_set_pos():
-    print("hello")
+    r = random.randint(0, pos_size_test - 1)
+    original = np.load((pos_location_test + "/" + list_pos_test[2 * r + 1]))
+    reward = np.load((pos_location_test + "/" + list_pos_test[2 * r + 2]))
+    if reward > 4:
+        # nonlocal reward
+        reward = 1
+    rot1 = tools.rotate_by_90(original)
+    rot2 = tools.rotate_by_90(rot1)
+    rot3 = tools.rotate_by_90(rot2)
+    return reward, original, rot1, rot2, rot3
 
 
 def get_test_set_neg():
