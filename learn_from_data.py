@@ -183,9 +183,26 @@ def load_batch_to_torch(is_test):
     return loaded_states, loaded_rewards
 
 
+def evaluate_the_net(current_epoch, evaluation_steps):
+    test_losses = []
+    backup_graph_name = os.path.abspath(os.path.join(tools.get_working_dir(), '../training_plots/test_result_'
+                                                     + str(current_epoch) + '_' + str(evaluation_steps) + '.png'))
+    for i in range(0, evaluation_steps):
+        loaded_s, loaded_rewards = load_batch_to_torch(True)
+        result = neural_net.forward(loaded_s)
+        loaded_rewards = loaded_rewards.unsqueeze(1)
+        test_loss = l1_loss(result, loaded_rewards)
+        test_losses.append(test_loss)
+
+    test_losses = np.array(test_losses)
+    plt.plot(test_losses)
+    plt.savefig(backup_graph_name)
+    plt.clf()
+
+
 def train_the_net(current_epoch, training_steps):
     train_losses = []
-    test_losses = []
+
     # set name based on current itt
 
     backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(),
@@ -203,6 +220,8 @@ def train_the_net(current_epoch, training_steps):
         # loss = F.smooth_l1_loss(result, loaded_rwds)
         optimizer.zero_grad()
         train_loss = l1_loss(result, loaded_rewards)
+        # print("this is train loss")
+        # print(train_loss)
         train_loss.backward()
         optimizer.step()
         train_losses.append(train_loss)
