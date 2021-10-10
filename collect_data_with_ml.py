@@ -50,7 +50,7 @@ def select_action(neural_net, state):
             local_tensor = local_tensor.unsqueeze(0)
             score_board[i - 1, j - 1] = neural_net.forward(local_tensor)
 
-    print("score board " + str(score_board))
+    # print("score board " + str(score_board))
     flat = score_board.flatten()
     flat.sort()
     flat = np.flipud(flat)
@@ -115,6 +115,10 @@ def play_the_game(how_many, epoch, steps, is_test_set=False):
                     # save data from transition
                     if reward > 0:
                         tools.save_action(reward, sub_state, is_test_set)
+                        print("this is reward "+str(reward))
+                        state = new_state
+                        state = min_int.mark_game(state)
+                        break
 
                     elif reward <= 0:
                         tools.save_action_neg(reward, sub_state, is_test_set)
