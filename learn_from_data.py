@@ -196,6 +196,8 @@ def evaluate_the_net(current_epoch, evaluation_steps):
 
     test_losses = np.array(test_losses)
     plt.plot(test_losses)
+    plt.ylim(0, 7)
+    plt.grid()
     plt.savefig(backup_graph_name)
     plt.clf()
 
@@ -231,6 +233,8 @@ def train_the_net(current_epoch, training_steps):
     # save this to image based on current_itt
     train_losses = np.array(train_losses)
     plt.plot(train_losses)
+    plt.ylim(0, 5)
+    plt.grid()
     plt.savefig(backup_graph_name)
     plt.clf()
     # plt.show()
