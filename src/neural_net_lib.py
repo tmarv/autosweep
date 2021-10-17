@@ -9,11 +9,11 @@ class ThreeByThreeSig(nn.Module):
 
     def __init__(self):
         super(ThreeByThreeSig, self).__init__()
-        self.layer1 = nn.Linear(9, 256)
+        self.layer1 = nn.Linear(9, 512)
         self.active1 = nn.ReLU()
-        self.layer2 = nn.Linear(256, 256)
+        self.layer2 = nn.Linear(512, 512)
         self.active2 = nn.ReLU()
-        self.layer3 = nn.Linear(256, 64)
+        self.layer3 = nn.Linear(512, 64)
         self.active3 = nn.ReLU()
         self.layer4 = nn.Linear(64, 1)
 

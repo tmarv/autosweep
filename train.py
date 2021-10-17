@@ -6,11 +6,25 @@ import collect_data_with_ml
 import learn_from_data
 
 # play and collect some data without any intelligence
-collect_data_with_ml.play_the_game(1, 2, 5000, False)
+#learn_from_data.train_the_net(4, 500)
+#learn_from_data.evaluate_the_net(4, 500)
+collect_data_with_ml.play_the_game(2, 4, 500, False)
+# collect_data_with_ml.play_the_game(10, 4, 5005, True)
+
+
 
 '''
-learn_from_data.train_the_net(2, 5000)
-learn_from_data.evaluate_the_net(2, 5000)
+learn_from_data.train_the_net(4, 5005)
+learn_from_data.evaluate_the_net(4, 5005)
+
+collect_data_with_ml.play_the_game(100, 4, 5005, False)
+collect_data_with_ml.play_the_game(10, 4, 5005, True)
+learn_from_data.train_the_net(4, 5005)
+learn_from_data.evaluate_the_net(4, 5005)
+
+
+learn_from_data.train_the_net(4, 5005)
+learn_from_data.evaluate_the_net(4, 5005)
 
 
 collect_data_no_ml.play_the_game(200, False)
@@ -44,4 +58,36 @@ learn_from_data.train_the_net(2, 2500)
 learn_from_data.evaluate_the_net(2, 2500)
 learn_from_data.train_the_net(2, 3500)
 learn_from_data.evaluate_the_net(2, 3500)
+
+collect_data_with_ml.play_the_game(100, 2, 3500, False)
+collect_data_with_ml.play_the_game(20, 2, 3500, True)
+learn_from_data.train_the_net(3, 2500)
+learn_from_data.evaluate_the_net(3, 2500)
+learn_from_data.train_the_net(3, 3500)
+learn_from_data.evaluate_the_net(3, 3500)
+collect_data_no_ml.play_the_game(50, False)
+collect_data_no_ml.play_the_game(10, True)
+learn_from_data.train_the_net(3, 5000)
+learn_from_data.evaluate_the_net(3, 5000)
+
+collect_data_with_ml.play_the_game(100, 3, 5000, False)
+collect_data_with_ml.play_the_game(20, 3, 5000, True)
+learn_from_data.train_the_net(4, 2500)
+learn_from_data.evaluate_the_net(4, 2500)
+learn_from_data.train_the_net(4, 3500)
+learn_from_data.evaluate_the_net(4, 3500)
+collect_data_no_ml.play_the_game(50, False)
+collect_data_no_ml.play_the_game(10, True)
+learn_from_data.train_the_net(4, 5000)
+learn_from_data.evaluate_the_net(4, 5000)
+collect_data_no_ml.play_the_game(100, False)
+collect_data_no_ml.play_the_game(20, True)
+learn_from_data.train_the_net(4, 5003)
+learn_from_data.evaluate_the_net(4, 5003)
+learn_from_data.train_the_net(4, 5004)
+learn_from_data.evaluate_the_net(4, 5004)
+
+
+collect_data_no_ml.play_the_game(50, False)
+collect_data_no_ml.play_the_game(10, True)
 '''

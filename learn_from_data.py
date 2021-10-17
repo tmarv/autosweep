@@ -14,7 +14,7 @@ from src import neural_net_lib
 from src import tools
 
 # Global variables
-BATCH_SIZE = 16
+BATCH_SIZE = 192
 steps_done = 0
 TRAINING_STPS = 2000
 TRAIN_ITER = 0
@@ -27,7 +27,7 @@ neural_net = neural_net_lib.ThreeByThreeSig()
 l1_loss = nn.SmoothL1Loss()
 # TODO try and see what descent method is best
 # optimizer = optim.SGD(neural_net.parameters(), lr=0.00003)
-optimizer = optim.Adam(neural_net.parameters(), lr=0.00007)
+optimizer = optim.Adam(neural_net.parameters(), lr=0.0001)
 
 # location of train samples
 pos_location, neg_location = tools.get_save_location()
@@ -75,12 +75,25 @@ def get_training_set_pos():
     # print((pos_location + "/" + list_pos[2 * r + 1]))
     # print(original)
     reward = np.load((pos_location + "/" + list_pos[2 * r + 2]))
+    #print("this is reward: " + str(reward))
     # print((pos_location + "/" + list_pos[2 * r + 2]))
     # print(reward)
     # a bit of reward shaping helps
-    if reward > 4:
+    if reward > 0.5 and original.sum() == 90:
         # nonlocal reward
-        reward = 1
+        reward = 0.25
+
+    elif reward > 0.5 and original.sum() == 6*10-3:
+        reward = 0.25
+
+        #print("this is reward 1: " + str(reward))
+    '''
+    elif reward == 1:
+        reward = 2.0
+        #print("this is reward 2: " + str(reward))
+    '''
+    #print("this is reward 3: " + str(reward))
+    #exit()
 
     rot1 = tools.rotate_by_90(original)
     rot2 = tools.rotate_by_90(rot1)
@@ -92,9 +105,17 @@ def get_test_set_pos():
     r = random.randint(0, pos_size_test - 1)
     original = np.load((pos_location_test + "/" + list_pos_test[2 * r + 1]))
     reward = np.load((pos_location_test + "/" + list_pos_test[2 * r + 2]))
-    if reward > 4:
+
+    if reward > 0.5 and original.sum() == 90:
         # nonlocal reward
-        reward = 1
+        reward = 0.25
+    elif reward > 0.5 and original.sum() == 6*10-3:
+        reward = 0.25
+    '''
+    elif reward == 1:
+        reward = 2.0
+    '''
+
     rot1 = tools.rotate_by_90(original)
     rot2 = tools.rotate_by_90(rot1)
     rot3 = tools.rotate_by_90(rot2)
@@ -105,7 +126,6 @@ def get_test_set_neg():
     r = random.randint(0, neg_size_test - 1)
     # r = r - r % 2
     original = np.load((neg_location_test + "/" + list_neg_test[2 * r + 1]))
-    # print(original)
     reward = np.load((neg_location_test + "/" + list_neg_test[2 * r + 2]))
     # reward shaping
     if original[1, 1] == 90:
@@ -114,9 +134,11 @@ def get_test_set_neg():
     elif original[1, 1] == 0:
         # nonlocal reward
         reward = -10.0
+    elif reward == -10:
+        reward = -20.0
     else:
         # nonlocal reward
-        reward = -2.0
+        reward = -0.1
     rot1 = tools.rotate_by_90(original)
     rot2 = tools.rotate_by_90(rot1)
     rot3 = tools.rotate_by_90(rot2)
@@ -139,9 +161,11 @@ def get_training_set_neg():
     elif original[1, 1] == 0:
         # nonlocal reward
         reward = -10.0
+    elif reward == -10:
+        reward = -20.0
     else:
         # nonlocal reward
-        reward = -2.0
+        reward = -0.1
     rot1 = tools.rotate_by_90(original)
     rot2 = tools.rotate_by_90(rot1)
     rot3 = tools.rotate_by_90(rot2)
@@ -233,7 +257,7 @@ def train_the_net(current_epoch, training_steps):
     # save this to image based on current_itt
     train_losses = np.array(train_losses)
     plt.plot(train_losses)
-    plt.ylim(0, 5)
+    # plt.ylim(0, 5)
     plt.grid()
     plt.savefig(backup_graph_name)
     plt.clf()

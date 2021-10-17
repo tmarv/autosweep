@@ -50,17 +50,29 @@ def select_action(neural_net, state):
             local_tensor = local_tensor.unsqueeze(0)
             score_board[i - 1, j - 1] = neural_net.forward(local_tensor)
 
-    # print("score board " + str(score_board))
+    print("score board " + str(score_board))
     flat = score_board.flatten()
     flat.sort()
     flat = np.flipud(flat)
     return_values = []
     total_len = len(flat)
-    for i in range(0, total_len):
+    print("this is total len      "+str(total_len))
+    print("this is flat: "+str(flat))
+    i = 0
+    while i < total_len:
+        # print("this is i at start: "+str(i))
         local_range = np.where(score_board == flat[i])
+        # print("this is local range: "+str(local_range))
         local_sz = len(local_range[0])
         for j in range(0, local_sz):
             return_values.append([local_range[0][j], local_range[1][j]])
+            # print("str: "+str([local_range[0][j], local_range[1][j]]))
+            i = i+1
+            # print("this is i after: " + str(i))
+    if len(return_values) != 64:
+        print("Catastrophic error: return values size is off "+str(len(return_values)))
+        exit()
+    print("this is size:    "+str(len(return_values)))
     return return_values
 
 
@@ -86,6 +98,7 @@ def play_the_game(how_many, epoch, steps, is_test_set=False):
         has_won = False
         while not dg.get_status() and counter < 100:
             action = select_action(neural_net, state)
+            print(action)
             counter += 1
             for k in range(0, 64):
                 print("this is k "+str(k))
@@ -121,6 +134,7 @@ def play_the_game(how_many, epoch, steps, is_test_set=False):
                         break
 
                     elif reward <= 0:
+                        print("this is reward " + str(reward))
                         tools.save_action_neg(reward, sub_state, is_test_set)
 
                     state = new_state
@@ -131,11 +145,15 @@ def play_the_game(how_many, epoch, steps, is_test_set=False):
                     # break
 
                 if has_won:
-                    # print("has won")
+                    print("has won collect data with ml")
                     tools.save_action(10, sub_state, is_test_set)
                     tools.move_and_click(1490, 900)
-                    tools.move_and_click(739, 320)
-                    gui.click()
+                    # tools.move_and_click(739, 320)
+                    # gui.click()
+                    state = new_state
+                    state = min_int.mark_game(state)
+                    counter += 1
+                    i_episode = i_episode+1
                     # print("DEBUG 3")
                     break
 
