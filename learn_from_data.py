@@ -14,7 +14,7 @@ from src import neural_net_lib
 from src import tools
 
 # Global variables
-BATCH_SIZE = 192
+BATCH_SIZE = 128
 steps_done = 0
 TRAINING_STPS = 2000
 TRAIN_ITER = 0
@@ -86,6 +86,9 @@ def get_training_set_pos():
     elif reward > 0.5 and original.sum() == 6*10-3:
         reward = 0.25
 
+    elif reward > 0.5 and original.sum() == (4 * 10 - 5):
+        reward = 0.25
+
         #print("this is reward 1: " + str(reward))
     '''
     elif reward == 1:
@@ -111,6 +114,8 @@ def get_test_set_pos():
         reward = 0.25
     elif reward > 0.5 and original.sum() == 6*10-3:
         reward = 0.25
+    elif reward > 0.5 and original.sum() == 4*10 - 5:
+        reward = 0.25
     '''
     elif reward == 1:
         reward = 2.0
@@ -135,10 +140,11 @@ def get_test_set_neg():
         # nonlocal reward
         reward = -10.0
     elif reward == -10:
-        reward = -20.0
-    else:
+        reward = -64.0
+    elif reward == 0:
         # nonlocal reward
-        reward = -0.1
+        reward = -0.15
+
     rot1 = tools.rotate_by_90(original)
     rot2 = tools.rotate_by_90(rot1)
     rot3 = tools.rotate_by_90(rot2)
@@ -162,10 +168,11 @@ def get_training_set_neg():
         # nonlocal reward
         reward = -10.0
     elif reward == -10:
-        reward = -20.0
-    else:
+        reward = -64.0
+    elif reward == 0:
         # nonlocal reward
-        reward = -0.1
+        reward = -0.15
+
     rot1 = tools.rotate_by_90(original)
     rot2 = tools.rotate_by_90(rot1)
     rot3 = tools.rotate_by_90(rot2)
@@ -174,7 +181,7 @@ def get_training_set_neg():
 
 def get_random_set(is_test):
     toggle = random.random()
-    if toggle > 0.5:
+    if toggle > 0.4:
         if is_test:
             return get_test_set_pos()
         else:

@@ -201,5 +201,5 @@ def get_state_from_screen():
                 continue
 
     # TODO remove this once stable
-    print(board_state)
+    # print(board_state)
     return board_state

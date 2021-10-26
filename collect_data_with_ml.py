@@ -40,8 +40,8 @@ reward_counter = 0
 
 def select_action(neural_net, state):
     state = tools.extend_state(state)
-    print("state")
-    print(state)
+    # print("state")
+    # print(state)
     score_board = np.zeros((8, 8))
     for i in range(1, 9):
         for j in range(1, 9):
@@ -50,14 +50,14 @@ def select_action(neural_net, state):
             local_tensor = local_tensor.unsqueeze(0)
             score_board[i - 1, j - 1] = neural_net.forward(local_tensor)
 
-    print("score board " + str(score_board))
+    # print("score board " + str(score_board))
     flat = score_board.flatten()
     flat.sort()
     flat = np.flipud(flat)
     return_values = []
     total_len = len(flat)
-    print("this is total len      "+str(total_len))
-    print("this is flat: "+str(flat))
+    # print("this is total len      "+str(total_len))
+    print("this is flat: " + str(flat))
     i = 0
     while i < total_len:
         # print("this is i at start: "+str(i))
@@ -67,24 +67,26 @@ def select_action(neural_net, state):
         for j in range(0, local_sz):
             return_values.append([local_range[0][j], local_range[1][j]])
             # print("str: "+str([local_range[0][j], local_range[1][j]]))
-            i = i+1
+            i = i + 1
             # print("this is i after: " + str(i))
     if len(return_values) != 64:
-        print("Catastrophic error: return values size is off "+str(len(return_values)))
+        print("Catastrophic error: return values size is off " + str(len(return_values)))
         exit()
-    print("this is size:    "+str(len(return_values)))
+    # print("this is size:    "+str(len(return_values)))
     return return_values
 
 
-def play_the_game(how_many, epoch, steps, is_test_set=False):
+def play_the_game(how_many, epoch, steps, is_test_set=False, random_percent=0.0):
     net_name = os.path.abspath(
         os.path.join(tools.get_working_dir(), '../saved_nets/neural_net_' + str(epoch) + '_' + str(
             steps)))
-    print("path: "+str(net_name))
+    print("path: " + str(net_name))
     neural_net = neural_net_lib.ThreeByThreeSig()
     neural_net.load_state_dict(torch.load(net_name))
 
-    for i_episode in range(how_many):
+    i_episode = 0
+    while i_episode < how_many:
+        # for i_episode in range(how_many):
         # click on a start location
         sleep(0.3)
         print("this is i_episode " + str(i_episode))
@@ -96,12 +98,20 @@ def play_the_game(how_many, epoch, steps, is_test_set=False):
         sleep(0.3)
         counter = 0
         has_won = False
-        while not dg.get_status() and counter < 100:
+        while not dg.get_status() and counter < 1000:
             action = select_action(neural_net, state)
-            print(action)
+            # print(action)
             counter += 1
             for k in range(0, 64):
-                print("this is k "+str(k))
+                print("this is k " + str(k))
+                print(action[k][0], action[k][1])
+                # generate random num
+                if random.random() < random_percent:
+                    print("random action")
+                    action[k][0] = random.randint(0, 7)
+                    action[k][1] = random.randint(0, 7)
+                # else:
+                print(action[k][0], action[k][1])
                 min_int.move_and_click_to_ij(action[k][0], action[k][1])
                 gui.moveTo(1490, 900)
                 # if hit a mine
@@ -116,6 +126,7 @@ def play_the_game(how_many, epoch, steps, is_test_set=False):
                     tools.move_and_click(1490, 900)
                     counter += 1
                     print("DEBUG 1")
+                    i_episode = i_episode + 1
                     break
 
                 # compute reward
@@ -128,7 +139,7 @@ def play_the_game(how_many, epoch, steps, is_test_set=False):
                     # save data from transition
                     if reward > 0:
                         tools.save_action(reward, sub_state, is_test_set)
-                        print("this is reward "+str(reward))
+                        print("this is reward " + str(reward))
                         state = new_state
                         state = min_int.mark_game(state)
                         break
@@ -142,23 +153,28 @@ def play_the_game(how_many, epoch, steps, is_test_set=False):
                     counter += 1
                     # print(reward)
                     # print("DEBUG 2")
-                    # break
+                    continue
 
                 if has_won:
                     print("has won collect data with ml")
+
                     tools.save_action(10, sub_state, is_test_set)
                     tools.move_and_click(1490, 900)
                     # tools.move_and_click(739, 320)
                     # gui.click()
                     state = new_state
                     state = min_int.mark_game(state)
-                    counter += 1
-                    i_episode = i_episode+1
+                    print("has won collect data with ml :" + str(counter))
+                    counter += 1001
+                    print("has won collect data with ml :" + str(i_episode))
+                    print("has won collect data with ml :" + str(counter))
+                    i_episode = i_episode + 1
                     # print("DEBUG 3")
                     break
 
                 state = new_state
-
+                print("incrementing i episode" + str(i_episode))
+                i_episode += 1
                 # mark cells
                 state = min_int.mark_game(state)
                 counter += 1
