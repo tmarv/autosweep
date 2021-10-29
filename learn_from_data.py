@@ -21,7 +21,7 @@ TRAIN_ITER = 0
 NAME = 'nets/neural_net_' + str(TRAINING_STPS)
 # prepare ml stuff
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-neural_net = neural_net_lib.ThreeByThreeSig()
+neural_net = neural_net_lib.ThreeByThreeSig().to(device)
 # TODO try different loss functions
 # mse_loss = nn.MSELoss()
 l1_loss = nn.SmoothL1Loss()
@@ -30,11 +30,11 @@ l1_loss = nn.SmoothL1Loss()
 optimizer = optim.Adam(neural_net.parameters(), lr=0.0001)
 
 # location of train samples
-pos_location, neg_location = tools.get_save_location()
+pos_location, neg_location = tools.get_save_location_three()
 print("neg_location")
 print(neg_location)
 # location of test samples
-pos_location_test, neg_location_test = tools.get_save_test_location()
+pos_location_test, neg_location_test = tools.get_save_test_location_three()
 
 list_pos = os.listdir(pos_location)
 list_neg = os.listdir(neg_location)
@@ -64,21 +64,11 @@ list_neg_test.sort()
 
 # BUG -> gitignore counts as 0th element
 # everything is offset by 1
-def get_training_set_pos():
-    # print("positive")
+def get_training_set_pos_three():
     r = random.randint(0, pos_size - 1)
-    # print((pos_location + "/" + list_pos[0]))
-    # print((pos_location + "/" + list_pos[1]))
-    # r = r - r % 2
-    # print(r)
     original = np.load((pos_location + "/" + list_pos[2 * r + 1]))
-    # print((pos_location + "/" + list_pos[2 * r + 1]))
-    # print(original)
     reward = np.load((pos_location + "/" + list_pos[2 * r + 2]))
-    #print("this is reward: " + str(reward))
-    # print((pos_location + "/" + list_pos[2 * r + 2]))
-    # print(reward)
-    # a bit of reward shaping helps
+    # a bit of reward shaping
     if reward > 0.5 and original.sum() == 90:
         # nonlocal reward
         reward = 0.25
@@ -104,7 +94,7 @@ def get_training_set_pos():
     return reward, original, rot1, rot2, rot3
 
 
-def get_test_set_pos():
+def get_test_set_pos_three():
     r = random.randint(0, pos_size_test - 1)
     original = np.load((pos_location_test + "/" + list_pos_test[2 * r + 1]))
     reward = np.load((pos_location_test + "/" + list_pos_test[2 * r + 2]))
@@ -127,7 +117,7 @@ def get_test_set_pos():
     return reward, original, rot1, rot2, rot3
 
 
-def get_test_set_neg():
+def get_test_set_neg_three():
     r = random.randint(0, neg_size_test - 1)
     # r = r - r % 2
     original = np.load((neg_location_test + "/" + list_neg_test[2 * r + 1]))
@@ -140,7 +130,7 @@ def get_test_set_neg():
         # nonlocal reward
         reward = -10.0
     elif reward == -10:
-        reward = -64.0
+        reward = -200.0
     elif reward == 0:
         # nonlocal reward
         reward = -0.15
@@ -152,7 +142,7 @@ def get_test_set_neg():
 
 
 # SAME bug as before with Gitignore file at 0th index
-def get_training_set_neg():
+def get_training_set_neg_three():
     # print("negative")
     r = random.randint(0, neg_size - 1)
     # r = r - r % 2
@@ -168,7 +158,7 @@ def get_training_set_neg():
         # nonlocal reward
         reward = -10.0
     elif reward == -10:
-        reward = -64.0
+        reward = -200.0
     elif reward == 0:
         # nonlocal reward
         reward = -0.15
@@ -179,26 +169,26 @@ def get_training_set_neg():
     return reward, original, rot1, rot2, rot3
 
 
-def get_random_set(is_test):
+def get_random_set_three(is_test):
     toggle = random.random()
     if toggle > 0.4:
         if is_test:
-            return get_test_set_pos()
+            return get_test_set_pos_three()
         else:
-            return get_training_set_pos()
+            return get_training_set_pos_three()
     else:
         if is_test:
-            return get_test_set_neg()
+            return get_test_set_neg_three()
         else:
-            return get_training_set_neg()
+            return get_training_set_neg_three()
 
 
-def load_batch_to_torch(is_test):
+def load_batch_to_torch_three(is_test):
     states = []
     reward = []
 
     for i in range(0, BATCH_SIZE):
-        r, s1, s2, s3, s4 = get_random_set(is_test)
+        r, s1, s2, s3, s4 = get_random_set_three(is_test)
         reward.append(r)
         reward.append(r)
         reward.append(r)
@@ -219,7 +209,7 @@ def evaluate_the_net(current_epoch, evaluation_steps):
     backup_graph_name = os.path.abspath(os.path.join(tools.get_working_dir(), '../training_plots/test_result_'
                                                      + str(current_epoch) + '_' + str(evaluation_steps) + '.png'))
     for i in range(0, evaluation_steps):
-        loaded_s, loaded_rewards = load_batch_to_torch(True)
+        loaded_s, loaded_rewards = load_batch_to_torch_three(True)
         result = neural_net.forward(loaded_s)
         loaded_rewards = loaded_rewards.unsqueeze(1)
         test_loss = l1_loss(result, loaded_rewards)
@@ -246,7 +236,7 @@ def train_the_net(current_epoch, training_steps):
     print(backup_graph_name)
 
     for i in range(0, training_steps):
-        loaded_s, loaded_rewards = load_batch_to_torch(False)
+        loaded_s, loaded_rewards = load_batch_to_torch_three(False)
         result = neural_net.forward(loaded_s)
         loaded_rewards = loaded_rewards.unsqueeze(1)
         # TODO investigate different error functions

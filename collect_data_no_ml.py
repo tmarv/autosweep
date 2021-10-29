@@ -14,9 +14,9 @@ from src import tools
 #  Global variables
 NUM_ACTIONS = 64  # size of an 8 by 8 minefield
 
-pos_location, neg_location = tools.get_save_location()
+pos_location, neg_location = tools.get_save_location_three()
 
-# TODO check why action is in state
+# no need for a gpu if it is an purely random play
 device = torch.device("cpu")
 
 # start minesweeper program
@@ -73,8 +73,8 @@ def play_the_game(how_many, is_test_set=False):
                 new_state = dg.get_state_from_screen()
                 if dg.get_status():
                     # print('hit mine')
-                    sub_state = tools.grab_sub_state(state, ii + 1, jj + 1)
-                    tools.save_action_neg(-10, sub_state, is_test_set)
+                    sub_state = tools.grab_sub_state_three(state, ii + 1, jj + 1)
+                    tools.save_action_neg_three(-10, sub_state, is_test_set)
                     # print(sub_state)
                     tools.move_and_click(1490, 900)
                     counter += 1
@@ -82,18 +82,16 @@ def play_the_game(how_many, is_test_set=False):
 
                 # compute reward
                 reward, has_won = reward_manager.compute_reward(state, new_state)
-                sub_state = tools.grab_sub_state(state, ii + 1, jj + 1)
-                # print("reward " + str(reward))
-                # print(sub_state)
+                sub_state = tools.grab_sub_state_three(state, ii + 1, jj + 1)
                 if not has_won:
                     # print("no win")
                     # save data from transition
                     if reward > 0:
-                        tools.save_action(reward, sub_state, is_test_set)
+                        tools.save_action_three(reward, sub_state, is_test_set)
                         # print("reward is positive")
 
                     elif reward <= 0:
-                        tools.save_action_neg(reward, sub_state, is_test_set)
+                        tools.save_action_neg_three(reward, sub_state, is_test_set)
                         # print("reward is negative")
 
                     state = new_state
@@ -103,7 +101,7 @@ def play_the_game(how_many, is_test_set=False):
 
                 if has_won:
                     # print("has won")
-                    tools.save_action(10, sub_state, is_test_set)
+                    tools.save_action_three(10, sub_state, is_test_set)
                     tools.move_and_click(1490, 900)
                     tools.move_and_click(739, 320)
                     gui.click()

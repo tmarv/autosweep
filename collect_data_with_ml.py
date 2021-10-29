@@ -20,7 +20,7 @@ from src import tools
 
 NUM_ACTIONS = 64  # size of an 8 by 8 minefield
 
-pos_location, neg_location = tools.get_save_location()
+pos_location, neg_location = tools.get_save_location_three()
 
 # TODO check why action is in state
 device = torch.device("cpu")
@@ -117,12 +117,14 @@ def play_the_game(how_many, epoch, steps, is_test_set=False, random_percent=0.0)
                 # if hit a mine
                 sleep(0.5)
                 new_state = dg.get_state_from_screen()
+                sub_state_three = tools.grab_sub_state_three(state, action[k][1] + 1, action[k][0] + 1)
+                sub_state_five = tools.grab_sub_state_five(state, action[k][1] + 2, action[k][0] + 2)
                 if dg.get_status():
                     print('hit mine')
-                    # TODO check indices
-                    sub_state = tools.grab_sub_state(state, action[k][1] + 1, action[k][0] + 1)
-                    tools.save_action_neg(-10, sub_state, is_test_set)
-                    print(sub_state)
+                    tools.save_action_neg_three(-10, sub_state_three, is_test_set)
+                    tools.save_action_neg_five(-10, sub_state_five, is_test_set)
+                    print(sub_state_three)
+                    print(sub_state_five)
                     tools.move_and_click(1490, 900)
                     counter += 1
                     print("DEBUG 1")
@@ -131,14 +133,15 @@ def play_the_game(how_many, epoch, steps, is_test_set=False, random_percent=0.0)
 
                 # compute reward
                 reward, has_won = reward_manager.compute_reward(state, new_state)
-                sub_state = tools.grab_sub_state(state, action[k][1] + 1, action[k][0] + 1)
+                # sub_state = tools.grab_sub_state_three(state, action[k][1] + 1, action[k][0] + 1)
                 # print("reward " + str(reward))
                 # print(sub_state)
                 if not has_won:
                     # print("no win")
                     # save data from transition
                     if reward > 0:
-                        tools.save_action(reward, sub_state, is_test_set)
+                        tools.save_action_three(reward, sub_state_three, is_test_set)
+                        tools.save_action_five(reward, sub_state_five, is_test_set)
                         print("this is reward " + str(reward))
                         state = new_state
                         state = min_int.mark_game(state)
@@ -146,19 +149,18 @@ def play_the_game(how_many, epoch, steps, is_test_set=False, random_percent=0.0)
 
                     elif reward <= 0:
                         print("this is reward " + str(reward))
-                        tools.save_action_neg(reward, sub_state, is_test_set)
+                        tools.save_action_neg_three(reward, sub_state_three, is_test_set)
+                        tools.save_action_neg_five(reward, sub_state_five, is_test_set)
 
                     state = new_state
                     state = min_int.mark_game(state)
                     counter += 1
-                    # print(reward)
-                    # print("DEBUG 2")
                     continue
 
                 if has_won:
                     print("has won collect data with ml")
-
-                    tools.save_action(10, sub_state, is_test_set)
+                    tools.save_action_three(10, sub_state_three, is_test_set)
+                    tools.save_action_five(10, sub_state_five, is_test_set)
                     tools.move_and_click(1490, 900)
                     # tools.move_and_click(739, 320)
                     # gui.click()

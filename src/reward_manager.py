@@ -29,8 +29,16 @@ def compute_reward(before, after):
 
     if not has_acted:
         total_sum = 0.0
-    #print("this is total sum: "+str(total_sum))
-    #print("this is before :"+str(before))
-    #print("this is after :"+str(after))
+    # print("this is total sum: "+str(total_sum))
+    # print("this is before :"+str(before))
+    # print("this is after :"+str(after))
     #  if no ten is present this means the board has been cleared and the game has been won :)
     return total_sum, has_no_ten
+
+
+def reward_shaper_pos_three(sub_state):
+    return 1.0
+
+
+def reward_shaper_neg_three(sub_state):
+    return -1.0
