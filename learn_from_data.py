@@ -226,6 +226,7 @@ def load_batch_to_torch_three(is_test):
 
 
 def evaluate_the_net(current_epoch, evaluation_steps):
+    neural_net.eval()
     test_losses = []
     backup_graph_name = os.path.abspath(os.path.join(tools.get_working_dir(), '../training_plots/test_result_'
                                                      + str(current_epoch) + '_' + str(evaluation_steps) + '.png'))

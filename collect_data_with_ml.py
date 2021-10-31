@@ -38,7 +38,7 @@ total_reward = 0.0
 reward_counter = 0
 
 
-def select_action(neural_net, state):
+def select_action_three(neural_net, state):
     state = tools.extend_state(state)
     # print("state")
     # print(state)
@@ -76,14 +76,14 @@ def select_action(neural_net, state):
     return return_values
 
 
-def play_the_game(how_many, epoch, steps, is_test_set=False, random_percent=0.0):
+def play_the_game_and_collect(how_many, epoch, steps, is_test_set=False, random_percent=0.0):
     net_name = os.path.abspath(
         os.path.join(tools.get_working_dir(), '../saved_nets/neural_net_' + str(epoch) + '_' + str(
             steps)))
     print("path: " + str(net_name))
     neural_net = neural_net_lib.ThreeByThreeSig()
     neural_net.load_state_dict(torch.load(net_name))
-
+    neural_net.eval()
     i_episode = 0
     while i_episode < how_many:
         # for i_episode in range(how_many):
@@ -99,7 +99,7 @@ def play_the_game(how_many, epoch, steps, is_test_set=False, random_percent=0.0)
         counter = 0
         has_won = False
         while not dg.get_status() and counter < 1000:
-            action = select_action(neural_net, state)
+            action = select_action_three(neural_net, state)
             # print(action)
             counter += 1
             for k in range(0, 64):

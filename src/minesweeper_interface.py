@@ -10,6 +10,7 @@ width_extra = 123
 height_extra = 123
 
 # TODO check this on the proper distro
+# warning this is not maintained, use 20.04 is best
 '''
 #ubuntu 18.04
 start_x = 478
