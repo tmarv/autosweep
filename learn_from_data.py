@@ -79,15 +79,6 @@ def get_training_set_pos_three():
     elif reward > 0.5 and original.sum() == (4 * 10 - 5):
         reward = 0.25
 
-        #print("this is reward 1: " + str(reward))
-    '''
-    elif reward == 1:
-        reward = 2.0
-        #print("this is reward 2: " + str(reward))
-    '''
-    #print("this is reward 3: " + str(reward))
-    #exit()
-
     rot1 = tools.rotate_by_90(original)
     rot2 = tools.rotate_by_90(rot1)
     rot3 = tools.rotate_by_90(rot2)
@@ -183,6 +174,36 @@ def get_random_set_three(is_test):
             return get_training_set_neg_three()
 
 
+def get_test_set_pos_five():
+    return 0
+
+
+def get_training_set_pos_five():
+    return 0
+
+
+def get_test_set_neg_five():
+    return 0
+
+
+def get_training_set_neg_five():
+    return 0
+
+
+def get_random_set_five(is_test):
+    toggle = random.random()
+    if toggle > 0.4:
+        if is_test:
+            return get_test_set_pos_five()
+        else:
+            return get_training_set_pos_five()
+    else:
+        if is_test:
+            return get_test_set_neg_five()
+        else:
+            return get_training_set_neg_five()
+
+
 def load_batch_to_torch_three(is_test):
     states = []
     reward = []
@@ -234,17 +255,18 @@ def train_the_net(current_epoch, training_steps):
     backup_graph_name = os.path.abspath(os.path.join(tools.get_working_dir(), '../training_plots/train_result_'
                                                      + str(current_epoch) + '_' + str(training_steps) + '.png'))
     print(backup_graph_name)
-
+    neural_net.train()
     for i in range(0, training_steps):
         loaded_s, loaded_rewards = load_batch_to_torch_three(False)
         result = neural_net.forward(loaded_s)
         loaded_rewards = loaded_rewards.unsqueeze(1)
         # TODO investigate different error functions
         # loss = F.smooth_l1_loss(result, loaded_rwds)
-        optimizer.zero_grad()
+
         train_loss = l1_loss(result, loaded_rewards)
         # print("this is train loss")
         # print(train_loss)
+        optimizer.zero_grad()
         train_loss.backward()
         optimizer.step()
         train_losses.append(train_loss)

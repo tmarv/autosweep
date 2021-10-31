@@ -36,9 +36,17 @@ def compute_reward(before, after):
     return total_sum, has_no_ten
 
 
-def reward_shaper_pos_three(sub_state):
+def reward_shaper_pos_three(sub_state, grid):
     return 1.0
 
 
-def reward_shaper_neg_three(sub_state):
+def reward_shaper_neg_three(sub_state, grid):
+    return -1.0
+
+
+def reward_shaper_pos_five(sub_state, grid):
+    return 1.0
+
+
+def reward_shaper_neg_five(sub_state, grid):
     return -1.0

@@ -18,6 +18,11 @@ check how this is done
 '''
 
 '''
+model.eval()
+model.train()
+'''
+
+'''
 learn_from_data.train_the_net(4, 5005)
 learn_from_data.evaluate_the_net(4, 5005)
 
@@ -110,5 +115,6 @@ print("B")
 '''
 #learn_from_data.train_the_net(5, 800)
 # collect_data_with_ml.play_the_game(2, 5, 800, False)
-# learn_from_data.train_the_net(5, 1000)
-collect_data_with_ml.play_the_game(3, 5, 1000, False, 0.1)
+# learn_from_data.train_the_net(5, 100)
+collect_data_with_ml.play_the_game(30, 5, 1000, False, 0.2)
+collect_data_with_ml.play_the_game(8, 5, 1000, True, 0.2)

@@ -115,6 +115,7 @@ def get_save_location_five():
 def get_save_test_location_five():
     return _pos_location_test_five, _neg_location_test_five
 
+
 def start_minesweeper_game():
     # start minesweeper program
     move_and_click(33, 763)
