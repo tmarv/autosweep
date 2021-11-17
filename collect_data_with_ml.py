@@ -23,8 +23,7 @@ NUM_ACTIONS = 64  # size of an 8 by 8 minefield
 pos_location, neg_location = tools.get_save_location_three()
 
 # TODO check why action is in state
-device = torch.device("cpu")
-
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # start minesweeper program
 tools.move_and_click(33, 763)
 # can be slow

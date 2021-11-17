@@ -14,23 +14,26 @@ print("this is number "+str(number))
 print("this is array_n "+str(array_n))
 print(ttensor)
 '''
-print("test 1")
 pos_location, neg_location = tools.get_save_location_three()
 src.tools.get_save_location_three()
-params = {'batch_size': 1,
+params = {'batch_size': 128,
           'shuffle': True,
-          'num_workers': 1}
+          'num_workers': 0}
 custom_set = custom_data_loader.CustomDataset(src.tools.get_save_location_three()[0],
                                               src.tools.get_save_location_three()[1])
 train_loader = DataLoader(custom_set, **params)
-print("test 2")
 
 print("started ")
 for i, data in enumerate(train_loader, 0):
-    print("hello 1")
-    inputs, labels = data
+    # print("------ " +str(i)+" fff")
+    # print(len(data))
+    inputs, rewards = data
+    # make sure it is the same length as batch size
+    print(len(inputs))
+    # print(inputs)
+    # print(rewards)
 
-exit()
+#exit()
 
 
 '''

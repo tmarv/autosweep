@@ -13,9 +13,9 @@ class ThreeByThreeSig(nn.Module):
         self.active1 = nn.ReLU()
         self.layer2 = nn.Linear(512, 512)
         self.active2 = nn.ReLU()
-        self.layer3 = nn.Linear(512, 64)
+        self.layer3 = nn.Linear(512, 128)
         self.active3 = nn.ReLU()
-        self.layer4 = nn.Linear(64, 1)
+        self.layer4 = nn.Linear(128, 1)
 
     def forward(self, x):
         x = torch.flatten(x, 1)
