@@ -50,6 +50,11 @@ def grab_sub_state_noext(state, i, j):
     return sub_state
 
 
+def grab_sub_state_noext_five(state, i, j):
+    sub_state = state[[i - 2, i - 1, i, i +1, i + 2], :][:, [j - 2, j-1, j, j + 1, j + 2]]
+    return sub_state
+
+
 def move_and_click(w, h):
     pyautogui.moveTo(w, h)
     pyautogui.click()

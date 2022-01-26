@@ -10,6 +10,7 @@ from src import custom_data_loader, tools, neural_net_lib
 import torch.optim as optim
 import torch.nn as nn
 
+import os
 # how to use batch size?
 '''
 # this works
@@ -37,7 +38,7 @@ params_five = {'batch_size': 32,
                'shuffle': True,
                'num_workers': 0}
 
-custom_set_five = custom_data_loader.CustomDataset(src.tools.get_save_location_five()[0],
+custom_set_five = custom_data_loader.CustomDatasetFive(src.tools.get_save_location_five()[0],
                                                    src.tools.get_save_location_five()[1])
 train_loader_five = DataLoader(custom_set_five, **params_three)
 
@@ -47,7 +48,7 @@ neural_net_three = neural_net_lib.ThreeByThreeSig().to(device)
 optimizer_three = optim.Adam(neural_net_three.parameters(), lr=0.0005)
 
 neural_net_five = neural_net_lib.FiveByFiveSig().to(device)
-optimizer_five = optim.Adam(neural_net_five.parameters(), lr=0.0007)
+optimizer_five = optim.Adam(neural_net_five.parameters(), lr=0.0003)
 
 l1_loss = nn.SmoothL1Loss()
 
@@ -82,9 +83,13 @@ for e in range(1):
         optimizer_five.step()
         train_losses_five.append(train_loss)
 
+
+backup_net_name = os.path.abspath(
+        os.path.join(tools.get_working_dir(), "../saved_nets/neural_net_five_test"))
+
+torch.save(neural_net_five.state_dict(), backup_net_name)
 train_losses_three = np.array(train_losses_three)
 plt.plot(train_losses_three)
 plt.plot(np.array(train_losses_five))
-#plt.legend()
 
 plt.show()

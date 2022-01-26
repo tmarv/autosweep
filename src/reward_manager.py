@@ -53,16 +53,33 @@ def reward_shaper_neg_three(reward, grid):
     elif grid[1, 1] == 0:
         reward = -10.0
     elif reward == -10:
-        reward = -200.0
+        reward = -20.0
     elif reward == 0:
         reward = -0.15
 
     return reward
 
 
-def reward_shaper_pos_five(sub_state, grid):
-    return 1.0
+def reward_shaper_pos_five(reward, grid):
+    if reward > 0.5 and grid.sum() == 25*10:
+        reward = 0.25
+    '''    
+    elif reward > 0.5 and grid.sum() == 6 * 10 - 3:
+        reward = 0.25
+    elif reward > 0.5 and grid.sum() == (4 * 10 - 5):
+        reward = 0.25
+    '''
+    return reward
 
 
-def reward_shaper_neg_five(sub_state, grid):
-    return -1.0
+def reward_shaper_neg_five(reward, grid):
+    if grid[2, 2] == 90:
+        reward = -12.0
+    elif grid[2, 2] == 0:
+        reward = -12.0
+    elif reward == -10:
+        reward = -20.0
+    elif reward == 0:
+        reward = -0.15
+
+    return reward
