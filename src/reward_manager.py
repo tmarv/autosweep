@@ -22,7 +22,7 @@ def compute_reward(before, after):
                 is_only_ten = False
             if after[i, j] == before[i, j]:
                 continue
-            if before[i, j] == 10 and after[i, j] < 10:
+            if before[i, j] == 10 and (after[i, j] < 10 or after[i, j] == 90):
                 total_sum += 1
                 has_acted = True
                 continue

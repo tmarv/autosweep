@@ -23,8 +23,8 @@ def extend_state(state):
 def extend_state_five(state):
     extended_five = -1 * np.ones((12, 12))
     extended_five[2:10, 2:10] = state
-    print("this is inside tools")
-    print(extended_five)
+    # print("this is inside tools")
+    # print(extended_five)
     return extended_five
 
 
@@ -55,10 +55,12 @@ def grab_sub_state_noext_five(state, i, j):
     return sub_state
 
 
-def move_and_click(w, h):
+### todo remove duplicate
+def move_to(w, h):
     pyautogui.moveTo(w, h)
-    pyautogui.click()
+    #pyautogui.click()
     sleep(0.02)
+
 
 
 def save_action_three(reward, before, is_test_set):

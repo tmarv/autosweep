@@ -4,12 +4,15 @@
 import collect_data_no_ml
 import collect_data_with_ml
 import learn_from_data
+import play
 
 # play and collect some data without any intelligence
 # learn_from_data.train_the_net(4, 500)
 # learn_from_data.evaluate_the_net(4, 500)
 # collect_data_with_ml.play_the_game(2, 4, 500, False)
 # collect_data_with_ml.play_the_game(10, 4, 5005, True)
+
+play.play_with_nets(1, 3)
 
 '''
 Dr Malinovic
@@ -118,7 +121,7 @@ print("B")
 #collect_data_no_ml.play_the_game(40, False)
 #collect_data_no_ml.play_the_game(8, True)
 #learn_from_data.train_the_net(5, 1000)
-collect_data_with_ml.play_the_game_and_collect(2, 5, 1000, False)
+#collect_data_with_ml.play_the_game_and_collect(2, 5, 1000, False)
 #collect_data_with_ml.play_the_game_and_collect(30, 5, 1000, False, 0.0)
 #collect_data_with_ml.play_the_game_and_collect(8, 5, 1000, True, 0.0)
 #collect_data_with_ml.play_the_game(8, 5, 1000, True, 0.2)

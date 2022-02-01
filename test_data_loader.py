@@ -69,7 +69,7 @@ for e in range(1):
         optimizer_three.step()
         train_losses_three.append(train_loss)
 
-for e in range(1):
+for e in range(3):
     for i, data in enumerate(train_loader_five):
         inputs, rewards = data
         # make sure it is the same length as batch size
@@ -85,7 +85,7 @@ for e in range(1):
 
 
 backup_net_name = os.path.abspath(
-        os.path.join(tools.get_working_dir(), "../saved_nets/neural_net_five_test"))
+        os.path.join(tools.get_working_dir(), "../saved_nets/neural_net_five_test_3"))
 
 torch.save(neural_net_five.state_dict(), backup_net_name)
 train_losses_three = np.array(train_losses_three)
