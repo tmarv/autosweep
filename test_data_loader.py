@@ -60,8 +60,8 @@ for e in range(1):
         inputs, rewards = data
         # make sure it is the same length as batch size
         input_len = len(inputs)
-        inputs = inputs.reshape([input_len * 4, 3, 3])
-        rewards = rewards.reshape([input_len * 4, 1])
+        inputs = inputs.reshape([input_len * 4, 3, 3]).to(device)
+        rewards = rewards.reshape([input_len * 4, 1]).to(device)
         result = neural_net_three.forward(inputs)
         train_loss = l1_loss(result, rewards)
         optimizer_three.zero_grad()
@@ -74,8 +74,8 @@ for e in range(3):
         inputs, rewards = data
         # make sure it is the same length as batch size
         input_len = len(inputs)
-        inputs = inputs.reshape([input_len * 4, 5, 5])
-        rewards = rewards.reshape([input_len * 4, 1])
+        inputs = inputs.reshape([input_len * 4, 5, 5]).to(device)
+        rewards = rewards.reshape([input_len * 4, 1]).to(device)
         result = neural_net_five.forward(inputs)
         train_loss = l1_loss(result, rewards)
         optimizer_five.zero_grad()
