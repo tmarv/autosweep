@@ -5,6 +5,7 @@ import collect_data_no_ml
 import collect_data_with_ml
 import learn_from_data
 import play
+#import test_data_loader
 
 # play and collect some data without any intelligence
 # learn_from_data.train_the_net(4, 500)
@@ -12,7 +13,11 @@ import play
 # collect_data_with_ml.play_the_game(2, 4, 500, False)
 # collect_data_with_ml.play_the_game(10, 4, 5005, True)
 
-play.play_with_nets(1, 3)
+play.play_with_nets(50, 3)
+#collect_data_no_ml.play_the_game(1, False)
+#collect_data_no_ml.play_the_game(1, True)
+
+#test_data_loader
 
 '''
 Dr Malinovic

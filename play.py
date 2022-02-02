@@ -27,7 +27,58 @@ def play_with_three(how_many, epoch, steps):
         i_episode += 1
 
 def select_action_fused(neural_net_three, neural_net_five, state):
-    return 0
+    state_five = tools.extend_state_five(state)
+    state_three = tools.extend_state_three(state)
+    score_board_three = np.zeros((8, 8))
+    score_board_five = np.zeros((8, 8))
+    score_board = np.zeros((8, 8))
+
+    for i in range(1, 9):
+        for j in range(1, 9):
+            # todo adapt this
+            local_cpy = tools.grab_sub_state_noext_three(state_three, j, i)
+            local_tensor = torch.from_numpy(local_cpy).to(dtype=torch.float)
+            local_tensor = local_tensor.unsqueeze(0)
+            score_board_three[i - 1, j - 1] = neural_net.forward(local_tensor)
+
+    for i in range(2, 10):
+        for j in range(2, 10):
+            # todo adapt this
+            local_cpy = tools.grab_sub_state_noext_five(state_five, j, i)
+            local_tensor = torch.from_numpy(local_cpy).to(dtype=torch.float)
+            local_tensor = local_tensor.unsqueeze(0)
+            score_board_five[i - 2, j - 2] = neural_net.forward(local_tensor)
+    # fuse results
+    for i in range(0, 8):
+        for j in range(0,8):
+            score_board[i,j] = score_board_three[i, j] + score_board_five[i, j]
+
+    return prepare_return_values(score_board)
+
+
+def prepare_return_values(score_board):
+    flat = score_board.flatten()
+    flat.sort()
+    flat = np.flipud(flat)
+    return_values = []
+    total_len = len(flat)
+    i = 0
+    while i < total_len:
+        # print("this is i at start: "+str(i))
+        local_range = np.where(score_board == flat[i])
+        # print("this is local range: "+str(local_range))
+        local_sz = len(local_range[0])
+        for j in range(0, local_sz):
+            return_values.append([local_range[0][j], local_range[1][j]])
+            # print("str: "+str([local_range[0][j], local_range[1][j]]))
+            i = i + 1
+            # print("this is i after: " + str(i))
+    if len(return_values) != 64:
+        print("Catastrophic error: return values size is off " + str(len(return_values)))
+        exit()
+    # print("this is size:    "+str(len(return_values)))
+    return return_values
+
 
 
 def select_action_five(neural_net, state):

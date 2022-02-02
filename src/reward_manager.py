@@ -69,6 +69,8 @@ def reward_shaper_pos_five(reward, grid):
     elif reward > 0.5 and grid.sum() == (4 * 10 - 5):
         reward = 0.25
     '''
+    if reward>5:
+        reward = 2
     return reward
 
 
