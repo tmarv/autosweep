@@ -55,15 +55,33 @@ def grab_sub_state_noext_five(state, i, j):
     return sub_state
 
 
-### todo remove duplicate
+### Todo remove duplicate
 def move_to(w, h):
     pyautogui.moveTo(w, h)
     #pyautogui.click()
     sleep(0.02)
 
+def save_action_text_three(reward, before):
+    # turn the grid into a csv
+    list = before.flatten().tolist()
+    list = ','.join(str(v) for v in list)
+    _rewards3_text_file.write(list)
+    _rewards3_text_file.write(','+str(reward))
+    _rewards3_text_file.write('\n')
+
+
+def save_action_text_five(reward, before):
+    # turn the grid into a csv
+    list = before.flatten().tolist()
+    list = ','.join(str(v) for v in list)
+    _rewards5_text_file.write(list)
+    _rewards5_text_file.write(','+str(reward))
+    _rewards5_text_file.write('\n')
 
 
 def save_action_three(reward, before, is_test_set):
+    save_action_text_three(reward, before)
+    '''
     hashname = str(uuid.uuid4().hex)
     filename = os.path.join(_pos_location_three, hashname)
     if is_test_set:
@@ -72,9 +90,11 @@ def save_action_three(reward, before, is_test_set):
     np.save(filename_bef, before)
     filename_reward = filename + "_reward.npy"
     np.save(filename_reward, reward)
-
+    '''
 
 def save_action_five(reward, before, is_test_set):
+    save_action_text_five(reward, before)
+    '''
     hashname = str(uuid.uuid4().hex)
     filename = os.path.join(_pos_location_five, hashname)
     if is_test_set:
@@ -83,9 +103,11 @@ def save_action_five(reward, before, is_test_set):
     np.save(filename_bef, before)
     filename_reward = filename + "_reward.npy"
     np.save(filename_reward, reward)
-
+    '''
 
 def save_action_neg_three(reward, before, is_test_set):
+    save_action_text_three(reward, before)
+    '''
     hashname = str(uuid.uuid4().hex)
     filename = os.path.join(_neg_location_three, hashname)
     if is_test_set:
@@ -94,9 +116,11 @@ def save_action_neg_three(reward, before, is_test_set):
     np.save(filename_bef, before)
     filename_reward = filename + "_reward.npy"
     np.save(filename_reward, reward)
-
+    '''
 
 def save_action_neg_five(reward, before, is_test_set):
+    save_action_text_five(reward, before)
+    '''
     hashname = str(uuid.uuid4().hex)
     filename = os.path.join(_neg_location_five, hashname)
     if is_test_set:
@@ -105,7 +129,7 @@ def save_action_neg_five(reward, before, is_test_set):
     np.save(filename_bef, before)
     filename_reward = filename + "_reward.npy"
     np.save(filename_reward, reward)
-
+    '''
 
 def get_save_location_three():
     return _pos_location_three, _neg_location_three
@@ -138,6 +162,10 @@ def get_working_dir():
     return dir_path
 
 
+def get_text_file_names():
+    return [_data_pts_3_filename, _data_pts_5_filename]
+
+
 real_path = os.path.realpath(__file__)
 dir_path = os.path.dirname(real_path)
 
@@ -151,3 +179,13 @@ _pos_location_five = os.path.join(dir_path, "../collected_data/positive_reward_5
 _neg_location_five = os.path.join(dir_path, "../collected_data/negative_reward_5")
 _neg_location_test_five = os.path.join(dir_path, "../collected_data/test_negative_reward_5")
 _pos_location_test_five = os.path.join(dir_path, "../collected_data/test_positive_reward_5")
+
+_data_pts_3_filename = os.path.join(dir_path, "../collected_data/rewards3.txt")
+_data_pts_5_filename = os.path.join(dir_path, "../collected_data/rewards5.txt")
+_rewards3_text_file = open(_data_pts_3_filename, 'a')
+_rewards5_text_file = open(_data_pts_5_filename, 'a')
+
+
+def __del__(self):
+    _rewards3_text_file.close()
+    _rewards5_text_file.close()
