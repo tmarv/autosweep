@@ -114,11 +114,14 @@ def get_state_from_screen():
     unknown_counter = 0
     screen_shot = pyscreenshot.grab(bbox=(0, 0, 1920, 1080))
     numpy_image = cv2.cvtColor(np.array(screen_shot), cv2.COLOR_RGB2BGR)
+    #cv2.imshow("numpy_image", numpy_image)
+    #cv2.imwrite("backup40.png", numpy_image)
+    #cv2.waitKey()
+    #exit()
     smaller_size = (960, 540)
     resized = cv2.resize(numpy_image, smaller_size, interpolation=cv2.INTER_AREA)
     img = resized[47:533, 213:699]
-    # cv2.imshow("img",img)
-    # cv2.waitKey()
+
     for i in range(0, 8):
         for j in range(0, 8):
             x1 = i * (tile_dx + delta_px)

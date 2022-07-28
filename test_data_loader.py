@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# Tim Marvel
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
@@ -5,7 +7,7 @@ from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 
 import src.tools
-from src import custom_data_loader, tools, neural_net_lib
+from src import custom_data_loader_text, tools, neural_net_lib
 
 import torch.optim as optim
 import torch.nn as nn
@@ -30,16 +32,14 @@ params_three = {'batch_size': 32,
                 'shuffle': True,
                 'num_workers': 0}
 
-custom_set_three = custom_data_loader.CustomDataset(src.tools.get_save_location_three()[0],
-                                                    src.tools.get_save_location_three()[1])
+custom_set_three = custom_data_loader_text.CustomDatasetFromTextFiles3()
 train_loader_three = DataLoader(custom_set_three, **params_three)
 
 params_five = {'batch_size': 32,
                'shuffle': True,
                'num_workers': 0}
 
-custom_set_five = custom_data_loader.CustomDatasetFive(src.tools.get_save_location_five()[0],
-                                                   src.tools.get_save_location_five()[1])
+custom_set_five = custom_data_loader_text.CustomDatasetFromTextFiles5()
 train_loader_five = DataLoader(custom_set_five, **params_three)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -55,13 +55,13 @@ l1_loss = nn.SmoothL1Loss()
 train_losses_three = []
 train_losses_five = []
 
-for e in range(1):
+for e in range(2):
     for i, data in enumerate(train_loader_three):
         inputs, rewards = data
         # make sure it is the same length as batch size
         input_len = len(inputs)
-        inputs = inputs.reshape([input_len * 4, 3, 3]).to(device)
-        rewards = rewards.reshape([input_len * 4, 1]).to(device)
+        inputs = inputs.reshape([input_len, 3, 3]).to(device)
+        rewards = rewards.reshape([input_len, 1]).to(device)
         result = neural_net_three.forward(inputs)
         train_loss = l1_loss(result, rewards)
         optimizer_three.zero_grad()
@@ -69,13 +69,13 @@ for e in range(1):
         optimizer_three.step()
         train_losses_three.append(train_loss)
 
-for e in range(3):
+for e in range(2):
     for i, data in enumerate(train_loader_five):
         inputs, rewards = data
         # make sure it is the same length as batch size
         input_len = len(inputs)
-        inputs = inputs.reshape([input_len * 4, 5, 5]).to(device)
-        rewards = rewards.reshape([input_len * 4, 1]).to(device)
+        inputs = inputs.reshape([input_len, 5, 5]).to(device)
+        rewards = rewards.reshape([input_len, 1]).to(device)
         result = neural_net_five.forward(inputs)
         train_loss = l1_loss(result, rewards)
         optimizer_five.zero_grad()
@@ -85,7 +85,7 @@ for e in range(3):
 
 
 backup_net_name = os.path.abspath(
-        os.path.join(tools.get_working_dir(), "../saved_nets/neural_net_five_test_3"))
+        os.path.join(tools.get_working_dir(), "../saved_nets/neural_net_five_test_five"))
 
 torch.save(neural_net_five.state_dict(), backup_net_name)
 train_losses_three = np.array(train_losses_three)
