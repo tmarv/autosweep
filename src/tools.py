@@ -14,7 +14,6 @@ def move_and_click(w, h):
 
 
 def extend_state(state):
-    # print("called extend state ")
     extended = -1 * np.ones((10, 10))
     extended[1:9, 1:9] = state
     return extended
@@ -23,8 +22,6 @@ def extend_state(state):
 def extend_state_five(state):
     extended_five = -1 * np.ones((12, 12))
     extended_five[2:10, 2:10] = state
-    # print("this is inside tools")
-    # print(extended_five)
     return extended_five
 
 
@@ -58,7 +55,6 @@ def grab_sub_state_noext_five(state, i, j):
 ### Todo remove duplicate
 def move_to(w, h):
     pyautogui.moveTo(w, h)
-    #pyautogui.click()
     sleep(0.02)
 
 def save_action_text_three(reward, before):
@@ -166,6 +162,10 @@ def get_text_file_names():
     return [_data_pts_3_filename, _data_pts_5_filename]
 
 
+def get_text_file_names_small():
+    return [_data_pts_3_filename_small, _data_pts_5_filename_small]
+
+
 real_path = os.path.realpath(__file__)
 dir_path = os.path.dirname(real_path)
 
@@ -180,7 +180,9 @@ _neg_location_five = os.path.join(dir_path, "../collected_data/negative_reward_5
 _neg_location_test_five = os.path.join(dir_path, "../collected_data/test_negative_reward_5")
 _pos_location_test_five = os.path.join(dir_path, "../collected_data/test_positive_reward_5")
 
+_data_pts_3_filename_small = os.path.join(dir_path, "../collected_data/rewards3_short.txt")
 _data_pts_3_filename = os.path.join(dir_path, "../collected_data/rewards3.txt")
+_data_pts_5_filename_small = os.path.join(dir_path, "../collected_data/rewards5_short.txt")
 _data_pts_5_filename = os.path.join(dir_path, "../collected_data/rewards5.txt")
 _rewards3_text_file = open(_data_pts_3_filename, 'a')
 _rewards5_text_file = open(_data_pts_5_filename, 'a')
