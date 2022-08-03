@@ -163,7 +163,13 @@ def get_text_file_names():
 
 
 def get_text_file_names_small():
-    return [_data_pts_3_filename_small, _data_pts_5_filename_small]
+    # just to try it out
+    return [_data_pts_3_filename_var, _data_pts_5_filename_small]
+    #return [_data_pts_3_filename_small, _data_pts_5_filename_small]
+
+
+def get_text_file_names_var():
+    return [_data_pts_3_filename_var, _data_pts_5_filename_var]
 
 
 real_path = os.path.realpath(__file__)
@@ -182,12 +188,16 @@ _pos_location_test_five = os.path.join(dir_path, "../collected_data/test_positiv
 
 _data_pts_3_filename_small = os.path.join(dir_path, "../collected_data/rewards3_short.txt")
 _data_pts_3_filename = os.path.join(dir_path, "../collected_data/rewards3.txt")
+_data_pts_3_filename_var = os.path.join(dir_path, "../collected_data/rewards3_var.txt")
+
 _data_pts_5_filename_small = os.path.join(dir_path, "../collected_data/rewards5_short.txt")
 _data_pts_5_filename = os.path.join(dir_path, "../collected_data/rewards5.txt")
+_data_pts_5_filename_var = os.path.join(dir_path, "../collected_data/rewards3_var.txt")
+
+
 _rewards3_text_file = open(_data_pts_3_filename, 'a')
 _rewards5_text_file = open(_data_pts_5_filename, 'a')
 
-
 def __del__(self):
     _rewards3_text_file.close()
-    _rewards5_text_file.close()
+    _rewards5_text_file_with_var.close()
