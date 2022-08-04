@@ -3,7 +3,7 @@
 
 import collect_data_no_ml
 import collect_data_with_ml
-import learn_from_data
+#import learn_from_data
 import play
 #import test_data_loader
 
@@ -13,9 +13,9 @@ import play
 # collect_data_with_ml.play_the_game(2, 4, 500, False)
 # collect_data_with_ml.play_the_game(10, 4, 5005, True)
 
-play.play_with_nets(5, 3)
-#collect_data_no_ml.play_the_game(1, False)
-#collect_data_no_ml.play_the_game(1, True)
+#collect_data_no_ml.play_the_game(3, False)
+#play.play_with_nets(3, 3)
+#collect_data_no_ml.play_the_game(3, True)
 
 #test_data_loader
 

@@ -63,7 +63,7 @@ def reward_shaper_neg_three(reward, grid):
 def reward_shaper_pos_five(reward, grid):
     if reward > 0.5 and grid.sum() == 25*10:
         reward = 0.25
-    '''    
+    '''
     elif reward > 0.5 and grid.sum() == 6 * 10 - 3:
         reward = 0.25
     elif reward > 0.5 and grid.sum() == (4 * 10 - 5):
@@ -85,3 +85,15 @@ def reward_shaper_neg_five(reward, grid):
         reward = -0.15
 
     return reward
+
+
+def reward_shaper_three(rewards, grids):
+    for i in len(rewards):
+        reward=rewards[i]
+        grid<=grids[i]
+        if reward <= 0:
+            rewards[i]=reward_shaper_neg_three(reward, grid)
+        else:
+            rewards[i]=reward_shaper_pos_three(reward, grid)
+
+    return rewards

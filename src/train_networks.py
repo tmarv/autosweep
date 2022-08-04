@@ -36,10 +36,13 @@ class trainThreeByThree():
         for e in range(iterations):
             for i, data in enumerate(self.data_loader):
                 inputs, rewards = data
+                #print(rewards)
+                #print(inputs)
                 # reward shaping
-                # rewards =
                 input_len = len(inputs)
-                inputs = inputs.reshape([input_len, 3, 3]).to(self.device)
+                inputs = inputs.reshape([input_len, 3, 3])
+                rewards = reward_manager.reward_shaper_three(rewards,inputs)
+                inputs = inputs.to(self.device)
                 rewards = rewards.reshape([input_len, 1]).to(self.device)
                 result = self.neural_net.forward(inputs)
                 train_loss = self.lossfunction(result, rewards)
