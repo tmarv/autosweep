@@ -15,15 +15,13 @@ from src import minesweeper_interface as min_int
 from src import neural_net_lib
 from src import tools
 
-#  Global variables
-
-
 NUM_ACTIONS = 64  # size of an 8 by 8 minefield
 
 pos_location, neg_location = tools.get_save_location_three()
 
 # TODO check why action is in state
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = tools.get_device()
 # start minesweeper program
 tools.move_and_click(33, 763)
 # can be slow
@@ -116,14 +114,16 @@ def play_the_game_and_collect(how_many, epoch, steps, is_test_set=False, random_
         os.path.join(tools.get_working_dir(), '../saved_nets/neural_net_' + str(epoch) + '_' + str(
             steps)))
     net_name = os.path.abspath(
-        os.path.join(tools.get_working_dir(),"../saved_nets/neural_net_five_test"))
+        os.path.join(tools.get_working_dir(),"../saved_nets/neural_net_three_test_clean_short"))
     print("path: " + str(net_name))
 
-    #neural_net = neural_net_lib.ThreeByThreeSig()
-    neural_net = neural_net_lib.FiveByFiveSig()
+    neural_net = neural_net_lib.ThreeByThreeSig()
+    #neural_net = neural_net_lib.FiveByFiveSig()
     neural_net.load_state_dict(torch.load(net_name))
     neural_net.eval()
     i_episode = 0
+    games_won=0
+    games_lost=0
     while i_episode < how_many:
         # for i_episode in range(how_many):
         # click on a start location
@@ -138,8 +138,8 @@ def play_the_game_and_collect(how_many, epoch, steps, is_test_set=False, random_
         counter = 0
         has_won = False
         while not dg.get_status() and counter < 1000:
-            # action = select_action_three(neural_net, state)
-            action = select_action_five(neural_net, state)
+            action = select_action_three(neural_net, state)
+            #action = select_action_five(neural_net, state)
             # print(action)
             counter += 1
             for k in range(0, 64):
@@ -161,6 +161,7 @@ def play_the_game_and_collect(how_many, epoch, steps, is_test_set=False, random_
                 sub_state_five = tools.grab_sub_state_five(state, action[k][1] + 2, action[k][0] + 2)
                 if dg.get_status():
                     print('hit mine')
+                    games_lost+=1
                     tools.save_action_neg_three(-10, sub_state_three, is_test_set)
                     tools.save_action_neg_five(-10, sub_state_five, is_test_set)
                     print(sub_state_three)
@@ -198,6 +199,7 @@ def play_the_game_and_collect(how_many, epoch, steps, is_test_set=False, random_
                     continue
 
                 if has_won:
+                    games_won+=1
                     print("has won collect data with ml")
                     tools.save_action_three(10, sub_state_three, is_test_set)
                     tools.save_action_five(10, sub_state_five, is_test_set)
@@ -220,3 +222,5 @@ def play_the_game_and_collect(how_many, epoch, steps, is_test_set=False, random_
                 # mark cells
                 state = min_int.mark_game(state)
                 counter += 1
+    print("games won: "+str(games_won))
+    print("games lost: "+str(games_lost))
