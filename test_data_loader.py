@@ -28,14 +28,15 @@ pos_location, neg_location = tools.get_save_location_three()
 src.tools.get_save_location_three()
 '''
 
-params_three = {'batch_size': 32,
+params_three = {'batch_size': 16*2048,
                 'shuffle': True,
                 'num_workers': 0}
 
-custom_set_three = custom_data_loader_text.CustomDatasetFromTextFiles3(True)
+custom_set_three = custom_data_loader_text.CustomDatasetFromTextFiles3(False,True)
+#custom_set_three = custom_data_loader_text.CustomDatasetFromTextFiles3()
 train_loader_three = DataLoader(custom_set_three, **params_three)
 
-params_five = {'batch_size': 32,
+params_five = {'batch_size': 2*2048,
                'shuffle': True,
                'num_workers': 0}
 
@@ -45,7 +46,7 @@ train_loader_five = DataLoader(custom_set_five, **params_three)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 neural_net_three = neural_net_lib.ThreeByThreeSig().to(device)
-optimizer_three = optim.Adam(neural_net_three.parameters(), lr=0.01)
+optimizer_three = optim.Adam(neural_net_three.parameters(), lr=0.0001)
 
 neural_net_five = neural_net_lib.FiveByFiveSig().to(device)
 optimizer_five = optim.Adam(neural_net_five.parameters(), lr=0.005)
@@ -55,7 +56,9 @@ l1_loss = nn.SmoothL1Loss()
 train_losses_three = []
 train_losses_five = []
 
-for e in range(2000):
+for e in range(1000):
+    if(e%100 == 0):
+        print("iteration: "+str(e))
     for i, data in enumerate(train_loader_three):
         inputs, rewards = data
         # make sure it is the same length as batch size
@@ -67,7 +70,7 @@ for e in range(2000):
         optimizer_three.zero_grad()
         train_loss.backward()
         optimizer_three.step()
-        train_losses_three.append(train_loss)
+        train_losses_three.append(train_loss.detach().cpu())
 
 for e in range(0):
     for i, data in enumerate(train_loader_five):
@@ -88,7 +91,9 @@ backup_net_name_five = os.path.abspath(
         os.path.join(tools.get_working_dir(), "../saved_nets/neural_net_five_test_five"))
 
 backup_net_name_three = os.path.abspath(
-        os.path.join(tools.get_working_dir(), "../saved_nets/neural_net_three_test_variance"))
+#        os.path.join(tools.get_working_dir(), "../saved_nets/neural_net_three_test"))
+#        os.path.join(tools.get_working_dir(), "../saved_nets/neural_net_three_test_variance"))
+        os.path.join(tools.get_working_dir(), "../saved_nets/neural_net_three_test_clean_short"))
 
 torch.save(neural_net_five.state_dict(), backup_net_name_five)
 torch.save(neural_net_three.state_dict(), backup_net_name_three)

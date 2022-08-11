@@ -20,7 +20,8 @@ TRAINING_STPS = 2000
 TRAIN_ITER = 0
 NAME = 'nets/neural_net_' + str(TRAINING_STPS)
 # prepare ml stuff
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = tools.get_device()
 neural_net = neural_net_lib.ThreeByThreeSig().to(device)
 # TODO try different loss functions
 # mse_loss = nn.MSELoss()
@@ -162,7 +163,7 @@ def get_training_set_neg_three():
 
 def get_random_set_three(is_test):
     toggle = random.random()
-    if toggle > 0.4:
+    if toggle > 0.5:
         if is_test:
             return get_test_set_pos_three()
         else:

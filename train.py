@@ -2,7 +2,7 @@
 # Tim Marvel
 
 import collect_data_no_ml
-import collect_data_with_ml
+#import collect_data_with_ml
 #import learn_from_data
 import play
 #import test_data_loader
@@ -18,7 +18,8 @@ import play
 #collect_data_no_ml.play_the_game(3, True)
 
 #test_data_loader
-
+#collect_data_with_ml.play_the_game_and_collect(5, 4, 5005, is_test_set=True, random_percent=0.0)
+#collect_data_with_ml.play_the_game_and_collect(2, 4, 5005, is_test_set=True,random_percent=0.5)
 '''
 Dr Malinovic
 Bagging and Boosting
@@ -123,7 +124,7 @@ print("B")
 '''
 #learn_from_data.train_the_net(5, 800)
 # collect_data_with_ml.play_the_game(2, 5, 800, False)
-#collect_data_no_ml.play_the_game(40, False)
+collect_data_no_ml.play_the_game(1, False)
 #collect_data_no_ml.play_the_game(8, True)
 #learn_from_data.train_the_net(5, 1000)
 #collect_data_with_ml.play_the_game_and_collect(2, 5, 1000, False)

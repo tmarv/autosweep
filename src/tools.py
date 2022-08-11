@@ -6,6 +6,7 @@ from time import sleep
 import os
 import uuid
 
+import torch
 
 def move_and_click(w, h):
     pyautogui.moveTo(w, h)
@@ -77,70 +78,31 @@ def save_action_text_five(reward, before):
 
 def save_action_three(reward, before, is_test_set):
     save_action_text_three(reward, before)
-    '''
-    hashname = str(uuid.uuid4().hex)
-    filename = os.path.join(_pos_location_three, hashname)
-    if is_test_set:
-        filename = os.path.join(_pos_location_test_three, hashname)
-    filename_bef = filename + "_before.npy"
-    np.save(filename_bef, before)
-    filename_reward = filename + "_reward.npy"
-    np.save(filename_reward, reward)
-    '''
 
 def save_action_five(reward, before, is_test_set):
     save_action_text_five(reward, before)
-    '''
-    hashname = str(uuid.uuid4().hex)
-    filename = os.path.join(_pos_location_five, hashname)
-    if is_test_set:
-        filename = os.path.join(_pos_location_test_five, hashname)
-    filename_bef = filename + "_before.npy"
-    np.save(filename_bef, before)
-    filename_reward = filename + "_reward.npy"
-    np.save(filename_reward, reward)
-    '''
 
 def save_action_neg_three(reward, before, is_test_set):
     save_action_text_three(reward, before)
-    '''
-    hashname = str(uuid.uuid4().hex)
-    filename = os.path.join(_neg_location_three, hashname)
-    if is_test_set:
-        filename = os.path.join(_neg_location_test_three, hashname)
-    filename_bef = filename + "_before.npy"
-    np.save(filename_bef, before)
-    filename_reward = filename + "_reward.npy"
-    np.save(filename_reward, reward)
-    '''
 
 def save_action_neg_five(reward, before, is_test_set):
     save_action_text_five(reward, before)
-    '''
-    hashname = str(uuid.uuid4().hex)
-    filename = os.path.join(_neg_location_five, hashname)
-    if is_test_set:
-        filename = os.path.join(_neg_location_test_five, hashname)
-    filename_bef = filename + "_before.npy"
-    np.save(filename_bef, before)
-    filename_reward = filename + "_reward.npy"
-    np.save(filename_reward, reward)
-    '''
 
-def get_save_location_three():
-    return _pos_location_three, _neg_location_three
+def get_device():
+    return device
 
 
-def get_save_test_location_three():
-    return _pos_location_test_three, _neg_location_test_three
+#def get_save_location_three():
+#   return _pos_location_three, _neg_location_three
 
+#def get_save_test_location_three():
+#   return _pos_location_test_three, _neg_location_test_three
 
-def get_save_location_five():
-    return _pos_location_five, _neg_location_five
+#def get_save_location_five():
+#   return _pos_location_five, _neg_location_five
 
-
-def get_save_test_location_five():
-    return _pos_location_test_five, _neg_location_test_five
+#def get_save_test_location_five():
+#   return _pos_location_test_five, _neg_location_test_five
 
 
 def start_minesweeper_game():
@@ -164,35 +126,42 @@ def get_text_file_names():
 
 def get_text_file_names_small():
     # just to try it out
-    return [_data_pts_3_filename_var, _data_pts_5_filename_small]
-    #return [_data_pts_3_filename_small, _data_pts_5_filename_small]
+    #return [_data_pts_3_filename_var, _data_pts_5_filename_small]
+    return [_data_pts_3_filename_small, _data_pts_5_filename_small]
 
 
 def get_text_file_names_var():
     return [_data_pts_3_filename_var, _data_pts_5_filename_var]
+
+def get_text_file_names_clean():
+    return [_data_pts_3_filename_clean, _data_pts_5_filename_clean]
 
 
 real_path = os.path.realpath(__file__)
 dir_path = os.path.dirname(real_path)
 
 # location for the testing set is fixed within the root directory
-_pos_location_three = os.path.join(dir_path, "../collected_data/positive_reward_3")
-_neg_location_three = os.path.join(dir_path, "../collected_data/negative_reward_3")
-_neg_location_test_three = os.path.join(dir_path, "../collected_data/test_negative_reward_3")
-_pos_location_test_three = os.path.join(dir_path, "../collected_data/test_positive_reward_3")
+#_pos_location_three = os.path.join(dir_path, "../collected_data/positive_reward_3")
+#_neg_location_three = os.path.join(dir_path, "../collected_data/negative_reward_3")
+#_neg_location_test_three = os.path.join(dir_path, "../collected_data/test_negative_reward_3")
+#_pos_location_test_three = os.path.join(dir_path, "../collected_data/test_positive_reward_3")
 
-_pos_location_five = os.path.join(dir_path, "../collected_data/positive_reward_5")
-_neg_location_five = os.path.join(dir_path, "../collected_data/negative_reward_5")
-_neg_location_test_five = os.path.join(dir_path, "../collected_data/test_negative_reward_5")
-_pos_location_test_five = os.path.join(dir_path, "../collected_data/test_positive_reward_5")
+#_pos_location_five = os.path.join(dir_path, "../collected_data/positive_reward_5")
+#_neg_location_five = os.path.join(dir_path, "../collected_data/negative_reward_5")
+#_neg_location_test_five = os.path.join(dir_path, "../collected_data/test_negative_reward_5")
+#_pos_location_test_five = os.path.join(dir_path, "../collected_data/test_positive_reward_5")
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 _data_pts_3_filename_small = os.path.join(dir_path, "../collected_data/rewards3_short.txt")
 _data_pts_3_filename = os.path.join(dir_path, "../collected_data/rewards3.txt")
 _data_pts_3_filename_var = os.path.join(dir_path, "../collected_data/rewards3_var.txt")
+_data_pts_3_filename_clean = os.path.join(dir_path, "../collected_data/rewards3_clean.txt")
 
 _data_pts_5_filename_small = os.path.join(dir_path, "../collected_data/rewards5_short.txt")
 _data_pts_5_filename = os.path.join(dir_path, "../collected_data/rewards5.txt")
-_data_pts_5_filename_var = os.path.join(dir_path, "../collected_data/rewards3_var.txt")
+_data_pts_5_filename_var = os.path.join(dir_path, "../collected_data/rewards5_var.txt")
+_data_pts_5_filename_clean = os.path.join(dir_path, "../collected_data/rewards5_clean.txt")
 
 
 _rewards3_text_file = open(_data_pts_3_filename, 'a')

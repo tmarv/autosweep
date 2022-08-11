@@ -14,7 +14,7 @@ from src import tools
 #  Global variables
 NUM_ACTIONS = 64  # size of an 8 by 8 minefield
 
-pos_location, neg_location = tools.get_save_location_three()
+#pos_location, neg_location = tools.get_save_location_three()
 
 # no need for a gpu if it is an purely random play
 device = torch.device("cpu")
