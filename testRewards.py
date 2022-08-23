@@ -68,9 +68,37 @@ def init_the_cluster_nets(base_name):
     net_2.eval()
     return [net_0,net_1,net_2]
 
+
+def select_action_cluster(cluster_net, the_nets, state):
+    cluster = perform_eval(state, cluster_net)[0]
+    #print(clusters)
+    #state_three = tools.extend_state(state)
+    #score_board = np.zeros((8, 8))
+
+    #for i in range(1, 9):
+    #for j in range(1, 9):
+    #print("cluster alone")
+    #print(cluster)
+    mult0 = 1.0
+    mult1 = 1.0
+    mult2 = 1.0
+    if cluster[0]<0.1:
+        mult0 = 0
+    if cluster[1]<0.1:
+        mult1 = 0
+    if cluster[2]<0.1:
+        mult2 = 0
+
+    result0 = perform_eval(state,the_nets[0])
+    result1 = perform_eval(state,the_nets[1])
+    result2 = perform_eval(state,the_nets[2])
+
+    score_board = result0*mult0+(result1*mult1)-abs(result2*mult2)
+    return score_board
+
 def play_with_cluster():
 
-    #nets_clusters = init_the_cluster_nets("net_three_cluster_")
+    nets_clusters = init_the_cluster_nets("net_three_cluster_")
     # load the 3 by 3 kernel network
     cluster_net = neural_net_lib.ThreeByThreeCluster()
     net_name_cluster = os.path.abspath(
@@ -82,12 +110,34 @@ def play_with_cluster():
     test_corner = np.array([[-1.,10.,10.],[-1.,10.,10.],[-1.,-1.,-1.]])
     test_corner2 = np.array([[-1.,-1.,-1.],[-1.,10.,10.],[-1.,10.,10.]])
     test_corner3 = np.array([[10.,10.,-1],[10, 10.,-1.],[-1.,-1.,-1.]])
+    test_corner3_ = np.array([[1.,10.,10],[10, 10.,10.],[-1.,-1.,-1.]])
     test_corner4 = np.array([[-1.,-1.,-1.],[10.,10.,-1],[10, 10.,-1.]])
 
     test_side = np.array([[-1.,-1.,-1.],[10.,10.,10.],[10.,10.,10.]])
+    test_side2 = np.array([[10.,10.,-1.],[10.,10.,-1.],[10.,10.,-1.]])
     test_empty = np.array([[10,10,10],[10,10,10],[10,10,10]])
+    test_empty = np.array([[1,10,10],[2,10,10],[1,10,10]])
+    #test_cluster = np.array([[-1,0,0],[-1,0,0],[0,0,0]])
+    test_cluster = np.array([[-1.0,0.0,0.0],[-1.0,0.0,0.0],[-1.0,0.0,0.0]])
+    test_cluster = np.array([[ 1. ,10., 10.],[ 2., 10., 10.],[90., 10., 10.]])
+    #[ 0.9632585   0.07715082 -0.0341807 ]
+    test_cluster = np.array([[ 1., 0., -1.],[2.,1.,-1.],[10.,10.,-1.]])
+
+    #test_empty = np.array([[4,10,10],[10,10,10],[10,10,10]])
+    #test_empty = np.array([[1,10,-1],[2,10,-1],[10,10,-1]])
+
 
     test_rewarding = np.array([[10, 10, 10], [1, 0, 0], [0, 0, 0]])
+    test_rewarding2 = np.array([[10, 10, 1], [10, 10, 2], [10, 10, 1]])
+    test_rewardig_false = np.array([[1, 10, 10], [10, 10, 10], [-1, -1, -1]])
+    test_rewardig_false2 = np.array([[10., 10., -1.], [10., 10., -1.], [10., 10., -1.]])
+    '''
+    [ 0.37024987 -0.29518628  0.92714]
+    [[ 2.  2.  3.],[10. 10. 10.],[-1. -1. -1.]]
+    0.37024986743927 -0.29518628120422363 0.9271399974822998
+    tensor([-141.2553], grad_fn=<SubBackward0>)
+    '''
+    test_cluster = np.array([[2.,2.,3.], [10., 10., 10.], [-1., -1., -1.]])
 
     #print(perform_eval(test_corner,neural_net_three))
     print(perform_eval(test_corner,cluster_net))
@@ -101,11 +151,38 @@ def play_with_cluster():
     print("sides:")
     #print(perform_eval(test_side,neural_net_three))
     print(perform_eval(test_side,cluster_net))
+    print(perform_eval(test_side,cluster_net))
+    print("-------------- test test_rewardig_false2: ")
     #print(perform_eval(test_empty,neural_net_three))
-    print(perform_eval(test_empty,cluster_net))
-    print("rewarding cases: ")
-    print(perform_eval(test_rewarding,cluster_net))
+    cluster_ = perform_eval(test_cluster, cluster_net)
+    print(cluster_[0])
+    clust1 = perform_eval(test_cluster, nets_clusters[0])
+    print(clust1)
+    clust2 = perform_eval(test_cluster, nets_clusters[1])
+    print(clust2)
+    clust3 = perform_eval(test_cluster, nets_clusters[2])
+    print(clust3)
+    mult0 = 3.0
+    mult1 = 0.5
+    mult2 = 2.0
+    print(cluster_[0][0])
+    print(cluster_[0][1])
+    print(cluster_[0][2])
+    if cluster_[0][0] < 0.1:
+        mult0 = 0
+    if cluster_[0][1] < 0.1:
+        mult1 = 0
+    if cluster_[0][2] < 0.1:
+        mult2 = 0
+    print(mult0*clust1+0.5*clust2*mult1-abs(clust3*mult2))
+    print("-------------- ")
+    #select_action_cluster(cluster_net, the_nets, state):
+    result_empty = select_action_cluster(cluster_net, nets_clusters, test_empty)
+    print("result empty: "+str(result_empty))
+    print("test_cluster cases: ")
+    print(perform_eval(test_cluster, cluster_net))
 
+device = tools.get_device()
 
 #play_with_three(3,3,3)
 play_with_cluster()

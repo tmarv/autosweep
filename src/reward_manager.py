@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Tim Marvel
-
+import numpy as np
 def compute_reward(before, after):
     # both numpy arrays have to be of the same dimensions
     if before.shape != after.shape:
@@ -48,12 +48,13 @@ def reward_shaper_pos_three(reward, grid):
 
 
 def reward_shaper_neg_three(reward, grid):
-    if grid[1, 1] == 90:
+    grid_2d = grid.reshape(3,3)
+    if grid_2d[1, 1] == 90:
         reward = -10.0
-    elif grid[1, 1] == 0:
+    elif grid_2d[1, 1] == 0:
         reward = -10.0
-    elif reward == -10:
-        reward = -20.0
+    elif reward == -64:
+        reward = -64.0
     elif reward == 0:
         reward = -0.15
 
@@ -79,8 +80,8 @@ def reward_shaper_neg_five(reward, grid):
         reward = -12.0
     elif grid[2, 2] == 0:
         reward = -12.0
-    elif reward == -10:
-        reward = -20.0
+    elif reward == -64:
+        reward = -64.0
     elif reward == 0:
         reward = -0.15
 
@@ -88,12 +89,26 @@ def reward_shaper_neg_five(reward, grid):
 
 
 def reward_shaper_three(rewards, grids):
-    for i in len(rewards):
+    for i in range(len(rewards)):
         reward=rewards[i]
-        grid<=grids[i]
+        grid=grids[i]
         if reward <= 0:
             rewards[i]=reward_shaper_neg_three(reward, grid)
-        else:
-            rewards[i]=reward_shaper_pos_three(reward, grid)
+        #else:
+            #rewards[i]=reward_shaper_pos_three(reward, grid)
 
+    #print("end")
+    return rewards
+
+def reward_shaper_five(rewards, grids):
+    for i in range(len(rewards)):
+        reward=rewards[i]
+        grid=grids[i]
+        grid_2d = grid.reshape(5,5)
+        if reward <= 0:
+            rewards[i]=reward_shaper_neg_five(reward, grid_2d)
+        #else:
+            #rewards[i]=reward_shaper_pos_three(reward, grid)
+
+    #print("end")
     return rewards

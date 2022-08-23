@@ -31,6 +31,18 @@ def rotate_by_90(state):
     return rot
 
 
+def rotate_by_90_flat(state):
+    rot = np.rot90(state.reshape(3,3), k=1, axes=(1, 0))
+    return rot.flatten()
+
+def rotate_by_90_flat_five(state):
+    #print(state.reshape(5, 5))
+    rot = np.rot90(state.reshape(5, 5), k=1, axes=(1, 0))
+    #print(rot)
+    return rot.flatten()
+
+
+
 def grab_sub_state_three(state, i, j):
     sub_state = extend_state(state)
     sub_state = sub_state[[i - 1, i, i + 1], :][:, [j - 1, j, j + 1]]
@@ -52,6 +64,47 @@ def grab_sub_state_noext_five(state, i, j):
     sub_state = state[[i - 2, i - 1, i, i +1, i + 2], :][:, [j - 2, j-1, j, j + 1, j + 2]]
     return sub_state
 
+
+#self.rewards, self.dataPoints = tools.augmentData(self.rewards, self.dataPoints)
+def augment_data(rewards, data_points):
+    aug_rewards = []
+    aug_data_pts = []
+    for i in range(len(rewards)):
+        state = data_points[i]
+        reward = rewards[i]
+        state_b = rotate_by_90_flat(state)
+        state_c = rotate_by_90_flat(state_b)
+        state_d = rotate_by_90_flat(state_c)
+        aug_rewards.append(reward)
+        aug_rewards.append(reward)
+        aug_rewards.append(reward)
+        aug_rewards.append(reward)
+        aug_data_pts.append(state)
+        aug_data_pts.append(state_b)
+        aug_data_pts.append(state_c)
+        aug_data_pts.append(state_d)
+
+    return np.array(aug_rewards), np.array(aug_data_pts)
+
+def augment_data_five(rewards, data_points):
+    aug_rewards = []
+    aug_data_pts = []
+    for i in range(len(rewards)):
+        state = data_points[i]
+        reward = rewards[i]
+        state_b = rotate_by_90_flat_five(state)
+        state_c = rotate_by_90_flat_five(state_b)
+        state_d = rotate_by_90_flat_five(state_c)
+        aug_rewards.append(reward)
+        aug_rewards.append(reward)
+        aug_rewards.append(reward)
+        aug_rewards.append(reward)
+        aug_data_pts.append(state)
+        aug_data_pts.append(state_b)
+        aug_data_pts.append(state_c)
+        aug_data_pts.append(state_d)
+
+    return np.array(aug_rewards), np.array(aug_data_pts)
 
 ### Todo remove duplicate
 def move_to(w, h):
@@ -91,20 +144,6 @@ def save_action_neg_five(reward, before, is_test_set):
 def get_device():
     return device
 
-
-#def get_save_location_three():
-#   return _pos_location_three, _neg_location_three
-
-#def get_save_test_location_three():
-#   return _pos_location_test_three, _neg_location_test_three
-
-#def get_save_location_five():
-#   return _pos_location_five, _neg_location_five
-
-#def get_save_test_location_five():
-#   return _pos_location_test_five, _neg_location_test_five
-
-
 def start_minesweeper_game():
     # start minesweeper program
     move_and_click(33, 763)
@@ -140,16 +179,6 @@ def get_text_file_names_clean():
 real_path = os.path.realpath(__file__)
 dir_path = os.path.dirname(real_path)
 
-# location for the testing set is fixed within the root directory
-#_pos_location_three = os.path.join(dir_path, "../collected_data/positive_reward_3")
-#_neg_location_three = os.path.join(dir_path, "../collected_data/negative_reward_3")
-#_neg_location_test_three = os.path.join(dir_path, "../collected_data/test_negative_reward_3")
-#_pos_location_test_three = os.path.join(dir_path, "../collected_data/test_positive_reward_3")
-
-#_pos_location_five = os.path.join(dir_path, "../collected_data/positive_reward_5")
-#_neg_location_five = os.path.join(dir_path, "../collected_data/negative_reward_5")
-#_neg_location_test_five = os.path.join(dir_path, "../collected_data/test_negative_reward_5")
-#_pos_location_test_five = os.path.join(dir_path, "../collected_data/test_positive_reward_5")
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -170,3 +199,10 @@ _rewards5_text_file = open(_data_pts_5_filename, 'a')
 def __del__(self):
     _rewards3_text_file.close()
     _rewards5_text_file_with_var.close()
+
+'''
+just making sure the five by five works
+mytest = np.array([1,2,3,4,5,1,2,3,4,5,1,2,3,4,5,1,2,3,4,5,1,2,3,4,5])
+my_result = rotate_by_90_flat_five(mytest)
+print(my_result)
+'''

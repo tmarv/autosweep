@@ -3,6 +3,7 @@
 import os
 import torch
 import random
+import math
 import numpy as np
 from time import sleep
 
@@ -14,7 +15,8 @@ from src import neural_net_lib
 from src import tools
 
 random_percent = 0.0
-
+VERBOSE = False
+NUM_ACTIONS = 64
 
 def select_action_fused(neural_net_three, neural_net_five, state):
     state_five = tools.extend_state_five(state)
@@ -65,19 +67,27 @@ def prepare_return_values(score_board):
     while i < total_len:
         # print("this is i at start: "+str(i))
         local_range = np.where(score_board == flat[i])
-        # print("this is local range: "+str(local_range))
+        #print(local_range)
+        #print("this is flat[i]: "+str(flat[i]))
+        #print("this is local range: "+str(local_range))
         local_sz = len(local_range[0])
         for j in range(0, local_sz):
-            return_values.append([local_range[0][j], local_range[1][j]])
-            # print("str: "+str([local_range[0][j], local_range[1][j]]))
+            return_values.append([local_range[1][j], local_range[0][j]])
+            #print("str: "+str([local_range[0][j], local_range[1][j]]))
             i = i + 1
             # print("this is i after: " + str(i))
+        #if local_sz > 1:
+            #print("----------- local_sz is bigger than 1")
+            #print(local_sz)
+            #print(flat)
+            #exit()
+
     if len(return_values) != 64:
         print("Catastrophic error: return values size is off " + str(len(return_values)))
         exit()
     # print("this is size:    "+str(len(return_values)))
-    print(return_values)
-    print(flat)
+    #print(return_values)
+    #print(flat)
     return return_values
 
 
@@ -118,39 +128,55 @@ def select_action_five(neural_net, state):
 
 def run_clustering_three(state):
     state_three = tools.extend_state(state)
-    score_board_clusters = np.zeros((8, 8))
+    score_board_clusters = np.zeros((8, 8, 3))
     for i in range(1, 9):
         for j in range(1, 9):
-            local_cpy = tools.grab_sub_state_noext(state_three, j, i)
+            local_cpy = tools.grab_sub_state_noext(state_three, i, j)
             local_tensor = torch.from_numpy(local_cpy).to(dtype=torch.float)
             local_tensor = local_tensor.unsqueeze(0)
             float_result = cluster_net.forward(local_tensor.reshape([1,9]))
-            score_board_clusters[j - 1, i - 1] = round(torch.argmax(float_result).item())
+            #print(local_cpy)
+            #print(float_result[0].detach().numpy())
+            #score_board_clusters[j - 1, i - 1] = round(torch.argmax(float_result).item())
+            score_board_clusters[i - 1, j - 1,:] = float_result[0].detach().numpy()
     return score_board_clusters
 
 
 def select_action_cluster(the_nets, state):
     clusters = run_clustering_three(state)
-    print(clusters)
+    #print(state)
     state_three = tools.extend_state(state)
     score_board = np.zeros((8, 8))
 
     for i in range(1, 9):
         for j in range(1, 9):
-            local_cpy = tools.grab_sub_state_noext(state_three, j, i)
+            local_cpy = tools.grab_sub_state_noext(state_three, i, j)
             local_tensor = torch.from_numpy(local_cpy).to(dtype=torch.float)
             local_tensor = local_tensor.unsqueeze(0)
             cluster = clusters[i - 1, j - 1]
-            result = 0.0
-            if cluster == 0:
-                result = the_nets[0].forward(local_tensor.reshape([1,9]))*2.0
-            elif cluster == 1:
-                result = the_nets[1].forward(local_tensor.reshape([1,9]))/2.0
-            elif cluster == 2:
-                result = the_nets[2].forward(local_tensor.reshape([1,9]))
-
-            score_board[i - 1, j - 1] = result
-
+            # print("cluster alone")
+            # print(cluster)
+            # print(local_cpy)
+            # if(j==2):
+            #    exit()
+            mult0 = 3.0
+            mult1 = 0.5
+            mult2 = 2.0
+            #print(cluster[0])
+            #print(cluster[1])
+            #print(cluster[2])
+            if cluster[0]<0.1:
+                mult0 = 0
+            if cluster[1]<0.1:
+                mult1 = 0
+            if cluster[2]<0.1:
+                mult2 = 0
+            result0 = the_nets[0].forward(local_tensor.reshape([1,9]))[0]
+            result1 = the_nets[1].forward(local_tensor.reshape([1,9]))[0]
+            result2 = the_nets[2].forward(local_tensor.reshape([1,9]))[0]
+            #print(result0*mult0+(result1*mult1)-abs(result2*mult2))
+            score_board[i - 1, j - 1] = result0*mult0+(result1*mult1)-abs(result2*mult2)
+    #print(score_board)
     return prepare_return_values(score_board)
 
 
@@ -172,29 +198,33 @@ def init_the_cluster_nets(base_name):
     net_0.eval()
     net_1.eval()
     net_2.eval()
-    return [net_0,net_1,net_2]
+    return [net_0, net_1, net_2]
 
-def play_with_nets(how_many, epoch, is_test_set=False, random_percent=0.0):
+def play_with_nets(iterations, epoch='', is_test_set=False, random_percent=0.0):
     print("starting only five by five play")
     # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # print(device)
     # load the 5 by 5 kernel network
     neural_net_five = neural_net_lib.FiveByFiveSig()
     net_name_five = os.path.abspath(
-        os.path.join(tools.get_working_dir(), '../saved_nets/neural_net_five_test_' + str(epoch)))
+        os.path.join(tools.get_working_dir(), '../saved_nets/raw_net_five'))
     neural_net_five.load_state_dict(torch.load(net_name_five, map_location=device))
     neural_net_five.eval()
     ''''''
+    win=0
+    lose=0
     # load the 3 by 3 kernel network
+    '''
     neural_net_three = neural_net_lib.ThreeByThreeSig()
     # TODO: fix this
     net_name_three = os.path.abspath(
         os.path.join(tools.get_working_dir(), '../saved_nets/neural_net_three_test_' + str(epoch)))
     neural_net_three.load_state_dict(torch.load(net_name_three,  map_location=device))
     neural_net_three.eval()
+    '''
     # TODO fix incrementation bug
     i_episode = 0
-    while i_episode < how_many:
+    while i_episode < iterations:
         print("-- restarted at while")
         sleep(0.3)
         print("this is i_episode " + str(i_episode))
@@ -209,8 +239,8 @@ def play_with_nets(how_many, epoch, is_test_set=False, random_percent=0.0):
         counter = 0
         while not dg.get_status() and counter < 200:
             print("loop not")
-            #action = select_action_five(neural_net_five, state)
-            action = select_action_fused(neural_net_three, neural_net_five, state)
+            action = select_action_five(neural_net_five, state)
+            #action = select_action_fused(neural_net_three, neural_net_five, state)
             counter += 1
             for k in range(0, 64):
                 print("loop k: "+str(dg.get_status()))
@@ -220,7 +250,7 @@ def play_with_nets(how_many, epoch, is_test_set=False, random_percent=0.0):
                     action[k][1] = random.randint(0, 7)
 
                 min_int.move_and_click_to_ij(action[k][0], action[k][1])
-                print(action[k])
+                #print(action[k])
                 tools.move_to(1490, 900)
                 # if hit a mine
                 sleep(0.5)
@@ -241,6 +271,7 @@ def play_with_nets(how_many, epoch, is_test_set=False, random_percent=0.0):
                     counter += 1
                     i_episode = i_episode + 1
                     print("-- should restart")
+                    lose+=1
                     break
 
                 # compute reward
@@ -255,6 +286,7 @@ def play_with_nets(how_many, epoch, is_test_set=False, random_percent=0.0):
                     counter += 1001
                     i_episode = i_episode + 1
                     print("should restart")
+                    win+=1
                     break
                 else:
                     print("no win")
@@ -277,13 +309,16 @@ def play_with_nets(how_many, epoch, is_test_set=False, random_percent=0.0):
                     break
                 print("updating state")
                 counter += 1
+    print("win"+str(win))
+    print("lose"+str(lose))
 
-
-def play_with_clustering(iterations=1):
+def play_with_clustering(iterations=1, random_percent=0.0):
     nets_clusters = init_the_cluster_nets("net_three_cluster_")
     print("playing with clusters")
     is_test_set = False
     i_episode = 0
+    winners = 0
+    losers = 0
     while i_episode < iterations:
         sleep(0.3)
         print("this is i_episode " + str(i_episode))
@@ -302,17 +337,18 @@ def play_with_clustering(iterations=1):
             counter += 1
             for k in range(0, 64):
                 print("loop k: " + str(dg.get_status()))
+                '''
                 if random.random() < random_percent:
                     print("random action")
                     action[k][0] = random.randint(0, 7)
                     action[k][1] = random.randint(0, 7)
-
+                '''
                 min_int.move_and_click_to_ij(action[k][0], action[k][1])
-                print(action[k])
+                #print(action[k])
                 tools.move_to(1490, 900)
                 #exit()
                 # if hit a mine
-                sleep(0.5)
+                sleep(0.3)
                 state = dg.get_state_from_screen()
                 if not dg.get_status():
                     state = min_int.mark_game(state)
@@ -322,6 +358,7 @@ def play_with_clustering(iterations=1):
                 # we hit a mine
                 if dg.get_status():
                     print('hit mine')
+                    losers+=1
                     tools.save_action_neg_three(-64, sub_state_three, is_test_set)
                     tools.save_action_neg_five(-64, sub_state_five, is_test_set)
                     print(sub_state_three)
@@ -336,7 +373,8 @@ def play_with_clustering(iterations=1):
                 reward, has_won = reward_manager.compute_reward(previous_state, state)
 
                 if has_won:
-                    print("has won collect data with ml")
+                    winners+=1
+                    print("has won with clusters")
                     tools.save_action_three(10, sub_state_three, is_test_set)
                     tools.save_action_five(10, sub_state_five, is_test_set)
                     tools.move_and_click(1490, 900)
@@ -367,7 +405,96 @@ def play_with_clustering(iterations=1):
                 print("updating state")
                 counter += 1
 
-device = tools.get_device()
+    print("winners: "+str(winners)+" losers: "+str(losers))
+
+def select_action():
+    random_action = random.randrange(NUM_ACTIONS)
+    # print('this is random action ', random_action)
+    return torch.tensor([[math.floor(random_action / 8), random_action % 8]], device=device, dtype=torch.int)
+
+def play_random(iterations=1):
+    print("playing with clusters")
+    is_test_set = False
+    i_episode = 0
+    nets_clusters = init_the_cluster_nets("net_three_cluster_")
+    while i_episode < iterations:
+        sleep(0.3)
+        print("this is i_episode " + str(i_episode))
+        i_episode = i_episode + 1
+        tools.move_and_click(739, 320)
+        sleep(0.3)
+        state = dg.get_state_from_screen()
+        # run the flagging algorithm
+        state = min_int.mark_game(state)
+        # perform a deep copy
+        previous_state = state.copy()
+        sleep(0.3)
+        counter = 0
+        while not dg.get_status() and counter < 200:
+            action = select_action_cluster(nets_clusters, state)
+            counter += 1
+            for k in range(0, 64):
+                #action = select_action()
+                k1 = random.randrange(64)
+                #print(action)
+                #print(action[0])
+                print("loop k: " + str(dg.get_status()))
+                min_int.move_and_click_to_ij(action[k1][0], action[k1][1])
+                # print(action[k])
+                tools.move_to(1490, 900)
+                # exit()
+                # if hit a mine
+                sleep(0.5)
+                state = dg.get_state_from_screen()
+                if not dg.get_status():
+                    state = min_int.mark_game(state)
+                sub_state_three = tools.grab_sub_state_three(previous_state, action[k1][1] + 1, action[k1][0] + 1)
+                sub_state_five = tools.grab_sub_state_five(previous_state, action[k1][1] + 2, action[k1][0] + 2)
+
+                # we hit a mine
+                if dg.get_status():
+                    print('hit mine')
+                    tools.save_action_neg_three(-64, sub_state_three, is_test_set)
+                    tools.save_action_neg_five(-64, sub_state_five, is_test_set)
+                    print(sub_state_three)
+                    print(sub_state_five)
+                    tools.move_and_click(1490, 900)
+                    counter += 1
+                    # i_episode = i_episode + 1
+                    print("-- should restart")
+                    break
+
+                # compute reward
+                reward, has_won = reward_manager.compute_reward(previous_state, state)
+
+                if has_won:
+                    print("has won with randmo")
+                    tools.save_action_three(10, sub_state_three, is_test_set)
+                    tools.save_action_five(10, sub_state_five, is_test_set)
+                    tools.move_and_click(1490, 900)
+                    print("has won collect data with ml :" + str(counter))
+                    counter += 1001
+                    # i_episode = i_episode + 1
+                    print("should restart")
+                    break
+                else:
+                    print("no win")
+                    if reward > 0:
+                        tools.save_action_three(reward, sub_state_three, is_test_set)
+                        tools.save_action_five(reward, sub_state_five, is_test_set)
+
+                previous_state = state.copy()
+                state = min_int.mark_game(state)
+                # if we didn't act -> k = 100
+                if reward != 0:
+                    print("call ml again")
+                    break
+                print("updating state")
+                counter += 1
+
+
+#device = tools.get_device()
+device = "cpu"
 
 cluster_net = neural_net_lib.ThreeByThreeCluster()
 cluster_net_name = os.path.abspath(
@@ -384,4 +511,6 @@ tools.move_and_click(739, 320)
 # init
 #gui.click()
 
-play_with_clustering(iterations=10)
+play_with_clustering(iterations=1)
+#play_with_nets(iterations=10)
+#play_random(iterations=10)
