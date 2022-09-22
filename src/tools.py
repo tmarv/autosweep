@@ -5,7 +5,7 @@ import pyautogui
 from time import sleep
 import os
 import uuid
-
+import subprocess
 import torch
 
 def move_and_click(w, h):
@@ -106,10 +106,12 @@ def augment_data_five(rewards, data_points):
 
     return np.array(aug_rewards), np.array(aug_data_pts)
 
+
 ### Todo remove duplicate
 def move_to(w, h):
     pyautogui.moveTo(w, h)
     sleep(0.02)
+
 
 def save_action_text_three(reward, before):
     # turn the grid into a csv
@@ -132,17 +134,22 @@ def save_action_text_five(reward, before):
 def save_action_three(reward, before, is_test_set):
     save_action_text_three(reward, before)
 
+
 def save_action_five(reward, before, is_test_set):
     save_action_text_five(reward, before)
+
 
 def save_action_neg_three(reward, before, is_test_set):
     save_action_text_three(reward, before)
 
+
 def save_action_neg_five(reward, before, is_test_set):
     save_action_text_five(reward, before)
 
+
 def get_device():
     return device
+
 
 def start_minesweeper_game():
     # start minesweeper program
@@ -154,6 +161,12 @@ def start_minesweeper_game():
     # init
     pyautogui.click()
 
+
+def launch_mines():
+    # start the game directly
+    start_game = "/usr/games/gnome-mines"
+    res = subprocess.Popen(start_game, shell=False)
+    # os.system(start_game)
 
 def get_working_dir():
     return dir_path
