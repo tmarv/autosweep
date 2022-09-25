@@ -169,6 +169,7 @@ class FiveByFiveConv(nn.Module):
         self.layer4 = nn.Linear(256, 1)
 
     def forward(self, x):
+        #print(x)
         x = self.layer1(x)
         x = self.active1(x)
         x = torch.flatten(x, 1)
