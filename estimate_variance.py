@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import src.tools
 from src import neural_net_lib, reward_manager, tools, custom_data_loader_text
 
-def add_variance_and_cluster(thresh=0.3):
+def add_variance_and_cluster_three(thresh=0.3):
     neural_net = neural_net_lib.ThreeByThreeSig().to(device)
     net_name = os.path.abspath(os.path.join(tools.get_working_dir(), '../saved_nets/raw_net_three'))
     neural_net.load_state_dict(torch.load(net_name))
@@ -41,9 +41,9 @@ def add_variance_and_cluster(thresh=0.3):
         result = neural_net.forward(inputs_res)
         cluster = 0
 
-        if abs(result - rewards)>thresh:
+        if abs(result - rewards) > thresh:
             cluster = 1
-            if result<-0.15 or rewards<-0.15:
+            if result < -0.15 or rewards < -0.15:
                 cluster = 2
 
 
@@ -55,19 +55,18 @@ def add_variance_and_cluster(thresh=0.3):
     _rewards3_text_file_with_var.close()
 
 
-def add_variance_and_cluster_five(thresh=0.3):
-    neural_net = neural_net_lib.FiveByFiveSig().to(device)
-    net_name = os.path.abspath(os.path.join(tools.get_working_dir(), '../saved_nets/raw_net_five'))
+def add_variance_and_cluster_five_conv(backup_name="raw_net_five_conv", thresh=0.3):
+    neural_net = neural_net_lib.FiveByFiveConv().to(device)
+    net_name = os.path.abspath(os.path.join(tools.get_working_dir(), '../saved_nets/'+backup_name))
     neural_net.load_state_dict(torch.load(net_name))
 
     # we want them 1 by 1 since we are writting in a datafile
     params_three = {'batch_size': 1, 'shuffle': False, 'num_workers': 0}
 
-    #true because is small dataset
     custom_set_five = custom_data_loader_text.CustomDatasetFromTextFiles5()
     train_loader_five = DataLoader(custom_set_five, **params_three)
 
-    #_rewards5_text_file_with_var = open(text_file_with_var, 'w')
+    _rewards5_text_file_with_var = open(text_file_with_var5, 'w')
 
     results_plot = []
     rewards_plot = []
@@ -82,30 +81,32 @@ def add_variance_and_cluster_five(thresh=0.3):
         # make sure it is the same length as batch size
         input_len = len(inputs)
         inputs_res = inputs.reshape([input_len, 5, 5]).to(device)
+        inputs_res = inputs_res.unsqueeze(1)
+        # unsqueeze for convolutional neural net
         rewards = rewards.reshape([input_len, 1]).to(device)
         rewards_plot.append(rewards.item())
         result = neural_net.forward(inputs_res)
         results_plot.append(result.item())
         cluster = 0
 
-        if abs(result - rewards)>thresh:
+        if abs(result - rewards) > thresh:
             cluster = 1
-            if result<-0.15 or rewards<-0.15:
+            if result < -0.15 or rewards < -0.15:
                 cluster = 2
 
 
         inputs_list = inputs.flatten().tolist()
         list = ','.join(str(v) for v in inputs_list)
-        #_rewards5_text_file_with_var.write(list+","+str(rewards.item())+","+str(result.item())+","+str(cluster)+"\n")
+        _rewards5_text_file_with_var.write(list+","+str(rewards.item())+","+str(result.item())+","+str(cluster)+"\n")
 
     plt.plot(results_plot)
     plt.plot(rewards_plot)
     plt.show()
-    #_rewards5_text_file_with_var.close()
+    _rewards5_text_file_with_var.close()
 
 
 text_file_with_var3 = tools.get_text_file_names_var()[0]
-#text_file_with_var = tools.get_text_file_names_var()[1]
+text_file_with_var5 = tools.get_text_file_names_var()[1]
 #device = tools.get_device()
 # everything is happening on the cpu since we are going 1 by 1
 device = "cpu"
