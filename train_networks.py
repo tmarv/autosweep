@@ -38,14 +38,6 @@ def train_cluster_net_three(epoch=1000, batch_size=8192, plot_result=False, back
             start_time=end_time
         for i, data in enumerate(cluster_loader_three):
             inputs, clusters = data
-            #clusters = torch.from_numpy(clusters)
-            #print("len afore: " + str(len(clusters)))
-            # make sure it is the same length as batch size
-            #input_len = len(inputs)
-            #inputs = inputs.reshape([input_len, 3, 3]).to(device)
-            #inputs = inputs.reshape([input_len, 3, 3])
-            #clusters = clusters.reshape([input_len, 3]).to(device)
-            #clusters = clusters.reshape([input_len, 3])
             result = cluster_net_three.forward(inputs)
             train_loss = l1_loss(result, clusters)
             optimizer_cluster_three.zero_grad()
@@ -63,11 +55,11 @@ def train_cluster_net_three(epoch=1000, batch_size=8192, plot_result=False, back
 
 def train_cluster_net_five_conv(epoch=1000, batch_size=8192, plot_result=False, backup_name="backup_net_cluster_five", learning_rate=0.001):
     print("this is device " + str(device))
-    cluster_net_five_conv = neural_net_lib.FiveByFiveConv().to(device)
+    # TODO make a clustering conv net
+    cluster_net_five_conv = neural_net_lib.FiveByFiveConvCluster().to(device)
     params_cluster_five_conv = {'batch_size': batch_size, 'shuffle': True, 'num_workers': 0}
     cluster_set_five_conv = custom_data_loader_text.CustomDatasetFromTextFiles5(is_small=False, is_clean=True,
-                                                                            with_var=True, cluster_num=-1,
-                                                                            device=device)
+                                                                            with_var=True, cluster_num=-1, device=device)
     cluster_loader_five_conv = DataLoader(cluster_set_five_conv, **params_cluster_five_conv)
     optimizer_cluster_five_conv = optim.Adam(cluster_net_five_conv.parameters(), lr=learning_rate)
     l1_loss = nn.SmoothL1Loss().to(device)
@@ -82,6 +74,7 @@ def train_cluster_net_five_conv(epoch=1000, batch_size=8192, plot_result=False, 
             start_time = end_time
         for i, data in enumerate(cluster_loader_five_conv):
             inputs, clusters = data
+            inputs = inputs.reshape(batch_size, 5, 5).unsqueeze(1)
             # unsqueeze the data?
             result = cluster_net_five_conv.forward(inputs)
             train_loss = l1_loss(result, clusters)
@@ -208,7 +201,8 @@ def train_five_by_five_raw_net(epoch = 1000, batch_size=8192, plot_result=False,
         plt.show()
 
 
-def train_five_by_five_conv(epoch = 1000, batch_size=8192, plot_result=False, backup_name="backup_conv_net_five", learning_rate=0.001):
+def train_five_by_five_conv(epoch=1000, batch_size=8192, plot_result=False, backup_name="backup_conv_net_five",
+                            learning_rate=0.001):
     print("training convolution net 5 by 5")
     neural_net_five_conv = neural_net_lib.FiveByFiveConv().to(device)
     params = {'batch_size': batch_size, 'shuffle': True, 'num_workers': 0}

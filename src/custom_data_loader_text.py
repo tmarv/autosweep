@@ -42,7 +42,7 @@ class CustomDatasetFromTextFiles3(Dataset):
                 self.with_cluster = False
                 clustered_data = []
                 cluster_rewards = []
-                for i in range (self.dataset_size):
+                for i in range(self.dataset_size):
                     if self.clusters[i] == cluster_num:
                         clustered_data.append(self.dataPoints[i])
                         cluster_rewards.append(self.rewards[i])
@@ -85,24 +85,72 @@ class CustomDatasetFromTextFiles3(Dataset):
 
 class CustomDatasetFromTextFiles5(Dataset):
 
-    def __init__(self, is_small=False):
-        self.positive_percent = 0.5
+    def __init__(self, is_small=False, is_clean=False, with_var=False, cluster_num=-2, device="cpu"):
         self.filename5 = tools.get_text_file_names()[1]
-
+        self.augment_data = True
         if is_small:
             self.filename5 = tools.get_text_file_names_small()[1]
-
+        if is_clean:
+            self.filename5 = tools.get_text_file_names_clean()[1]
+        if with_var:
+            self.filename5 = tools.get_text_file_names_var()[1]
         print(self.filename5)
+
         self.dataPoints = pd.read_csv(self.filename5, header=None,
                           usecols=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
                                    14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24])
         self.dataPoints = np.array(self.dataPoints).astype(np.float32)
         self.rewards = pd.read_csv(self.filename5, header=None, usecols=[25])
         self.rewards = np.array(self.rewards).astype(np.float32)
-        self.rewards = reward_manager.reward_shaper_five(self.rewards, self.dataPoints)
-        self.rewards, self.dataPoints = tools.augment_data_five(self.rewards, self.dataPoints)
         self.dataset_size = len(self.dataPoints)
-
+        self.with_cluster = False
+        # if we are training for a specific cluster
+        if cluster_num > -2:
+            self.clusters = np.array(pd.read_csv(self.filename5, header=None, usecols=[27]))
+            self.rewards = np.array(pd.read_csv(self.filename5, header=None, usecols=[27]))
+            self.with_cluster = True
+            if cluster_num > -1:
+                self.rewards = pd.read_csv(self.filename5, header=None, usecols=[25])
+                self.rewards = np.array(self.rewards).astype(np.float32)
+                self.with_cluster = False
+                clustered_data = []
+                cluster_rewards = []
+                for i in range(self.dataset_size):
+                    if self.clusters[i] == cluster_num:
+                        clustered_data.append(self.dataPoints[i])
+                        cluster_rewards.append(self.rewards[i])
+                self.dataPoints = np.array(clustered_data).astype(np.float32)
+                self.rewards = np.array(cluster_rewards)
+                self.dataset_size = len(self.dataPoints)
+        # perform reward shaping here if
+        if not self.with_cluster:
+            #TODO create reward shaper five
+            self.rewards = reward_manager.reward_shaper_five(self.rewards, self.dataPoints)
+        if not with_var:
+            self.rewards, self.dataPoints = tools.augment_data(self.rewards, self.dataPoints)
+            self.dataset_size = len(self.rewards)
+            print(self.dataset_size)
+        if self.with_cluster:
+            enlarged_cluster = []
+            # print("len before: "+str(len(clusters)))
+            for i in range(len(self.rewards)):
+                if self.rewards[i] == 0:
+                    enlarged_cluster.append(np.array([1, 0, 0]))
+                elif self.rewards[i] == 1:
+                    enlarged_cluster.append(np.array([0, 1, 0]))
+                elif self.rewards[i] == 2:
+                    enlarged_cluster.append(np.array([0, 0, 1]))
+                else:
+                    print("ERROR")
+                    print("unkown cluster: " + str(self.clusters[i]))
+            self.rewards = np.asarray(enlarged_cluster)
+        for dataPt in self.dataPoints:
+            #TODO: fix/implement this
+            # print(dataPt)
+            dataPt=dataPt.reshape(5, 5)
+        self.rewards = torch.from_numpy(self.rewards).to(device)
+        self.dataPoints = torch.from_numpy(self.dataPoints).to(device)
+        print("this is dataset size: "+str(self.dataset_size))
     def __getitem__(self, index):
         return self.dataPoints[index], self.rewards[index]
 

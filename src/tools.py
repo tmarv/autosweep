@@ -83,7 +83,8 @@ def augment_data(rewards, data_points):
         aug_data_pts.append(state_b)
         aug_data_pts.append(state_c)
         aug_data_pts.append(state_d)
-
+    print(len(aug_rewards))
+    print(len(aug_data_pts))
     return np.array(aug_rewards), np.array(aug_data_pts)
 
 def augment_data_five(rewards, data_points):
