@@ -107,7 +107,9 @@ class CustomDatasetFromTextFiles5(Dataset):
         # if we are training for a specific cluster
         if cluster_num > -2:
             self.clusters = np.array(pd.read_csv(self.filename5, header=None, usecols=[27]))
+            self.clusters = np.array(self.clusters).astype(np.float32)
             self.rewards = np.array(pd.read_csv(self.filename5, header=None, usecols=[27]))
+            self.rewards = np.array(self.rewards).astype(np.float32)
             self.with_cluster = True
             if cluster_num > -1:
                 self.rewards = pd.read_csv(self.filename5, header=None, usecols=[25])
@@ -143,7 +145,7 @@ class CustomDatasetFromTextFiles5(Dataset):
                 else:
                     print("ERROR")
                     print("unkown cluster: " + str(self.clusters[i]))
-            self.rewards = np.asarray(enlarged_cluster)
+            self.rewards = np.asarray(enlarged_cluster).astype(np.float32)
         for dataPt in self.dataPoints:
             #TODO: fix/implement this
             # print(dataPt)

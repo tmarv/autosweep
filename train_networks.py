@@ -55,7 +55,6 @@ def train_cluster_net_three(epoch=1000, batch_size=8192, plot_result=False, back
 
 def train_cluster_net_five_conv(epoch=1000, batch_size=8192, plot_result=False, backup_name="backup_net_cluster_five", learning_rate=0.001):
     print("this is device " + str(device))
-    # TODO make a clustering conv net
     cluster_net_five_conv = neural_net_lib.FiveByFiveConvCluster().to(device)
     params_cluster_five_conv = {'batch_size': batch_size, 'shuffle': True, 'num_workers': 0}
     cluster_set_five_conv = custom_data_loader_text.CustomDatasetFromTextFiles5(is_small=False, is_clean=True,
@@ -74,8 +73,9 @@ def train_cluster_net_five_conv(epoch=1000, batch_size=8192, plot_result=False, 
             start_time = end_time
         for i, data in enumerate(cluster_loader_five_conv):
             inputs, clusters = data
-            inputs = inputs.reshape(batch_size, 5, 5).unsqueeze(1)
-            # unsqueeze the data?
+            input_len = len(inputs)
+            inputs = inputs.reshape(input_len, 5, 5)
+            inputs = inputs.unsqueeze(1)
             result = cluster_net_five_conv.forward(inputs)
             train_loss = l1_loss(result, clusters)
             optimizer_cluster_five_conv.zero_grad()
@@ -141,10 +141,6 @@ def train_three_by_three_for_one_cluster(cluster, epoch = 1000, batch_size = 204
             print("epoch: "+str(e))
         for i, data in enumerate(train_loader_three):
             inputs, rewards = data
-            # make sure it is the same length as batch size
-            # input_len = len(inputs)
-            # inputs = inputs.reshape([input_len, 3, 3]).to(device)
-            # rewards = rewards.reshape([input_len, 1]).to(device)
             result = neural_net_three.forward(inputs)
             train_loss = l1_loss(result, rewards)
             optimizer_three.zero_grad()
