@@ -237,6 +237,44 @@ def train_five_by_five_conv(epoch=1000, batch_size=8192, plot_result=False, back
     if plot_result:
         plt.show()
 
+
+def train_five_by_five_for_one_cluster(cluster, epoch = 1000, batch_size = 2048, plot_result = False,
+                                         backup_name = "backup_net_five", learning_rate = 0.001):
+    neural_net_five_conv = neural_net_lib.FiveByFiveConv().to(device)
+    params_five = {'batch_size': batch_size, 'shuffle': True, 'num_workers': 0}
+    train_dataset_five = custom_data_loader_text.CustomDatasetFromTextFiles5(is_small = False, is_clean = False,
+                                                                              with_var = True, cluster_num = cluster,
+                                                                              device = device)
+    train_loader_five = DataLoader(train_dataset_five, **params_five)
+    optimizer_five = optim.Adam(neural_net_five_conv.parameters(), lr=learning_rate)
+    l1_loss = nn.SmoothL1Loss()
+    train_losses = []
+
+    for e in range (epoch):
+        if e%100 == 0:
+            print("epoch: "+str(e))
+        for i, data in enumerate(train_loader_five):
+            inputs, rewards = data
+            input_len = len(inputs)
+            inputs = inputs.reshape([input_len, 5, 5]).to(device)
+            inputs = inputs.unsqueeze(1)
+            result = neural_net_five_conv.forward(inputs)
+            train_loss = l1_loss(result, rewards)
+            optimizer_five.zero_grad()
+            train_loss.backward()
+            optimizer_five.step()
+            train_losses.append(train_loss.detach().cpu())
+
+    backup_name+=("_cluster_five_"+str(cluster))
+    backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(), ("../saved_nets/" + backup_name)))
+    torch.save(neural_net_five_conv.state_dict(), backup_net_name)
+
+
+    plt.plot(np.array(train_losses))
+    plt.savefig(backup_name+".png")
+    if plot_result:
+        plt.show()
+
 #initialize everything
 device = tools.get_device()
 print(device)
