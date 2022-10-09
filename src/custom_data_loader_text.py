@@ -129,7 +129,7 @@ class CustomDatasetFromTextFiles5(Dataset):
             #TODO create reward shaper five
             self.rewards = reward_manager.reward_shaper_five(self.rewards, self.dataPoints)
         if not with_var:
-            self.rewards, self.dataPoints = tools.augment_data(self.rewards, self.dataPoints)
+            self.rewards, self.dataPoints = tools.augment_data_five(self.rewards, self.dataPoints)
             self.dataset_size = len(self.rewards)
             print(self.dataset_size)
         if self.with_cluster:
