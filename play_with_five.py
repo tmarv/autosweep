@@ -89,22 +89,6 @@ def select_action_five(neural_net, state):
     return return_values
 
 
-def run_clustering_three(state):
-    state_three = tools.extend_state(state)
-    score_board_clusters = np.zeros((8, 8, 3))
-    for i in range(1, 9):
-        for j in range(1, 9):
-            local_cpy = tools.grab_sub_state_noext(state_three, i, j)
-            local_tensor = torch.from_numpy(local_cpy).to(dtype=torch.float)
-            local_tensor = local_tensor.unsqueeze(0)
-            float_result = cluster_net.forward(local_tensor.reshape([1, 9]))
-            # print(local_cpy)
-            # print(float_result[0].detach().numpy())
-            # score_board_clusters[j - 1, i - 1] = round(torch.argmax(float_result).item())
-            score_board_clusters[i - 1, j - 1, :] = float_result[0].detach().numpy()
-    return score_board_clusters
-
-
 def run_clustering_five(state):
     # print("state: "+str(state))
     state_five = tools.extend_state_five(state)
@@ -198,18 +182,10 @@ def play_with_nets(iterations, epoch='', is_test_set=False, random_percent=0.0):
         os.path.join(tools.get_working_dir(), '../saved_nets/raw_net_five'))
     neural_net_five.load_state_dict(torch.load(net_name_five, map_location=device))
     neural_net_five.eval()
-    ''''''
     win = 0
     lose = 0
     # load the 3 by 3 kernel network
-    '''
-    neural_net_three = neural_net_lib.ThreeByThreeSig()
-    # TODO: fix this
-    net_name_three = os.path.abspath(
-        os.path.join(tools.get_working_dir(), '../saved_nets/neural_net_three_test_' + str(epoch)))
-    neural_net_three.load_state_dict(torch.load(net_name_three,  map_location=device))
-    neural_net_three.eval()
-    '''
+
     # TODO fix incrementation bug
     i_episode = 0
     while i_episode < iterations:
