@@ -209,13 +209,14 @@ def train_five_by_five_conv(epoch=1000, batch_size=8192, plot_result=False, back
     train_losses = []
     start_time = time.time()
     for e in range(epoch):
-        if e%100 == 0:
+        if e%10 == 0:
             end_time = time.time()
             print("epoch: " + str(e))
             print(end_time - start_time)
             start_time = end_time
         for i, data in enumerate(train_loader_five):
             inputs, rewards = data
+            # print("this is len " + str(len(inputs)))
             # make sure it is the same length as batch size
             input_len = len(inputs)
             inputs = inputs.reshape([input_len, 5, 5]).to(device)
@@ -233,6 +234,8 @@ def train_five_by_five_conv(epoch=1000, batch_size=8192, plot_result=False, back
     torch.save(neural_net_five_conv.state_dict(), backup_net_name)
 
     plt.plot(np.array(train_losses))
+    ax = plt.gca()
+    ax.set_ylim([0, 12])
     plt.savefig(backup_name+".png")
     if plot_result:
         plt.show()

@@ -59,7 +59,7 @@ def add_variance_and_cluster_five_conv(backup_name="raw_net_five_conv", thresh=0
     neural_net = neural_net_lib.FiveByFiveConv().to(device)
     net_name = os.path.abspath(os.path.join(tools.get_working_dir(), '../saved_nets/'+backup_name))
     neural_net.load_state_dict(torch.load(net_name))
-
+    neural_net.eval()
     # we want them 1 by 1 since we are writting in a datafile
     params_three = {'batch_size': 1, 'shuffle': False, 'num_workers': 0}
 

@@ -341,12 +341,12 @@ def play_with_clustering(iterations=1, random_percent=0.0):
             counter += 1
             for k in range(0, 64):
                 print("loop k: " + str(dg.get_status()))
-                '''
+
                 if random.random() < random_percent:
                     print("random action")
                     action[k][0] = random.randint(0, 7)
                     action[k][1] = random.randint(0, 7)
-                '''
+                ''''''
                 min_int.move_and_click_to_ij(action[k][0], action[k][1])
                 # print(action[k])
                 tools.move_to(1490, 900)
@@ -518,6 +518,6 @@ tools.move_and_click(739, 320)
 # init
 # gui.click()
 
-play_with_clustering(iterations=1)
+play_with_clustering(iterations=10, random_percent = 0.0)
 # play_with_nets(iterations=1)
 # play_random(iterations=10)

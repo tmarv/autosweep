@@ -39,18 +39,18 @@ def train_cluster_specific_nets_three():
 
 torch.set_num_threads(4)
 
-train_networks.train_five_by_five_conv(epoch=10000, plot_result=True, backup_name="raw_net_five_conv", learning_rate=0.0003, batch_size=16384)
+train_networks.train_five_by_five_conv(epoch=3000, plot_result=False, backup_name="raw_net_five_conv", learning_rate=0.0003, batch_size=8192)
 
 estimate_variance.add_variance_and_cluster_five_conv(backup_name="raw_net_five_conv")
 
-train_networks.train_cluster_net_five_conv(epoch=1000)
+train_networks.train_cluster_net_five_conv(epoch=3000, plot_result=False)
 
 '''
 # train the cluster specific nets 5 by 5
 '''
 def train_cluster_specific_nets_five():
-    train_networks.train_five_by_five_for_one_cluster(0, epoch=6000, plot_result=False, backup_name="net_five", batch_size=16384)
-    train_networks.train_five_by_five_for_one_cluster(1, epoch=6000, plot_result=False, backup_name="net_five", batch_size=16384)
-    train_networks.train_five_by_five_for_one_cluster(2, epoch=6000, plot_result=False, backup_name="net_five", batch_size=16384)
+    train_networks.train_five_by_five_for_one_cluster(0, epoch=2000, plot_result=False, backup_name="net_five", batch_size=8192)
+    train_networks.train_five_by_five_for_one_cluster(1, epoch=2000, plot_result=False, backup_name="net_five", batch_size=8192)
+    train_networks.train_five_by_five_for_one_cluster(2, epoch=2000, plot_result=False, backup_name="net_five", batch_size=8192)
 
 train_cluster_specific_nets_five()

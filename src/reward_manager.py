@@ -84,7 +84,6 @@ def reward_shaper_neg_five(reward, grid):
         reward = -64.0
     elif reward == 0:
         reward = -0.15
-
     return reward
 
 

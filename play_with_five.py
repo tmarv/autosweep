@@ -6,6 +6,7 @@ import random
 import math
 import numpy as np
 from time import sleep
+from datetime import datetime
 
 # self made classes
 from src import data_gathering_histgrm as dg
@@ -113,7 +114,9 @@ def run_clustering_five(state):
 
 def select_action_cluster(the_nets, state):
     # clusters = run_clustering_three(state)
+    print("before run clustering: " + str(datetime.now()))
     clusters = run_clustering_five(state)
+    print("after run clustering: " + str(datetime.now()))
     # print(state)
     state_five = tools.extend_state_five(state)
     score_board = np.zeros((8, 8))
@@ -130,9 +133,9 @@ def select_action_cluster(the_nets, state):
             # print(local_cpy)
             # if(j==2):
             #    exit()
-            mult0 = 3.0
-            mult1 = 1.0
-            mult2 = 1.5
+            mult0 = 5.0
+            mult1 = 0.5
+            mult2 = 1.2
             # print(cluster[0])
             # print(cluster[1])
             # print(cluster[2])
@@ -148,6 +151,7 @@ def select_action_cluster(the_nets, state):
             # print(result0*mult0+(result1*mult1)-abs(result2*mult2))
             score_board[i - 2, j - 2] = result0 * mult0 + (result1 * mult1) - abs(result2 * mult2)
     # print(score_board)
+    print("after run algo score board: " + str(datetime.now()))
     return prepare_return_values(score_board)
 
 
@@ -298,7 +302,9 @@ def play_with_clustering(iterations = 1, random_percent=0.0):
         sleep(0.3)
         counter = 0
         while not dg.get_status() and counter < 200:
+            print("gloabl before: "+str(datetime.now()))
             action = select_action_cluster(nets_clusters, state)
+            print("global after: "+str(datetime.now()))
             counter += 1
             for k in range(0, 64):
                 print("loop k: " + str(dg.get_status()))
@@ -373,15 +379,12 @@ def play_with_clustering(iterations = 1, random_percent=0.0):
     print("winners: " + str(winners) + " losers: " + str(losers))
 
 
-def select_action():
-    random_action = random.randrange(NUM_ACTIONS)
-    # print('this is random action ', random_action)
-    return torch.tensor([[math.floor(random_action / 8), random_action % 8]], device=device, dtype=torch.int)
 
 
 
-# device = tools.get_device()
-device = "cpu"
+
+device = tools.get_device()
+#device = "cpu"
 
 cluster_net = neural_net_lib.FiveByFiveConvCluster()
 cluster_net_name = os.path.abspath(
@@ -399,6 +402,8 @@ tools.move_and_click(739, 320)
 # init
 # gui.click()
 
-play_with_clustering(iterations=1)
+torch.set_num_threads(4)
+with torch.no_grad():
+    play_with_clustering(iterations=20)
 # play_with_nets(iterations=1)
 # play_random(iterations=10)
