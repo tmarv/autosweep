@@ -133,8 +133,8 @@ def select_action_cluster(the_nets, state):
             # print(local_cpy)
             # if(j==2):
             #    exit()
-            mult0 = 5.0
-            mult1 = 0.5
+            mult0 = 2.0
+            mult1 = 0.0
             mult2 = 1.2
             # print(cluster[0])
             # print(cluster[1])

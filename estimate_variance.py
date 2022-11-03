@@ -55,7 +55,7 @@ def add_variance_and_cluster_three(thresh=0.3):
     _rewards3_text_file_with_var.close()
 
 
-def add_variance_and_cluster_five_conv(backup_name="raw_net_five_conv", thresh=0.3):
+def add_variance_and_cluster_five_conv(backup_name="raw_net_five_conv", plot_result=False,  thresh=0.3):
     neural_net = neural_net_lib.FiveByFiveConv().to(device)
     net_name = os.path.abspath(os.path.join(tools.get_working_dir(), '../saved_nets/'+backup_name))
     neural_net.load_state_dict(torch.load(net_name))
@@ -99,9 +99,11 @@ def add_variance_and_cluster_five_conv(backup_name="raw_net_five_conv", thresh=0
         list = ','.join(str(v) for v in inputs_list)
         _rewards5_text_file_with_var.write(list+","+str(rewards.item())+","+str(result.item())+","+str(cluster)+"\n")
 
-    plt.plot(results_plot)
-    plt.plot(rewards_plot)
-    plt.show()
+    if plot_resul:
+        plt.plot(results_plot)
+        plt.plot(rewards_plot)
+        plt.show()
+
     _rewards5_text_file_with_var.close()
 
 

@@ -39,9 +39,9 @@ def train_cluster_specific_nets_three():
 
 torch.set_num_threads(4)
 
-train_networks.train_five_by_five_conv(epoch=3000, plot_result=False, backup_name="raw_net_five_conv", learning_rate=0.0003, batch_size=8192)
+#train_networks.train_five_by_five_conv(epoch=3000, plot_result=False, backup_name="raw_net_five_conv", learning_rate=0.0003, batch_size=8192)
 
-estimate_variance.add_variance_and_cluster_five_conv(backup_name="raw_net_five_conv")
+#estimate_variance.add_variance_and_cluster_five_conv(backup_name="raw_net_five_conv", plot_result=False)
 
 train_networks.train_cluster_net_five_conv(epoch=3000, plot_result=False)
 
