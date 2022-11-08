@@ -242,8 +242,14 @@ def train_five_by_five_conv(epoch=1000, batch_size=8192, plot_result=False, back
 
 
 def train_five_by_five_for_one_cluster(cluster, epoch = 1000, batch_size = 2048, plot_result = False,
-                                         backup_name = "backup_net_five", learning_rate = 0.001):
+                                         backup_name = "backup_net_five", learning_rate = 0.001, use_pretrained = False,
+                                       pretrained_name="raw_net_five_conv"):
     neural_net_five_conv = neural_net_lib.FiveByFiveConv().to(device)
+    if use_pretrained:
+        backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(), ("../saved_nets/" + pretrained_name)))
+        neural_net_five_conv.load_state_dict(torch.load(backup_net_name))
+        neural_net_five_conv.to(device)
+
     params_five = {'batch_size': batch_size, 'shuffle': True, 'num_workers': 0}
     train_dataset_five = custom_data_loader_text.CustomDatasetFromTextFiles5(is_small = False, is_clean = False,
                                                                               with_var = True, cluster_num = cluster,

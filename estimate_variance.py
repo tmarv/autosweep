@@ -99,7 +99,7 @@ def add_variance_and_cluster_five_conv(backup_name="raw_net_five_conv", plot_res
         list = ','.join(str(v) for v in inputs_list)
         _rewards5_text_file_with_var.write(list+","+str(rewards.item())+","+str(result.item())+","+str(cluster)+"\n")
 
-    if plot_resul:
+    if plot_result:
         plt.plot(results_plot)
         plt.plot(rewards_plot)
         plt.show()

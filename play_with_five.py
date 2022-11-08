@@ -103,12 +103,13 @@ def run_clustering_five(state):
             #local_tensor = local_tensor.unsqueeze(0)
             local_tensor = local_tensor.reshape([1, 5, 5])
             local_tensor = local_tensor.unsqueeze(0)
+            local_tensor = local_tensor.to(device)
             #print('local_tensor'+str(local_tensor))
             float_result = cluster_net.forward(local_tensor)
             # print(local_cpy)
             # print(float_result[0].detach().numpy())
             # score_board_clusters[j - 1, i - 1] = round(torch.argmax(float_result).item())
-            score_board_clusters[i - 2, j - 2, :] = float_result[0].detach().numpy()
+            score_board_clusters[i - 2, j - 2, :] = float_result[0].cpu().detach().numpy()
     return score_board_clusters
 
 
@@ -127,15 +128,16 @@ def select_action_cluster(the_nets, state):
             local_tensor = torch.from_numpy(local_cpy).to(dtype=torch.float)
             local_tensor = local_tensor.reshape([1, 5, 5])
             local_tensor = local_tensor.unsqueeze(0)
+            local_tensor = local_tensor.to(device)
             cluster = clusters[i - 2, j - 2]
             # print("cluster alone")
             # print(cluster)
             # print(local_cpy)
             # if(j==2):
             #    exit()
-            mult0 = 2.0
-            mult1 = 0.0
-            mult2 = 1.2
+            mult0 = 1.0
+            mult1 = 0.4
+            mult2 = 1.0
             # print(cluster[0])
             # print(cluster[1])
             # print(cluster[2])
@@ -156,9 +158,6 @@ def select_action_cluster(the_nets, state):
 
 
 def init_the_cluster_nets_five(base_name):
-    net_0 = neural_net_lib.FiveByFiveConv()
-    net_1 = neural_net_lib.FiveByFiveConv()
-    net_2 = neural_net_lib.FiveByFiveConv()
 
     net_0_name = os.path.abspath(
         os.path.join(tools.get_working_dir(), '../saved_nets/' + base_name + "0"))
@@ -166,13 +165,22 @@ def init_the_cluster_nets_five(base_name):
         os.path.join(tools.get_working_dir(), '../saved_nets/' + base_name + "1"))
     net_2_name = os.path.abspath(
         os.path.join(tools.get_working_dir(), '../saved_nets/' + base_name + "2"))
-
-    net_0.load_state_dict(torch.load(net_0_name, map_location=device))
-    net_1.load_state_dict(torch.load(net_1_name, map_location=device))
-    net_2.load_state_dict(torch.load(net_2_name, map_location=device))
+    #model.load_state_dict(torch.load(PATH))
+    net_0 = neural_net_lib.FiveByFiveConv()
+    net_0.load_state_dict(torch.load(net_0_name))
     net_0.eval()
+    net_0.to(device)
+
+    net_1 = neural_net_lib.FiveByFiveConv()
+    net_1.load_state_dict(torch.load(net_1_name))
     net_1.eval()
+    net_1.to(device)
+
+    net_2 = neural_net_lib.FiveByFiveConv()
+    net_2.load_state_dict(torch.load(net_2_name))
     net_2.eval()
+    net_2.to(device)
+
     return [net_0, net_1, net_2]
 
 
@@ -389,8 +397,9 @@ device = tools.get_device()
 cluster_net = neural_net_lib.FiveByFiveConvCluster()
 cluster_net_name = os.path.abspath(
     os.path.join(tools.get_working_dir(), '../saved_nets/backup_net_cluster_five'))
-cluster_net.load_state_dict(torch.load(cluster_net_name, map_location=device))
+cluster_net.load_state_dict(torch.load(cluster_net_name))
 cluster_net.eval()
+cluster_net.to(device)
 
 # start minesweeper program
 tools.launch_mines()
