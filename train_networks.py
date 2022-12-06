@@ -19,11 +19,13 @@ from src import reward_manager, tools, neural_net_lib, custom_data_loader_text
 
 
 def train_cluster_net_three(epoch=1000, batch_size=8192, plot_result=False, backup_name="backup_net", learning_rate=0.001):
-    print("this is device "+str(device))
     cluster_net_three = neural_net_lib.ThreeByThreeCluster().to(device)
     params_cluster_three = {'batch_size': batch_size, 'shuffle': True, 'num_workers': 0}
-    cluster_set_three = custom_data_loader_text.CustomDatasetFromTextFiles3(is_small=False, is_clean=True,
-                                                                            with_var=True, cluster_num=-1, device=device)
+    cluster_set_three = custom_data_loader_text.CustomDatasetFromTextFiles3(is_small=False,
+                                                                            is_clean=True,
+                                                                            with_var=True,
+                                                                            cluster_num=-1,
+                                                                            device=device)
     cluster_loader_three = DataLoader(cluster_set_three, **params_cluster_three)
     optimizer_cluster_three = optim.Adam(cluster_net_three.parameters(), lr=learning_rate)
     l1_loss = nn.SmoothL1Loss().to(device)
@@ -53,14 +55,31 @@ def train_cluster_net_three(epoch=1000, batch_size=8192, plot_result=False, back
         plt.show()
 
 
-def train_cluster_net_five_conv(epoch=1000, batch_size=8192, plot_result=False, backup_name="backup_net_cluster_five", learning_rate=0.001):
-    print("this is device " + str(device))
+def train_cluster_net_five_conv(epoch = 1000,
+                                batch_size = 8192,
+                                plot_result = False,
+                                backup_name = "backup_net_cluster_five",
+                                learning_rate = 0.001,
+                                use_pretrained = False,
+                                pretrained_net_name = "backup_net_cluster_five",
+                                training_loss_graph = "training_plots/train_cluster_five.png"):
     cluster_net_five_conv = neural_net_lib.FiveByFiveConvCluster().to(device)
+
+    if use_pretrained:
+        backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(),
+                                          ("../saved_nets/" + pretrained_net_name)))
+        cluster_net_five_conv.load_state_dict(torch.load(backup_net_name))
+        cluster_net_five_conv.to(device)
+
     params_cluster_five_conv = {'batch_size': batch_size, 'shuffle': True, 'num_workers': 0}
-    cluster_set_five_conv = custom_data_loader_text.CustomDatasetFromTextFiles5(is_small=False, is_clean=True,
-                                                                            with_var=True, cluster_num=-1, device=device)
+    cluster_set_five_conv = custom_data_loader_text.CustomDatasetFromTextFiles5(is_small=False,
+                                                                                is_clean=True,
+                                                                                with_var=True,
+                                                                                cluster_num=-1,
+                                                                                device=device)
     cluster_loader_five_conv = DataLoader(cluster_set_five_conv, **params_cluster_five_conv)
     optimizer_cluster_five_conv = optim.Adam(cluster_net_five_conv.parameters(), lr=learning_rate)
+    # TODO make this a parameter
     l1_loss = nn.SmoothL1Loss().to(device)
     train_losses = []
     cluster_net_five_conv.train()
@@ -85,10 +104,11 @@ def train_cluster_net_five_conv(epoch=1000, batch_size=8192, plot_result=False, 
 
     backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(), ("../saved_nets/" + backup_name)))
     torch.save(cluster_net_five_conv.state_dict(), backup_net_name)
-    plt.plot(np.array(train_losses))
-    plt.savefig(backup_name + ".png")
+
     if plot_result:
-        plt.show()
+        plt.clf()
+        plt.plot(np.array(train_losses))
+        plt.savefig(training_loss_graph)
 def train_three_by_three_raw_net(epoch = 1000, batch_size=8192, plot_result=False, backup_name="backup_net", learning_rate=0.001):
     neural_net_three = neural_net_lib.ThreeByThreeSig().to(device)
     params_three = {'batch_size': batch_size, 'shuffle': True, 'num_workers': 0}
@@ -124,12 +144,19 @@ def train_three_by_three_raw_net(epoch = 1000, batch_size=8192, plot_result=Fals
         plt.show()
 
 
-def train_three_by_three_for_one_cluster(cluster, epoch = 1000, batch_size = 2048, plot_result = False,
-                                         backup_name = "backup_net", learning_rate = 0.001):
+def train_three_by_three_for_one_cluster(cluster,
+                                         epoch = 1000,
+                                         batch_size = 2048,
+                                         plot_result = False,
+                                         backup_name = "backup_net",
+                                         learning_rate = 0.001):
+
     neural_net_three = neural_net_lib.ThreeByThreeSig().to(device)
     params_three = {'batch_size': batch_size, 'shuffle': True, 'num_workers': 0}
-    train_dataset_three = custom_data_loader_text.CustomDatasetFromTextFiles3(is_small = False, is_clean = False,
-                                                                              with_var = True, cluster_num = cluster,
+    train_dataset_three = custom_data_loader_text.CustomDatasetFromTextFiles3(is_small = False,
+                                                                              is_clean = False,
+                                                                              with_var = True,
+                                                                              cluster_num = cluster,
                                                                               device = device)
     train_loader_three = DataLoader(train_dataset_three, **params_three)
     optimizer_three = optim.Adam(neural_net_three.parameters(), lr=learning_rate)
@@ -151,7 +178,6 @@ def train_three_by_three_for_one_cluster(cluster, epoch = 1000, batch_size = 204
     backup_name+=("_cluster_"+str(cluster))
     backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(), ("../saved_nets/" + backup_name)))
     torch.save(neural_net_three.state_dict(), backup_net_name)
-
 
     plt.plot(np.array(train_losses))
     plt.savefig(backup_name+".png")
@@ -197,10 +223,22 @@ def train_five_by_five_raw_net(epoch = 1000, batch_size=8192, plot_result=False,
         plt.show()
 
 
-def train_five_by_five_conv(epoch=1000, batch_size=8192, plot_result=False, backup_name="backup_conv_net_five",
-                            learning_rate=0.001):
+def train_five_by_five_conv(epoch=1000,
+                            batch_size=8192,
+                            plot_result=False,
+                            backup_name="raw_net_five_conv",
+                            learning_rate=0.001,
+                            use_pretrained=False,
+                            pretrained_name="raw_net_five_conv",
+                            training_loss_graph="training_plots/plot.png"):
     print("training convolution net 5 by 5")
     neural_net_five_conv = neural_net_lib.FiveByFiveConv().to(device)
+
+    if use_pretrained:
+        backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(), ("../saved_nets/" + pretrained_name)))
+        neural_net_five_conv.load_state_dict(torch.load(backup_net_name))
+        neural_net_five_conv.to(device)
+
     params = {'batch_size': batch_size, 'shuffle': True, 'num_workers': 0}
     train_dataset_five = custom_data_loader_text.CustomDatasetFromTextFiles5(is_small=False)
     train_loader_five = DataLoader(train_dataset_five, **params)
@@ -232,18 +270,22 @@ def train_five_by_five_conv(epoch=1000, batch_size=8192, plot_result=False, back
 
     backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(), ("../saved_nets/" + backup_name)))
     torch.save(neural_net_five_conv.state_dict(), backup_net_name)
-
-    plt.plot(np.array(train_losses))
-    ax = plt.gca()
-    ax.set_ylim([0, 12])
-    plt.savefig(backup_name+".png")
     if plot_result:
-        plt.show()
+        plt.plot(np.array(train_losses))
+        ax = plt.gca()
+        ax.set_ylim([0, 12])
+        plt.savefig(training_loss_graph)
 
 
-def train_five_by_five_for_one_cluster(cluster, epoch = 1000, batch_size = 2048, plot_result = False,
-                                         backup_name = "backup_net_five", learning_rate = 0.001, use_pretrained = False,
-                                       pretrained_name="raw_net_five_conv"):
+def train_five_by_five_for_one_cluster(cluster,
+                                       epoch = 1000,
+                                       batch_size = 2048,
+                                       plot_result = False,
+                                       backup_name = "backup_net_five",
+                                       learning_rate = 0.001,
+                                       use_pretrained = False,
+                                       pretrained_name = "raw_net_five_conv",
+                                       training_loss_graph="training_plots/plot.png"):
     neural_net_five_conv = neural_net_lib.FiveByFiveConv().to(device)
     if use_pretrained:
         backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(), ("../saved_nets/" + pretrained_name)))
@@ -251,9 +293,11 @@ def train_five_by_five_for_one_cluster(cluster, epoch = 1000, batch_size = 2048,
         neural_net_five_conv.to(device)
 
     params_five = {'batch_size': batch_size, 'shuffle': True, 'num_workers': 0}
-    train_dataset_five = custom_data_loader_text.CustomDatasetFromTextFiles5(is_small = False, is_clean = False,
-                                                                              with_var = True, cluster_num = cluster,
-                                                                              device = device)
+    train_dataset_five = custom_data_loader_text.CustomDatasetFromTextFiles5(is_small = False,
+                                                                             is_clean = False,
+                                                                             with_var = True,
+                                                                             cluster_num = cluster,
+                                                                             device = device)
     train_loader_five = DataLoader(train_dataset_five, **params_five)
     optimizer_five = optim.Adam(neural_net_five_conv.parameters(), lr=learning_rate)
     l1_loss = nn.SmoothL1Loss()
@@ -274,17 +318,14 @@ def train_five_by_five_for_one_cluster(cluster, epoch = 1000, batch_size = 2048,
             optimizer_five.step()
             train_losses.append(train_loss.detach().cpu())
 
-    backup_name+=("_cluster_five_"+str(cluster))
     backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(), ("../saved_nets/" + backup_name)))
     torch.save(neural_net_five_conv.state_dict(), backup_net_name)
 
-
-    plt.plot(np.array(train_losses))
-    plt.savefig(backup_name+".png")
     if plot_result:
-        plt.show()
+        plt.plot(np.array(train_losses))
+        plt.savefig(training_loss_graph)
 
 #initialize everything
 device = tools.get_device()
-print(device)
+print("train_networks uses following cuda device: "+str(device))
 

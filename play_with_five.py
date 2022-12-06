@@ -135,16 +135,20 @@ def select_action_cluster(the_nets, state):
             # print(local_cpy)
             # if(j==2):
             #    exit()
-            mult0 = 1.0
-            mult1 = 0.4
+            mult0 = 3.0
+            mult1 = 0.05
             mult2 = 1.0
             # print(cluster[0])
             # print(cluster[1])
             # print(cluster[2])
-            if cluster[0] < 0.1:
+
+            if cluster[0] < 0.01:
                 mult0 = 0
+
             if cluster[1] < 0.1:
                 mult1 = 0
+            '''
+            '''
             if cluster[2] < 0.1:
                 mult2 = 0
             result0 = the_nets[0].forward(local_tensor)[0]
@@ -183,7 +187,7 @@ def init_the_cluster_nets_five(base_name):
 
     return [net_0, net_1, net_2]
 
-
+ # TODO rename or move
 def play_with_nets(iterations, epoch='', is_test_set=False, random_percent=0.0):
     print("starting only five by five play")
     # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -289,8 +293,8 @@ def play_with_nets(iterations, epoch='', is_test_set=False, random_percent=0.0):
     print("lose" + str(lose))
 
 
-def play_with_clustering(iterations = 1, random_percent=0.0):
-    nets_clusters = init_the_cluster_nets_five("net_five_cluster_five_")
+def play_with_clustering(iterations = 1, random_percent=0.0, save_data=True):
+    nets_clusters = init_the_cluster_nets_five("net_five_cluster_")
     print("playing with clusters")
     is_test_set = False
     i_episode = 0
@@ -316,12 +320,12 @@ def play_with_clustering(iterations = 1, random_percent=0.0):
             counter += 1
             for k in range(0, 64):
                 print("loop k: " + str(dg.get_status()))
-                '''
+                ''''''
                 if random.random() < random_percent:
                     print("random action")
                     action[k][0] = random.randint(0, 7)
                     action[k][1] = random.randint(0, 7)
-                '''
+
                 min_int.move_and_click_to_ij(action[k][0], action[k][1])
                 # print(action[k])
                 tools.move_to(1490, 900)
@@ -338,8 +342,9 @@ def play_with_clustering(iterations = 1, random_percent=0.0):
                 if dg.get_status():
                     print('hit mine')
                     losers += 1
-                    tools.save_action_neg_three(-64, sub_state_three, is_test_set)
-                    tools.save_action_neg_five(-64, sub_state_five, is_test_set)
+                    if save_data:
+                        tools.save_action_neg_three(-64, sub_state_three, is_test_set)
+                        tools.save_action_neg_five(-64, sub_state_five, is_test_set)
                     print(sub_state_three)
                     print(sub_state_five)
                     tools.move_and_click(1490, 900)
@@ -354,8 +359,9 @@ def play_with_clustering(iterations = 1, random_percent=0.0):
                 if has_won:
                     winners += 1
                     print("has won with clusters")
-                    tools.save_action_three(10, sub_state_three, is_test_set)
-                    tools.save_action_five(10, sub_state_five, is_test_set)
+                    if save_data:
+                        tools.save_action_three(10, sub_state_three, is_test_set)
+                        tools.save_action_five(10, sub_state_five, is_test_set)
                     tools.move_and_click(1490, 900)
                     print("has won collect data with ml :" + str(counter))
                     counter += 1001
@@ -365,12 +371,12 @@ def play_with_clustering(iterations = 1, random_percent=0.0):
                 else:
                     print("no win")
                     # save data from transition
-                    if reward > 0:
+                    if save_data and reward > 0:
                         tools.save_action_three(reward, sub_state_three, is_test_set)
                         tools.save_action_five(reward, sub_state_five, is_test_set)
                         print("this is positive reward " + str(reward))
 
-                    elif reward <= 0:
+                    elif save_data and reward <= 0:
                         print("this is negative reward " + str(reward))
                         tools.save_action_neg_three(reward, sub_state_three, is_test_set)
                         tools.save_action_neg_five(reward, sub_state_five, is_test_set)
@@ -390,9 +396,9 @@ def play_with_clustering(iterations = 1, random_percent=0.0):
 
 
 
+# prepare and load the nets
 
 device = tools.get_device()
-#device = "cpu"
 
 cluster_net = neural_net_lib.FiveByFiveConvCluster()
 cluster_net_name = os.path.abspath(
@@ -403,16 +409,11 @@ cluster_net.to(device)
 
 # start minesweeper program
 tools.launch_mines()
-#tools.move_and_click(33, 763)
 # can be slow
 sleep(1)
 # start 8 by 8 minesweeper
 tools.move_and_click(739, 320)
-# init
-# gui.click()
 
 torch.set_num_threads(4)
 with torch.no_grad():
-    play_with_clustering(iterations=20)
-# play_with_nets(iterations=1)
-# play_random(iterations=10)
+    play_with_clustering(iterations=4, random_percent=0.0, save_data=True)

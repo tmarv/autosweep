@@ -8,9 +8,8 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
-import src.tools
+#import src.tools
 from src import reward_manager, tools
-#import reward_manager, tools
 
 
 class CustomDatasetFromTextFiles3(Dataset):
@@ -149,7 +148,7 @@ class CustomDatasetFromTextFiles5(Dataset):
         for dataPt in self.dataPoints:
             #TODO: fix/implement this
             # print(dataPt)
-            dataPt=dataPt.reshape(5, 5)
+            dataPt = dataPt.reshape(5, 5)
         self.rewards = torch.from_numpy(self.rewards).to(device)
         self.dataPoints = torch.from_numpy(self.dataPoints).to(device)
         print("this is dataset size: "+str(self.dataset_size))

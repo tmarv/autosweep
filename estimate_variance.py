@@ -55,14 +55,15 @@ def add_variance_and_cluster_three(thresh=0.3):
     _rewards3_text_file_with_var.close()
 
 
-def add_variance_and_cluster_five_conv(backup_name="raw_net_five_conv", plot_result=False,  thresh=0.3):
+def add_variance_and_cluster_five_conv(backup_name="raw_net_five_conv", plot_result=False,  thresh=0.3,
+                                       backup_plot_name="backup.png"):
     neural_net = neural_net_lib.FiveByFiveConv().to(device)
     net_name = os.path.abspath(os.path.join(tools.get_working_dir(), '../saved_nets/'+backup_name))
     neural_net.load_state_dict(torch.load(net_name))
     neural_net.eval()
     # we want them 1 by 1 since we are writting in a datafile
     params_three = {'batch_size': 1, 'shuffle': False, 'num_workers': 0}
-
+    print("started add_variance_and_cluster_five_conv")
     custom_set_five = custom_data_loader_text.CustomDatasetFromTextFiles5()
     train_loader_five = DataLoader(custom_set_five, **params_three)
 
@@ -73,6 +74,8 @@ def add_variance_and_cluster_five_conv(backup_name="raw_net_five_conv", plot_res
 
     for i, data in enumerate(train_loader_five):
         inputs, rewards = data
+        if i%1000 == 0 and i>0:
+            print("at iteration: "+str(i))
         '''
         for i in range(len(rewards)):
             if rewards[i] == -10:
@@ -99,13 +102,15 @@ def add_variance_and_cluster_five_conv(backup_name="raw_net_five_conv", plot_res
         list = ','.join(str(v) for v in inputs_list)
         _rewards5_text_file_with_var.write(list+","+str(rewards.item())+","+str(result.item())+","+str(cluster)+"\n")
 
-    if plot_result:
-        plt.plot(results_plot)
-        plt.plot(rewards_plot)
-        plt.show()
-
     _rewards5_text_file_with_var.close()
 
+    if plot_result:
+        plt.clf()
+        plt.plot(results_plot)
+        plt.plot(rewards_plot)
+        plt.savefig(backup_plot_name)
+
+    print("finished add_variance_and_cluster_five_conv")
 
 text_file_with_var3 = tools.get_text_file_names_var()[0]
 text_file_with_var5 = tools.get_text_file_names_var()[1]
