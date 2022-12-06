@@ -7,7 +7,8 @@ import estimate_variance
 import json
 import torch
 
-config_file = open("config/config_retrain_conv_5.json")
+cfg_file_name = "config/config_retrain_conv_5.json"
+config_file = open(cfg_file_name)
 config = json.load(config_file)
 net_dim = config["dimensions"]
 config_raw = config["train_raw_net"]
