@@ -36,9 +36,7 @@ def rotate_by_90_flat(state):
     return rot.flatten()
 
 def rotate_by_90_flat_five(state):
-    #print(state.reshape(5, 5))
     rot = np.rot90(state.reshape(5, 5), k=1, axes=(1, 0))
-    #print(rot)
     return rot.flatten()
 
 
@@ -65,7 +63,6 @@ def grab_sub_state_noext_five(state, i, j):
     return sub_state
 
 
-#self.rewards, self.dataPoints = tools.augmentData(self.rewards, self.dataPoints)
 def augment_data(rewards, data_points):
     aug_rewards = []
     aug_data_pts = []

@@ -4,6 +4,7 @@ import os
 import torch
 import random
 import math
+import json
 import numpy as np
 from time import sleep
 from datetime import datetime
@@ -15,7 +16,7 @@ from src import minesweeper_interface as min_int
 from src import neural_net_lib
 from src import tools
 
-random_percent = 0.0
+#random_percent = 0.0
 VERBOSE = False
 NUM_ACTIONS = 64
 
@@ -28,36 +29,20 @@ def prepare_return_values(score_board):
     total_len = len(flat)
     i = 0
     while i < total_len:
-        # print("this is i at start: "+str(i))
         local_range = np.where(score_board == flat[i])
-        # print(local_range)
-        # print("this is flat[i]: "+str(flat[i]))
-        # print("this is local range: "+str(local_range))
         local_sz = len(local_range[0])
         for j in range(0, local_sz):
             return_values.append([local_range[1][j], local_range[0][j]])
-            # print("str: "+str([local_range[0][j], local_range[1][j]]))
             i = i + 1
-            # print("this is i after: " + str(i))
-        # if local_sz > 1:
-        # print("----------- local_sz is bigger than 1")
-        # print(local_sz)
-        # print(flat)
-        # exit()
 
     if len(return_values) != 64:
         print("Catastrophic error: return values size is off " + str(len(return_values)))
         exit()
-    # print("this is size:    "+str(len(return_values)))
-    # print(return_values)
-    # print(flat)
     return return_values
 
 
 def select_action_five(neural_net, state):
     state = tools.extend_state_five(state)
-    # print("state")
-    # print(state)
     score_board = np.zeros((8, 8))
     for i in range(2, 10):
         for j in range(2, 10):
@@ -74,51 +59,34 @@ def select_action_five(neural_net, state):
     total_len = len(flat)
     i = 0
     while i < total_len:
-        # print("this is i at start: "+str(i))
         local_range = np.where(score_board == flat[i])
-        # print("this is local range: "+str(local_range))
         local_sz = len(local_range[0])
         for j in range(0, local_sz):
             return_values.append([local_range[0][j], local_range[1][j]])
-            # print("str: "+str([local_range[0][j], local_range[1][j]]))
             i = i + 1
-            # print("this is i after: " + str(i))
     if len(return_values) != 64:
         print("Catastrophic error: return values size is off " + str(len(return_values)))
         exit()
-    # print("this is size:    "+str(len(return_values)))
     return return_values
 
 
 def run_clustering_five(state):
-    # print("state: "+str(state))
     state_five = tools.extend_state_five(state)
-    #print("state_five: "+str(state_five))
     score_board_clusters = np.zeros((8, 8, 3))
     for i in range(2, 10):
         for j in range(2, 10):
             local_cpy = tools.grab_sub_state_noext_five(state_five, i, j)
-            #print("local_cpy: " + str(local_cpy))
             local_tensor = torch.from_numpy(local_cpy).to(dtype=torch.float)
-            #local_tensor = local_tensor.unsqueeze(0)
             local_tensor = local_tensor.reshape([1, 5, 5])
             local_tensor = local_tensor.unsqueeze(0)
             local_tensor = local_tensor.to(device)
-            #print('local_tensor'+str(local_tensor))
             float_result = cluster_net.forward(local_tensor)
-            # print(local_cpy)
-            # print(float_result[0].detach().numpy())
-            # score_board_clusters[j - 1, i - 1] = round(torch.argmax(float_result).item())
             score_board_clusters[i - 2, j - 2, :] = float_result[0].cpu().detach().numpy()
     return score_board_clusters
 
 
 def select_action_cluster(the_nets, state):
-    # clusters = run_clustering_three(state)
-    print("before run clustering: " + str(datetime.now()))
     clusters = run_clustering_five(state)
-    print("after run clustering: " + str(datetime.now()))
-    # print(state)
     state_five = tools.extend_state_five(state)
     score_board = np.zeros((8, 8))
 
@@ -130,34 +98,20 @@ def select_action_cluster(the_nets, state):
             local_tensor = local_tensor.unsqueeze(0)
             local_tensor = local_tensor.to(device)
             cluster = clusters[i - 2, j - 2]
-            # print("cluster alone")
-            # print(cluster)
-            # print(local_cpy)
-            # if(j==2):
-            #    exit()
-            mult0 = 3.0
-            mult1 = 0.05
-            mult2 = 1.0
-            # print(cluster[0])
-            # print(cluster[1])
-            # print(cluster[2])
+            mult0 = mult0_conf
+            mult1 = mult1_conf
+            mult2 = mult2_conf
 
-            if cluster[0] < 0.01:
+            if cluster[0] < 0.05:
                 mult0 = 0
-
-            if cluster[1] < 0.1:
+            if cluster[1] < 0.4:
                 mult1 = 0
-            '''
-            '''
-            if cluster[2] < 0.1:
+            if cluster[2] < 0.2:
                 mult2 = 0
             result0 = the_nets[0].forward(local_tensor)[0]
             result1 = the_nets[1].forward(local_tensor)[0]
             result2 = the_nets[2].forward(local_tensor)[0]
-            # print(result0*mult0+(result1*mult1)-abs(result2*mult2))
             score_board[i - 2, j - 2] = result0 * mult0 + (result1 * mult1) - abs(result2 * mult2)
-    # print(score_board)
-    print("after run algo score board: " + str(datetime.now()))
     return prepare_return_values(score_board)
 
 
@@ -169,7 +123,7 @@ def init_the_cluster_nets_five(base_name):
         os.path.join(tools.get_working_dir(), '../saved_nets/' + base_name + "1"))
     net_2_name = os.path.abspath(
         os.path.join(tools.get_working_dir(), '../saved_nets/' + base_name + "2"))
-    #model.load_state_dict(torch.load(PATH))
+
     net_0 = neural_net_lib.FiveByFiveConv()
     net_0.load_state_dict(torch.load(net_0_name))
     net_0.eval()
@@ -187,115 +141,11 @@ def init_the_cluster_nets_five(base_name):
 
     return [net_0, net_1, net_2]
 
- # TODO rename or move
-def play_with_nets(iterations, epoch='', is_test_set=False, random_percent=0.0):
-    print("starting only five by five play")
-    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # print(device)
-    # load the 5 by 5 kernel network
-    neural_net_five = neural_net_lib.FiveByFiveSig()
-    net_name_five = os.path.abspath(
-        os.path.join(tools.get_working_dir(), '../saved_nets/raw_net_five'))
-    neural_net_five.load_state_dict(torch.load(net_name_five, map_location=device))
-    neural_net_five.eval()
-    win = 0
-    lose = 0
-    # load the 3 by 3 kernel network
-
-    # TODO fix incrementation bug
-    i_episode = 0
-    while i_episode < iterations:
-        print("-- restarted at while")
-        sleep(0.3)
-        print("this is i_episode " + str(i_episode))
-        tools.move_and_click(739, 320)
-        sleep(0.3)
-        state = dg.get_state_from_screen()
-        # run the flagging algorithm
-        state = min_int.mark_game(state)
-        # perform a deep copy
-        previous_state = state.copy()
-        sleep(0.3)
-        counter = 0
-        while not dg.get_status() and counter < 200:
-            print("loop not")
-            action = select_action_five(neural_net_five, state)
-            # action = select_action_fused(neural_net_three, neural_net_five, state)
-            counter += 1
-            for k in range(0, 64):
-                print("loop k: " + str(dg.get_status()))
-                if random.random() < random_percent:
-                    print("random action")
-                    action[k][0] = random.randint(0, 7)
-                    action[k][1] = random.randint(0, 7)
-
-                min_int.move_and_click_to_ij(action[k][0], action[k][1])
-                # print(action[k])
-                tools.move_to(1490, 900)
-                # if hit a mine
-                sleep(0.5)
-                state = dg.get_state_from_screen()
-                if not dg.get_status():
-                    state = min_int.mark_game(state)
-                sub_state_three = tools.grab_sub_state_three(previous_state, action[k][1] + 1, action[k][0] + 1)
-                sub_state_five = tools.grab_sub_state_five(previous_state, action[k][1] + 2, action[k][0] + 2)
-
-                # we hit a mine
-                if dg.get_status():
-                    print('hit mine')
-                    tools.save_action_neg_three(-64, sub_state_three, is_test_set)
-                    tools.save_action_neg_five(-64, sub_state_five, is_test_set)
-                    print(sub_state_three)
-                    print(sub_state_five)
-                    tools.move_and_click(1490, 900)
-                    counter += 1
-                    i_episode = i_episode + 1
-                    print("-- should restart")
-                    lose += 1
-                    break
-
-                # compute reward
-                reward, has_won = reward_manager.compute_reward(previous_state, state)
-
-                if has_won:
-                    print("has won collect data with ml")
-                    tools.save_action_three(10, sub_state_three, is_test_set)
-                    tools.save_action_five(10, sub_state_five, is_test_set)
-                    tools.move_and_click(1490, 900)
-                    print("has won collect data with ml :" + str(counter))
-                    counter += 1001
-                    i_episode = i_episode + 1
-                    print("should restart")
-                    win += 1
-                    break
-                else:
-                    print("no win")
-                    # save data from transition
-                    if reward > 0:
-                        tools.save_action_three(reward, sub_state_three, is_test_set)
-                        tools.save_action_five(reward, sub_state_five, is_test_set)
-                        print("this is positive reward " + str(reward))
-
-                    elif reward <= 0:
-                        print("this is negative reward " + str(reward))
-                        tools.save_action_neg_three(reward, sub_state_three, is_test_set)
-                        tools.save_action_neg_five(reward, sub_state_five, is_test_set)
-
-                previous_state = state.copy()
-                state = min_int.mark_game(state)
-                # if we didn't act -> k = 100
-                if reward != 0:
-                    print("call ml again")
-                    break
-                print("updating state")
-                counter += 1
-    print("win" + str(win))
-    print("lose" + str(lose))
 
 
-def play_with_clustering(iterations = 1, random_percent=0.0, save_data=True):
-    nets_clusters = init_the_cluster_nets_five("net_five_cluster_")
-    print("playing with clusters")
+def play_with_clustering(nets_clusters, iterations = 1, random_percent=0.0, save_data=True):
+    print("playing with clusters on a 5 by 5 grid")
+    print(save_data)
     is_test_set = False
     i_episode = 0
     winners = 0
@@ -314,23 +164,16 @@ def play_with_clustering(iterations = 1, random_percent=0.0, save_data=True):
         sleep(0.3)
         counter = 0
         while not dg.get_status() and counter < 200:
-            print("gloabl before: "+str(datetime.now()))
             action = select_action_cluster(nets_clusters, state)
-            print("global after: "+str(datetime.now()))
             counter += 1
             for k in range(0, 64):
-                print("loop k: " + str(dg.get_status()))
-                ''''''
                 if random.random() < random_percent:
                     print("random action")
                     action[k][0] = random.randint(0, 7)
                     action[k][1] = random.randint(0, 7)
 
                 min_int.move_and_click_to_ij(action[k][0], action[k][1])
-                # print(action[k])
                 tools.move_to(1490, 900)
-                # exit()
-                # if hit a mine
                 sleep(0.3)
                 state = dg.get_state_from_screen()
                 if not dg.get_status():
@@ -340,17 +183,12 @@ def play_with_clustering(iterations = 1, random_percent=0.0, save_data=True):
 
                 # we hit a mine
                 if dg.get_status():
-                    print('hit mine')
                     losers += 1
                     if save_data:
                         tools.save_action_neg_three(-64, sub_state_three, is_test_set)
                         tools.save_action_neg_five(-64, sub_state_five, is_test_set)
-                    print(sub_state_three)
-                    print(sub_state_five)
                     tools.move_and_click(1490, 900)
                     counter += 1
-                    # i_episode = i_episode + 1
-                    print("-- should restart")
                     break
 
                 # compute reward
@@ -358,26 +196,21 @@ def play_with_clustering(iterations = 1, random_percent=0.0, save_data=True):
 
                 if has_won:
                     winners += 1
-                    print("has won with clusters")
                     if save_data:
                         tools.save_action_three(10, sub_state_three, is_test_set)
                         tools.save_action_five(10, sub_state_five, is_test_set)
                     tools.move_and_click(1490, 900)
-                    print("has won collect data with ml :" + str(counter))
                     counter += 1001
-                    # i_episode = i_episode + 1
-                    print("should restart")
                     break
                 else:
-                    print("no win")
                     # save data from transition
                     if save_data and reward > 0:
                         tools.save_action_three(reward, sub_state_three, is_test_set)
                         tools.save_action_five(reward, sub_state_five, is_test_set)
-                        print("this is positive reward " + str(reward))
+                        #print("this is positive reward " + str(reward))
 
                     elif save_data and reward <= 0:
-                        print("this is negative reward " + str(reward))
+                        #print("this is negative reward " + str(reward))
                         tools.save_action_neg_three(reward, sub_state_three, is_test_set)
                         tools.save_action_neg_five(reward, sub_state_five, is_test_set)
 
@@ -385,27 +218,33 @@ def play_with_clustering(iterations = 1, random_percent=0.0, save_data=True):
                 state = min_int.mark_game(state)
                 # if we didn't act -> k = 100
                 if reward != 0:
-                    print("call ml again")
                     break
-                print("updating state")
+                #print("updating state")
                 counter += 1
 
     print("winners: " + str(winners) + " losers: " + str(losers))
 
+#load the config
 
-
-
+cfg_file_name = "config/play_5_convolutional.json"
+config_file = open(cfg_file_name)
+config = json.load(config_file)
 
 # prepare and load the nets
-
 device = tools.get_device()
 
 cluster_net = neural_net_lib.FiveByFiveConvCluster()
+
 cluster_net_name = os.path.abspath(
-    os.path.join(tools.get_working_dir(), '../saved_nets/backup_net_cluster_five'))
+    os.path.join(tools.get_working_dir(), '../saved_nets/'+config["name_of_net_cluster_net"]))
 cluster_net.load_state_dict(torch.load(cluster_net_name))
 cluster_net.eval()
 cluster_net.to(device)
+loaded_nets_clusters = init_the_cluster_nets_five(config["base_name_of_individual_cluster_nets"])
+
+mult0_conf = config["mult_factor_0"]
+mult1_conf = config["mult_factor_1"]
+mult2_conf = config["mult_factor_2"]
 
 # start minesweeper program
 tools.launch_mines()
@@ -416,4 +255,7 @@ tools.move_and_click(739, 320)
 
 torch.set_num_threads(4)
 with torch.no_grad():
-    play_with_clustering(iterations=4, random_percent=0.0, save_data=True)
+    play_with_clustering(loaded_nets_clusters,
+                         iterations = config["iterations"],
+                         random_percent = config["random_percent"],
+                         save_data = config["save_data"])

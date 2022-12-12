@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
-#import src.tools
 from src import reward_manager, tools
 
 
@@ -125,7 +124,6 @@ class CustomDatasetFromTextFiles5(Dataset):
                 self.dataset_size = len(self.dataPoints)
         # perform reward shaping here if
         if not self.with_cluster:
-            #TODO create reward shaper five
             self.rewards = reward_manager.reward_shaper_five(self.rewards, self.dataPoints)
         if not with_var:
             self.rewards, self.dataPoints = tools.augment_data_five(self.rewards, self.dataPoints)

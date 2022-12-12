@@ -76,11 +76,6 @@ def add_variance_and_cluster_five_conv(backup_name="raw_net_five_conv", plot_res
         inputs, rewards = data
         if i%1000 == 0 and i>0:
             print("at iteration: "+str(i))
-        '''
-        for i in range(len(rewards)):
-            if rewards[i] == -10:
-                rewards[i] = -64
-        '''
         # make sure it is the same length as batch size
         input_len = len(inputs)
         inputs_res = inputs.reshape([input_len, 5, 5]).to(device)

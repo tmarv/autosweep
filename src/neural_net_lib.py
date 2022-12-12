@@ -107,29 +107,22 @@ class ThreeByThreeAug(nn.Module):
     def __init__(self):
         super(ThreeByThreeAug, self).__init__()
         self.layer1 = nn.Linear(108, 128)
-        #self.active1 = nn.ReLU()
         self.active1 = nn.LeakyReLU()
         self.batchNorm1 = nn.BatchNorm1d(256)
         self.layer2 = nn.Linear(128, 128)
-        #self.active2 = nn.ReLU()
         self.active2 = nn.LeakyReLU()
         self.layer3 = nn.Linear(128, 128)
         self.batchNorm2 = nn.BatchNorm1d(128)
-        #self.active3 = nn.ReLU()
         self.active3 = nn.LeakyReLU()
         self.layer4 = nn.Linear(128, 1)
 
 
     def forward(self, x):
-        #x = torch.flatten(x, 1)
         x = self.layer1(x)
-        #x = self.batchNorm1(x)
         x = self.active1(x)
         x = self.layer2(x)
-        #x = self.batchNorm1(x)
         x = self.active2(x)
         x = self.layer3(x)
-        #x = self.batchNorm2(x)
         x = self.active3(x)
         x = self.layer4(x)
         return x

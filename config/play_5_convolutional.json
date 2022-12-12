@@ -1,0 +1,11 @@
+{
+ "iterations":20,
+ "name_of_net_cluster_net":"backup_net_cluster_five",
+ "base_name_of_individual_cluster_nets":"net_five_cluster_",
+ "random_percent":0.0,
+ "save_data":false,
+ "only_save_random":true,
+ "mult_factor_0":10.0,
+ "mult_factor_1":0.5,
+ "mult_factor_2":3.0
+}

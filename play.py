@@ -66,36 +66,20 @@ def prepare_return_values(score_board):
     total_len = len(flat)
     i = 0
     while i < total_len:
-        # print("this is i at start: "+str(i))
         local_range = np.where(score_board == flat[i])
-        # print(local_range)
-        # print("this is flat[i]: "+str(flat[i]))
-        # print("this is local range: "+str(local_range))
         local_sz = len(local_range[0])
         for j in range(0, local_sz):
             return_values.append([local_range[1][j], local_range[0][j]])
-            # print("str: "+str([local_range[0][j], local_range[1][j]]))
             i = i + 1
-            # print("this is i after: " + str(i))
-        # if local_sz > 1:
-        # print("----------- local_sz is bigger than 1")
-        # print(local_sz)
-        # print(flat)
-        # exit()
 
     if len(return_values) != 64:
-        print("Catastrophic error: return values size is off " + str(len(return_values)))
+        print("Catastrophic error: return values size is not 64 but: " + str(len(return_values)))
         exit()
-    # print("this is size:    "+str(len(return_values)))
-    # print(return_values)
-    # print(flat)
     return return_values
 
 
 def select_action_five(neural_net, state):
     state = tools.extend_state_five(state)
-    # print("state")
-    # print(state)
     score_board = np.zeros((8, 8))
     for i in range(2, 10):
         for j in range(2, 10):
@@ -114,11 +98,9 @@ def select_action_five(neural_net, state):
     while i < total_len:
         # print("this is i at start: "+str(i))
         local_range = np.where(score_board == flat[i])
-        # print("this is local range: "+str(local_range))
         local_sz = len(local_range[0])
         for j in range(0, local_sz):
             return_values.append([local_range[0][j], local_range[1][j]])
-            # print("str: "+str([local_range[0][j], local_range[1][j]]))
             i = i + 1
             # print("this is i after: " + str(i))
     if len(return_values) != 64:
@@ -137,16 +119,12 @@ def run_clustering_three(state):
             local_tensor = torch.from_numpy(local_cpy).to(dtype=torch.float)
             local_tensor = local_tensor.unsqueeze(0)
             float_result = cluster_net.forward(local_tensor.reshape([1, 9]))
-            # print(local_cpy)
-            # print(float_result[0].detach().numpy())
-            # score_board_clusters[j - 1, i - 1] = round(torch.argmax(float_result).item())
             score_board_clusters[i - 1, j - 1, :] = float_result[0].detach().numpy()
     return score_board_clusters
 
 
 def select_action_cluster(the_nets, state):
     clusters = run_clustering_three(state)
-    # print(state)
     state_three = tools.extend_state(state)
     score_board = np.zeros((8, 8))
 
@@ -156,17 +134,9 @@ def select_action_cluster(the_nets, state):
             local_tensor = torch.from_numpy(local_cpy).to(dtype=torch.float)
             local_tensor = local_tensor.unsqueeze(0)
             cluster = clusters[i - 1, j - 1]
-            # print("cluster alone")
-            # print(cluster)
-            # print(local_cpy)
-            # if(j==2):
-            #    exit()
             mult0 = 3.0
             mult1 = 1.0
             mult2 = 1.5
-            # print(cluster[0])
-            # print(cluster[1])
-            # print(cluster[2])
             if cluster[0] < 0.1:
                 mult0 = 0
             if cluster[1] < 0.1:
@@ -176,7 +146,6 @@ def select_action_cluster(the_nets, state):
             result0 = the_nets[0].forward(local_tensor.reshape([1, 9]))[0]
             result1 = the_nets[1].forward(local_tensor.reshape([1, 9]))[0]
             result2 = the_nets[2].forward(local_tensor.reshape([1, 9]))[0]
-            # print(result0*mult0+(result1*mult1)-abs(result2*mult2))
             score_board[i - 1, j - 1] = result0 * mult0 + (result1 * mult1) - abs(result2 * mult2)
     # print(score_board)
     return prepare_return_values(score_board)

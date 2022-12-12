@@ -124,10 +124,6 @@ def train_three_by_three_raw_net(epoch = 1000, batch_size=8192, plot_result=Fals
             print("epoch: "+str(e))
         for i, data in enumerate(train_loader_three):
             inputs, rewards = data
-            # make sure it is the same length as batch size
-            #input_len = len(inputs)
-            #inputs = inputs.reshape([input_len, 3, 3]).to(device)
-            #rewards = rewards.reshape([input_len, 1]).to(device)
             result = neural_net_three.forward(inputs)
             train_loss = l1_loss(result, rewards)
             optimizer_three.zero_grad()
@@ -254,8 +250,6 @@ def train_five_by_five_conv(epoch=1000,
             start_time = end_time
         for i, data in enumerate(train_loader_five):
             inputs, rewards = data
-            # print("this is len " + str(len(inputs)))
-            # make sure it is the same length as batch size
             input_len = len(inputs)
             inputs = inputs.reshape([input_len, 5, 5]).to(device)
             # add a dimension for the cnn
