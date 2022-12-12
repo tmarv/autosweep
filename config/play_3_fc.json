@@ -1,7 +1,7 @@
 {
  "iterations":1,
- "name_of_net_cluster_net":"backup_net_cluster_five",
- "base_name_of_individual_cluster_nets":"net_five_cluster_",
+ "name_of_net_cluster_net":"",
+ "base_name_of_individual_cluster_nets":"net_three_cluster_",
  "random_percent":0.0,
  "save_data":false,
  "only_save_random":true,

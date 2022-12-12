@@ -16,7 +16,6 @@ from src import minesweeper_interface as min_int
 from src import neural_net_lib
 from src import tools
 
-#random_percent = 0.0
 VERBOSE = False
 NUM_ACTIONS = 64
 
@@ -207,10 +206,8 @@ def play_with_clustering(nets_clusters, iterations = 1, random_percent=0.0, save
                     if save_data and reward > 0:
                         tools.save_action_three(reward, sub_state_three, is_test_set)
                         tools.save_action_five(reward, sub_state_five, is_test_set)
-                        #print("this is positive reward " + str(reward))
 
                     elif save_data and reward <= 0:
-                        #print("this is negative reward " + str(reward))
                         tools.save_action_neg_three(reward, sub_state_three, is_test_set)
                         tools.save_action_neg_five(reward, sub_state_five, is_test_set)
 
@@ -219,19 +216,20 @@ def play_with_clustering(nets_clusters, iterations = 1, random_percent=0.0, save
                 # if we didn't act -> k = 100
                 if reward != 0:
                     break
-                #print("updating state")
                 counter += 1
 
     print("winners: " + str(winners) + " losers: " + str(losers))
+
+
+
+# prepare and load the nets
+device = tools.get_device()
 
 #load the config
 
 cfg_file_name = "config/play_5_convolutional.json"
 config_file = open(cfg_file_name)
 config = json.load(config_file)
-
-# prepare and load the nets
-device = tools.get_device()
 
 cluster_net = neural_net_lib.FiveByFiveConvCluster()
 

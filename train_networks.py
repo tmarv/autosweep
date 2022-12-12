@@ -319,7 +319,7 @@ def train_five_by_five_for_one_cluster(cluster,
         plt.plot(np.array(train_losses))
         plt.savefig(training_loss_graph)
 
-#initialize everything
+# initialize everything
 device = tools.get_device()
 print("train_networks uses following cuda device: "+str(device))
 
