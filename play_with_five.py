@@ -221,39 +221,44 @@ def play_with_clustering(nets_clusters, iterations = 1, random_percent=0.0, save
     print("winners: " + str(winners) + " losers: " + str(losers))
 
 
+#plays the game for a given config file
+def play_the_game(cfg_file_name):
+    # load the config
+    config_file = open(cfg_file_name)
+    config = json.load(config_file)
 
-# prepare and load the nets
-device = tools.get_device()
+    cluster_net_name = os.path.abspath(
+        os.path.join(tools.get_working_dir(), '../saved_nets/' + config["name_of_net_cluster_net"]))
+    cluster_net.load_state_dict(torch.load(cluster_net_name))
+    cluster_net.eval()
+    cluster_net.to(device)
+    loaded_nets_clusters = init_the_cluster_nets_five(config["base_name_of_individual_cluster_nets"])
 
-#load the config
+    global mult0_conf, mult1_conf, mult2_conf
+    mult0_conf = config["mult_factor_0"]
+    mult1_conf = config["mult_factor_1"]
+    mult2_conf = config["mult_factor_2"]
 
-cfg_file_name = "config/play_5_convolutional.json"
-config_file = open(cfg_file_name)
-config = json.load(config_file)
+    # start minesweeper program
+    tools.launch_mines()
+    # can be slow
+    sleep(1)
+    # start 8 by 8 minesweeper
+    tools.move_and_click(739, 320)
 
-cluster_net = neural_net_lib.FiveByFiveConvCluster()
-
-cluster_net_name = os.path.abspath(
-    os.path.join(tools.get_working_dir(), '../saved_nets/'+config["name_of_net_cluster_net"]))
-cluster_net.load_state_dict(torch.load(cluster_net_name))
-cluster_net.eval()
-cluster_net.to(device)
-loaded_nets_clusters = init_the_cluster_nets_five(config["base_name_of_individual_cluster_nets"])
-
-mult0_conf = config["mult_factor_0"]
-mult1_conf = config["mult_factor_1"]
-mult2_conf = config["mult_factor_2"]
-
-# start minesweeper program
-tools.launch_mines()
-# can be slow
-sleep(1)
-# start 8 by 8 minesweeper
-tools.move_and_click(739, 320)
-
-torch.set_num_threads(4)
-with torch.no_grad():
-    play_with_clustering(loaded_nets_clusters,
+    torch.set_num_threads(4)
+    with torch.no_grad():
+        play_with_clustering(loaded_nets_clusters,
                          iterations = config["iterations"],
                          random_percent = config["random_percent"],
                          save_data = config["save_data"])
+    config_file.close()
+
+# prepare and load the nets
+device = tools.get_device()
+cluster_net = neural_net_lib.FiveByFiveConvCluster()
+mult0_conf = 1.0
+mult1_conf = 1.0
+mult2_conf = 1.0
+
+play_the_game(cfg_file_name = "config/play_5_convolutional.json")

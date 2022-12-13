@@ -487,6 +487,6 @@ tools.move_and_click(739, 320)
 # init
 # gui.click()
 
-play_with_clustering(iterations=10, random_percent = 0.0)
+play_with_clustering(iterations=1, random_percent = 0.0)
 # play_with_nets(iterations=1)
 # play_random(iterations=10)
