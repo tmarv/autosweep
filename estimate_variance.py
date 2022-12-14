@@ -16,9 +16,13 @@ import matplotlib.pyplot as plt
 import src.tools
 from src import neural_net_lib, reward_manager, tools, custom_data_loader_text
 
-def add_variance_and_cluster_three(thresh=0.3):
+def add_variance_and_cluster_three(backup_name="raw_net_three",
+                                   plot_result = False,
+                                   thresh = 0.3,
+                                   backup_plot_name = "backup.png"):
+
     neural_net = neural_net_lib.ThreeByThreeSig().to(device)
-    net_name = os.path.abspath(os.path.join(tools.get_working_dir(), '../saved_nets/raw_net_three'))
+    net_name = os.path.abspath(os.path.join(tools.get_working_dir(), '../saved_nets/'+backup_name))
     neural_net.load_state_dict(torch.load(net_name))
 
     # we want them 1 by 1 since we are writing in a datafile
@@ -30,6 +34,9 @@ def add_variance_and_cluster_three(thresh=0.3):
 
     _rewards3_text_file_with_var = open(text_file_with_var3, 'w')
 
+    results_plot = []
+    rewards_plot = []
+
     for i, data in enumerate(train_loader_three):
         inputs, rewards = data
         # call reward shaper to perform comparison
@@ -38,7 +45,9 @@ def add_variance_and_cluster_three(thresh=0.3):
         input_len = len(inputs)
         inputs_res = inputs.reshape([input_len, 3, 3])
         rewards = rewards.reshape([input_len, 1])
+        rewards_plot.append(rewards.item())
         result = neural_net.forward(inputs_res)
+        results_plot.append(result.item())
         cluster = 0
 
         if abs(result - rewards) > thresh:
@@ -51,6 +60,11 @@ def add_variance_and_cluster_three(thresh=0.3):
         list = ','.join(str(v) for v in inputs_list)
         _rewards3_text_file_with_var.write(list+","+str(rewards.item())+","+str(result.item())+","+str(cluster)+"\n")
 
+    if plot_result:
+        plt.clf()
+        plt.plot(results_plot)
+        plt.plot(rewards_plot)
+        plt.savefig(backup_plot_name)
 
     _rewards3_text_file_with_var.close()
 

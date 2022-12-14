@@ -49,9 +49,10 @@ def train_cluster_net_three(epoch=1000, batch_size=8192, plot_result=False, back
 
     backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(),("../saved_nets/"+backup_name)))
     torch.save(cluster_net_three.state_dict(), backup_net_name)
-    plt.plot(np.array(train_losses))
-    plt.savefig(backup_name+".png")
+
     if plot_result:
+        plt.plot(np.array(train_losses))
+        plt.savefig(backup_name + ".png")
         plt.show()
 
 
@@ -109,13 +110,26 @@ def train_cluster_net_five_conv(epoch = 1000,
         plt.clf()
         plt.plot(np.array(train_losses))
         plt.savefig(training_loss_graph)
-def train_three_by_three_raw_net(epoch = 1000, batch_size=8192, plot_result=False, backup_name="backup_net", learning_rate=0.001):
+def train_three_by_three_raw_net(epoch = 1000,
+                                 batch_size=8192,
+                                 plot_result=False,
+                                 backup_name="backup_net",
+                                 learning_rate=0.001,
+                                 graph_name = "training_plots/train.png",
+                                 use_pretrained_net = False,
+                                 pretrained_net_name = "none"):
     neural_net_three = neural_net_lib.ThreeByThreeSig().to(device)
     params_three = {'batch_size': batch_size, 'shuffle': True, 'num_workers': 0}
     train_dataset_three = custom_data_loader_text.CustomDatasetFromTextFiles3(is_small=False, is_clean=False,
-                                                                            with_var=False, cluster_num=-2)
+                                                                            with_var=False, cluster_num=-2,
+                                                                              device=device)
     train_loader_three = DataLoader(train_dataset_three, **params_three)
     optimizer_three = optim.Adam(neural_net_three.parameters(), lr=learning_rate)
+    if use_pretrained_net:
+        pretrained_net_path = os.path.abspath(os.path.join(tools.get_working_dir(), ("../saved_nets/" + pretrained_net_name)))
+        neural_net_three.load_state_dict(torch.load(pretrained_net_path))
+        neural_net_three.to(device)
+
     l1_loss = nn.SmoothL1Loss()
     train_losses = []
 
@@ -134,10 +148,10 @@ def train_three_by_three_raw_net(epoch = 1000, batch_size=8192, plot_result=Fals
     backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(), ("../saved_nets/" + backup_name)))
     torch.save(neural_net_three.state_dict(), backup_net_name)
 
-    plt.plot(np.array(train_losses))
-    plt.savefig(backup_name+".png")
     if plot_result:
-        plt.show()
+        plt.clf()
+        plt.plot(np.array(train_losses))
+        plt.savefig(graph_name)
 
 
 def train_three_by_three_for_one_cluster(cluster,
@@ -145,7 +159,10 @@ def train_three_by_three_for_one_cluster(cluster,
                                          batch_size = 2048,
                                          plot_result = False,
                                          backup_name = "backup_net",
-                                         learning_rate = 0.001):
+                                         learning_rate = 0.001,
+                                         use_pretrained = False,
+                                         pretrained_name = "",
+                                         training_loss_graph = "training_plots/plot.png"):
 
     neural_net_three = neural_net_lib.ThreeByThreeSig().to(device)
     params_three = {'batch_size': batch_size, 'shuffle': True, 'num_workers': 0}
@@ -158,6 +175,12 @@ def train_three_by_three_for_one_cluster(cluster,
     optimizer_three = optim.Adam(neural_net_three.parameters(), lr=learning_rate)
     l1_loss = nn.SmoothL1Loss()
     train_losses = []
+
+    if use_pretrained:
+        backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(), ("../saved_nets/" + pretrained_name)))
+        neural_net_three.load_state_dict(torch.load(backup_net_name))
+        neural_net_three.to(device)
+
 
     for e in range (epoch):
         if e%100 == 0:
@@ -175,10 +198,10 @@ def train_three_by_three_for_one_cluster(cluster,
     backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(), ("../saved_nets/" + backup_name)))
     torch.save(neural_net_three.state_dict(), backup_net_name)
 
-    plt.plot(np.array(train_losses))
-    plt.savefig(backup_name+".png")
     if plot_result:
-        plt.show()
+        plt.clf()
+        plt.plot(np.array(train_losses))
+        plt.savefig(training_loss_graph)
 
 
 def train_five_by_five_raw_net(epoch = 1000, batch_size=8192, plot_result=False, backup_name="backup_net_five", learning_rate=0.001):
@@ -213,10 +236,10 @@ def train_five_by_five_raw_net(epoch = 1000, batch_size=8192, plot_result=False,
     backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(), ("../saved_nets/" + backup_name)))
     torch.save(neural_net_five.state_dict(), backup_net_name)
 
-    plt.plot(np.array(train_losses))
-    plt.savefig(backup_name+".png")
     if plot_result:
-        plt.show()
+        plt.clf()
+        plt.plot(np.array(train_losses))
+        plt.savefig(backup_name + ".png")
 
 
 def train_five_by_five_conv(epoch=1000,
@@ -265,6 +288,7 @@ def train_five_by_five_conv(epoch=1000,
     backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(), ("../saved_nets/" + backup_name)))
     torch.save(neural_net_five_conv.state_dict(), backup_net_name)
     if plot_result:
+        plt.clf()
         plt.plot(np.array(train_losses))
         ax = plt.gca()
         ax.set_ylim([0, 12])
@@ -316,6 +340,7 @@ def train_five_by_five_for_one_cluster(cluster,
     torch.save(neural_net_five_conv.state_dict(), backup_net_name)
 
     if plot_result:
+        plt.clf()
         plt.plot(np.array(train_losses))
         plt.savefig(training_loss_graph)
 

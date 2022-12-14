@@ -20,35 +20,61 @@ def run_training(cfg_file_name):
         print("training a three by three network")
         if not config_raw[0]["skip"]:
             print("training raw three by three net")
-            # train_networks.train_three_by_three_raw_net(epoch=10000, plot_result=False, backup_name="raw_net_three")
+            train_networks.train_three_by_three_raw_net(epoch = config_raw[0]["epochs"],
+                                                        batch_size = config_raw[0]["batch_size"],
+                                                        plot_result = config_raw[0]["plot_result"],
+                                                        backup_name = config_raw[0]["net_backup_name"],
+                                                        learning_rate = config_raw[0]["learning_rate"],
+                                                        graph_name = config_raw[0]["training_loss_graph"],
+                                                        use_pretrained_net = config_raw[0]["use_pretrained_net"],
+                                                        pretrained_net_name = config_raw[0]["pretrained_net_name"])
 
         if not config_cluster[0]["skip"]:
             if not config_cluster[0]["skip_variance_eval"]:
                 print("evaluating variance")
-                # estimate_variance.add_variance_and_cluster_three(thresh=0.2)
+                estimate_variance.add_variance_and_cluster_three(backup_name = config_cluster[0]["raw_evaluation_net"],
+                                                                 plot_result = config_cluster[0]["plot_result"],
+                                                                 thresh = config_cluster[0]["variance_threshold"],
+                                                                 backup_plot_name = config_cluster[0]["variance_eval_graph_name"])
             print("training clustering net")
-            # train_networks.train_cluster_net_three(epoch=5000, plot_result=False, backup_name="cluster_net_three", batch_size=4096)
+            train_networks.train_cluster_net_three(epoch = config_cluster[0]["epochs"],
+                                                   batch_size = config_cluster[0]["batch_size"],
+                                                   plot_result = config_cluster[0]["plot_result"],
+                                                   backup_name = config_cluster[0]["net_backup_name"])
+
         if not config_individual_cluster[0]["skip"]:
             train_networks.train_three_by_three_for_one_cluster(0,
-                                                            epoch=8000,
-                                                            plot_result=False,
-                                                            backup_name="net_three",
-                                                            batch_size=16384)
+                                                            epoch = config_individual_cluster[0]["epochs_0"],
+                                                            batch_size = config_individual_cluster[0]["batch_size"],
+                                                            learning_rate=config_individual_cluster[0]["learning_rate"],
+                                                            plot_result = config_individual_cluster[0]["plot_results"],
+                                                            training_loss_graph = config_individual_cluster[0]["training_loss_graph_cluster_0"],
+                                                            backup_name = config_individual_cluster[0]["net_backup_name_0"],
+                                                            use_pretrained = config_individual_cluster[0]["use_pretrained_net"],
+                                                            pretrained_name = config_individual_cluster[0]["pretrained_net_name"])
             train_networks.train_three_by_three_for_one_cluster(1,
-                                                            epoch=6000,
-                                                            plot_result=False,
-                                                            backup_name="net_three",
-                                                            batch_size=16384)
+                                                            epoch = config_individual_cluster[0]["epochs_1"],
+                                                            batch_size = config_individual_cluster[0]["batch_size"],
+                                                            learning_rate=config_individual_cluster[0]["learning_rate"],
+                                                            plot_result = config_individual_cluster[0]["plot_results"],
+                                                            training_loss_graph = config_individual_cluster[0]["training_loss_graph_cluster_1"],
+                                                            backup_name=config_individual_cluster[0]["net_backup_name_1"],
+                                                            use_pretrained = config_individual_cluster[0]["use_pretrained_net"],
+                                                            pretrained_name = config_individual_cluster[0]["pretrained_net_name"])
             train_networks.train_three_by_three_for_one_cluster(2,
-                                                            epoch=6000,
-                                                            plot_result=False,
-                                                            backup_name="net_three",
-                                                            batch_size=16384)
+                                                            epoch = config_individual_cluster[0]["epochs_2"],
+                                                            batch_size = config_individual_cluster[0]["batch_size"],
+                                                            learning_rate=config_individual_cluster[0]["learning_rate"],
+                                                            plot_result = config_individual_cluster[0]["plot_results"],
+                                                            training_loss_graph = config_individual_cluster[0]["training_loss_graph_cluster_2"],
+                                                            backup_name = config_individual_cluster[0]["net_backup_name_2"],
+                                                            use_pretrained = config_individual_cluster[0]["use_pretrained_net"],
+                                                            pretrained_name = config_individual_cluster[0]["pretrained_net_name"])
 
     elif net_dim == 5:
         print("training a five by five net")
         if not config_raw[0]["skip"]:
-            train_networks.train_five_by_five_conv(plot_result=True,
+            train_networks.train_five_by_five_conv(plot_result=config_raw[0]["plot_result"],
                                                epoch=config_raw[0]["epochs"],
                                                backup_name=config_raw[0]["net_backup_name"],
                                                learning_rate=config_raw[0]["learning_rate"],
@@ -103,5 +129,6 @@ def run_training(cfg_file_name):
     else:
         print("no known training dimensions mentioned in config: will exit/return")
 
-cfg_file_name = "config/config_retrain_conv_5.json"
-run_training(cfg_file_name)
+#cfg_file_name_l = "config/config_retrain_conv_5.json"
+cfg_file_name_l = "config/config_train_from_scratch_3.json"
+run_training(cfg_file_name_l)

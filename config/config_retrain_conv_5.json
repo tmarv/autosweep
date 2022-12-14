@@ -6,6 +6,7 @@
     "skip":false,
     "epochs":10,
     "batch_size":8192,
+    "plot_result":true,
     "use_pretrained_net":true,
     "learning_rate":0.007,
     "net_backup_name":"raw_net_five_conv",
