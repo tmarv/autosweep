@@ -39,8 +39,12 @@ def run_training(cfg_file_name):
             print("training clustering net")
             train_networks.train_cluster_net_three(epoch = config_cluster[0]["epochs"],
                                                    batch_size = config_cluster[0]["batch_size"],
+                                                   learning_rate = config_cluster[0]["learning_rate"],
                                                    plot_result = config_cluster[0]["plot_result"],
-                                                   backup_name = config_cluster[0]["net_backup_name"])
+                                                   training_loss_graph = config_cluster[0]["training_loss_graph"],
+                                                   backup_name = config_cluster[0]["net_backup_name"],
+                                                   use_pretrained = config_cluster[0]["use_pretrained_net"],
+                                                   pretrained_name = config_cluster[0]["pretrained_net_name"])
 
         if not config_individual_cluster[0]["skip"]:
             train_networks.train_three_by_three_for_one_cluster(0,
@@ -130,5 +134,6 @@ def run_training(cfg_file_name):
         print("no known training dimensions mentioned in config: will exit/return")
 
 #cfg_file_name_l = "config/config_retrain_conv_5.json"
-cfg_file_name_l = "config/config_train_from_scratch_3.json"
+#cfg_file_name_l = "config/config_train_from_scratch_3.json"
+cfg_file_name_l = "config/config_retrain_3.json"
 run_training(cfg_file_name_l)

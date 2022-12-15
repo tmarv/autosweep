@@ -18,17 +18,28 @@ import src.tools
 from src import reward_manager, tools, neural_net_lib, custom_data_loader_text
 
 
-def train_cluster_net_three(epoch=1000, batch_size=8192, plot_result=False, backup_name="backup_net", learning_rate=0.001):
+def train_cluster_net_three(epoch=1000, batch_size=8192, plot_result=False,
+                            backup_name="backup_net",
+                            learning_rate=0.001,
+                            use_pretrained = False,
+                            pretrained_name="none",
+                            training_loss_graph="graph.png"):
     cluster_net_three = neural_net_lib.ThreeByThreeCluster().to(device)
     params_cluster_three = {'batch_size': batch_size, 'shuffle': True, 'num_workers': 0}
-    cluster_set_three = custom_data_loader_text.CustomDatasetFromTextFiles3(is_small=False,
-                                                                            is_clean=True,
-                                                                            with_var=True,
-                                                                            cluster_num=-1,
-                                                                            device=device)
+    cluster_set_three = custom_data_loader_text.CustomDatasetFromTextFiles3(is_small = False,
+                                                                            is_clean = True,
+                                                                            with_var = True,
+                                                                            cluster_num = -1,
+                                                                            device = device)
     cluster_loader_three = DataLoader(cluster_set_three, **params_cluster_three)
     optimizer_cluster_three = optim.Adam(cluster_net_three.parameters(), lr=learning_rate)
     l1_loss = nn.SmoothL1Loss().to(device)
+    if use_pretrained:
+        backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(),
+                                          ("../saved_nets/" + pretrained_name)))
+        cluster_net_three.load_state_dict(torch.load(backup_net_name))
+        cluster_net_three.to(device)
+
     train_losses = []
     cluster_net_three.train()
     start_time = time.time()
@@ -51,9 +62,9 @@ def train_cluster_net_three(epoch=1000, batch_size=8192, plot_result=False, back
     torch.save(cluster_net_three.state_dict(), backup_net_name)
 
     if plot_result:
+        plt.clf()
         plt.plot(np.array(train_losses))
-        plt.savefig(backup_name + ".png")
-        plt.show()
+        plt.savefig(training_loss_graph)
 
 
 def train_cluster_net_five_conv(epoch = 1000,

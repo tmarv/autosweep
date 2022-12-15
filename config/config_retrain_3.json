@@ -7,7 +7,7 @@
     "epochs":10,
     "batch_size":8192,
     "plot_result":true,
-    "use_pretrained_net":false,
+    "use_pretrained_net":true,
     "learning_rate":0.007,
     "net_backup_name":"raw_net_three",
     "pretrained_net_name":"raw_net_three",
@@ -27,9 +27,9 @@
     "batch_size":8192,
     "learning_rate":0.007,
     "raw_evaluation_net":"raw_net_three",
-    "use_pretrained_net":false,
+    "use_pretrained_net":true,
     "plot_results":true,
-    "pretrained_net_name":"backup_net_three",
+    "pretrained_net_name":"cluster_net_three",
     "net_backup_name":"backup_net_cluster_three",
     "training_loss_graph":"training_plots/train_clustering_three.png"
  }
@@ -40,7 +40,7 @@
  {
     "skip":false,	
     "learning_rate":0.007,
-    "use_pretrained_net":false,
+    "use_pretrained_net":true,
     "pretrained_net_name":"raw_net_three",
     "plot_results":true,
     "batch_size":8192,
