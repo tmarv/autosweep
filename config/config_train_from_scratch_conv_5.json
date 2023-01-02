@@ -6,6 +6,7 @@
     "skip":false,
     "epochs":1000,
     "batch_size":8192,
+    "plot_results":true,
     "use_pretrained_net":false,
     "learning_rate":0.007,
     "net_backup_name":"raw_net_five_conv",
@@ -43,15 +44,15 @@
     "plot_results":true,
     "batch_size":8192,
   
-    "epochs_0":100,
+    "epochs_0":200,
     "net_backup_name_0":"net_five_cluster_0",
     "training_loss_graph_cluster_0":"training_plots/train_cluster_0_no_pt.png",
  		
-    "epochs_1":100,
+    "epochs_1":200,
     "net_backup_name_1":"net_five_cluster_1",
     "training_loss_graph_cluster_1":"training_plots/train_cluster_1_no_pt.png",
   	
-    "epochs_2":100,
+    "epochs_2":200,
     "net_backup_name_2":"net_five_cluster_2",
     "training_loss_graph_cluster_2":"training_plots/train_cluster_2_no_pt.png"
 

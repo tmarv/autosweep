@@ -128,7 +128,7 @@ class CustomDatasetFromTextFiles5(Dataset):
         if not with_var:
             self.rewards, self.dataPoints = tools.augment_data_five(self.rewards, self.dataPoints)
             self.dataset_size = len(self.rewards)
-            print(self.dataset_size)
+        print(self.dataset_size)
         if self.with_cluster:
             enlarged_cluster = []
             # print("len before: "+str(len(clusters)))

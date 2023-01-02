@@ -22,7 +22,7 @@ def run_training(cfg_file_name):
             print("training raw three by three net")
             train_networks.train_three_by_three_raw_net(epoch = config_raw[0]["epochs"],
                                                         batch_size = config_raw[0]["batch_size"],
-                                                        plot_result = config_raw[0]["plot_result"],
+                                                        plot_result = config_raw[0]["plot_results"],
                                                         backup_name = config_raw[0]["net_backup_name"],
                                                         learning_rate = config_raw[0]["learning_rate"],
                                                         graph_name = config_raw[0]["training_loss_graph"],
@@ -78,7 +78,7 @@ def run_training(cfg_file_name):
     elif net_dim == 5:
         print("training a five by five net")
         if not config_raw[0]["skip"]:
-            train_networks.train_five_by_five_conv(plot_result=config_raw[0]["plot_result"],
+            train_networks.train_five_by_five_conv(plot_result=config_raw[0]["plot_results"],
                                                epoch=config_raw[0]["epochs"],
                                                backup_name=config_raw[0]["net_backup_name"],
                                                learning_rate=config_raw[0]["learning_rate"],
@@ -133,7 +133,7 @@ def run_training(cfg_file_name):
     else:
         print("no known training dimensions mentioned in config: will exit/return")
 
-#cfg_file_name_l = "config/config_retrain_conv_5.json"
+cfg_file_name_l = "config/config_retrain_conv_5.json"
 #cfg_file_name_l = "config/config_train_from_scratch_3.json"
-cfg_file_name_l = "config/config_retrain_3.json"
+#cfg_file_name_l = "config/config_retrain_3.json"
 run_training(cfg_file_name_l)

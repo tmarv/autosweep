@@ -5,7 +5,7 @@
  "random_percent":0.0,
  "save_data":false,
  "only_save_random":true,
- "mult_factor_0":10.0,
+ "mult_factor_0":3.0,
  "mult_factor_1":0.5,
- "mult_factor_2":3.0
+ "mult_factor_2":2.0
 }

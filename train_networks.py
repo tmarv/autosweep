@@ -33,7 +33,7 @@ def train_cluster_net_three(epoch=1000, batch_size=8192, plot_result=False,
                                                                             device = device)
     cluster_loader_three = DataLoader(cluster_set_three, **params_cluster_three)
     optimizer_cluster_three = optim.Adam(cluster_net_three.parameters(), lr=learning_rate)
-    l1_loss = nn.SmoothL1Loss().to(device)
+    cross_ent_loss = nn.CrossEntropyLoss().to(device)
     if use_pretrained:
         backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(),
                                           ("../saved_nets/" + pretrained_name)))
@@ -48,11 +48,11 @@ def train_cluster_net_three(epoch=1000, batch_size=8192, plot_result=False,
             end_time = time.time()
             print("epoch: "+str(e))
             print(end_time-start_time)
-            start_time=end_time
+            start_time = end_time
         for i, data in enumerate(cluster_loader_three):
             inputs, clusters = data
             result = cluster_net_three.forward(inputs)
-            train_loss = l1_loss(result, clusters)
+            train_loss = cross_ent_loss(result, clusters)
             optimizer_cluster_three.zero_grad()
             train_loss.backward()
             optimizer_cluster_three.step()
@@ -92,7 +92,7 @@ def train_cluster_net_five_conv(epoch = 1000,
     cluster_loader_five_conv = DataLoader(cluster_set_five_conv, **params_cluster_five_conv)
     optimizer_cluster_five_conv = optim.Adam(cluster_net_five_conv.parameters(), lr=learning_rate)
     # TODO make this a parameter
-    l1_loss = nn.SmoothL1Loss().to(device)
+    cross_ent_loss = nn.CrossEntropyLoss().to(device)
     train_losses = []
     cluster_net_five_conv.train()
     start_time = time.time()
@@ -108,7 +108,7 @@ def train_cluster_net_five_conv(epoch = 1000,
             inputs = inputs.reshape(input_len, 5, 5)
             inputs = inputs.unsqueeze(1)
             result = cluster_net_five_conv.forward(inputs)
-            train_loss = l1_loss(result, clusters)
+            train_loss = cross_ent_loss(result, clusters)
             optimizer_cluster_five_conv.zero_grad()
             train_loss.backward()
             optimizer_cluster_five_conv.step()
@@ -141,7 +141,7 @@ def train_three_by_three_raw_net(epoch = 1000,
         neural_net_three.load_state_dict(torch.load(pretrained_net_path))
         neural_net_three.to(device)
 
-    l1_loss = nn.SmoothL1Loss()
+    l1_loss = nn.SmoothL1Loss().to(device)
     train_losses = []
 
     for e in range (epoch):

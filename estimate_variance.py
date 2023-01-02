@@ -52,8 +52,9 @@ def add_variance_and_cluster_three(backup_name="raw_net_three",
 
         if abs(result - rewards) > thresh:
             cluster = 1
-            if result < -0.15 or rewards < -0.15:
-                cluster = 2
+        # cluster 2 trumps cluster 1 in terms of importance
+        if result < -0.15 or rewards < -0.15:
+            cluster = 2
 
 
         inputs_list = inputs.flatten().tolist()
@@ -103,8 +104,9 @@ def add_variance_and_cluster_five_conv(backup_name="raw_net_five_conv", plot_res
 
         if abs(result - rewards) > thresh:
             cluster = 1
-            if result < -0.15 or rewards < -0.15:
-                cluster = 2
+        # cluster 2 trumps cluster 1 in terms of importance
+        if result < -0.15 or rewards < -0.15:
+            cluster = 2
 
 
         inputs_list = inputs.flatten().tolist()
@@ -123,7 +125,7 @@ def add_variance_and_cluster_five_conv(backup_name="raw_net_five_conv", plot_res
 
 text_file_with_var3 = tools.get_text_file_names_var()[0]
 text_file_with_var5 = tools.get_text_file_names_var()[1]
-#device = tools.get_device()
+device = tools.get_device()
 # everything is happening on the cpu since we are going 1 by 1
-device = "cpu"
+#device = "cpu"
 #add_variance_and_cluster_five()
