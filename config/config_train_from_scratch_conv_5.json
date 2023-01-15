@@ -4,7 +4,7 @@
  [
  {
     "skip":false,
-    "epochs":1000,
+    "epochs":500,
     "batch_size":8192,
     "plot_results":true,
     "use_pretrained_net":false,
@@ -21,7 +21,7 @@
     "skip":false,
     "skip_variance_eval":false,
     "variance_eval_graph_name":"training_plots/evaluate_variance.png",
-    "variance_threshold":0.8,
+    "variance_threshold":0.5,
     "epochs":400,
     "batch_size":8192,
     "learning_rate":0.007,

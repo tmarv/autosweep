@@ -4,7 +4,7 @@
  [
  {
     "skip":false,
-    "epochs":10,
+    "epochs":200,
     "batch_size":8192,
     "plot_results":true,
     "use_pretrained_net":false,
@@ -23,7 +23,7 @@
     "plot_result":true,
     "variance_eval_graph_name":"training_plots/evaluate_variance_three.png",
     "variance_threshold":0.8,
-    "epochs":10,
+    "epochs":300,
     "batch_size":8192,
     "learning_rate":0.007,
     "raw_evaluation_net":"raw_net_three",
@@ -45,15 +45,15 @@
     "plot_results":true,
     "batch_size":8192,
   
-    "epochs_0":10,
+    "epochs_0":100,
     "net_backup_name_0":"net_three",
     "training_loss_graph_cluster_0":"training_plots/train_three_cluster_0.png",
  		
-    "epochs_1":10,
+    "epochs_1":100,
     "net_backup_name_1":"net_three",
     "training_loss_graph_cluster_1":"training_plots/train_three_cluster_1.png",
   	
-    "epochs_2":10,
+    "epochs_2":100,
     "net_backup_name_2":"net_three",
     "training_loss_graph_cluster_2":"training_plots/train_three_cluster_2.png"
 

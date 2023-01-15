@@ -102,7 +102,7 @@ def play_with_cluster():
     # load the 3 by 3 kernel network
     cluster_net = neural_net_lib.ThreeByThreeCluster()
     net_name_cluster = os.path.abspath(
-        os.path.join(tools.get_working_dir(), '../saved_nets/cluster_net_three'))
+        os.path.join(tools.get_working_dir(), '../saved_nets/backup_net_cluster_three'))
     device = tools.get_device()
     cluster_net.load_state_dict(torch.load(net_name_cluster, map_location=device))
     cluster_net.eval()
@@ -119,7 +119,8 @@ def play_with_cluster():
     test_empty = np.array([[1,10,10],[2,10,10],[1,10,10]])
     #test_cluster = np.array([[-1,0,0],[-1,0,0],[0,0,0]])
     test_cluster = np.array([[-1.0,0.0,0.0],[-1.0,0.0,0.0],[-1.0,0.0,0.0]])
-    test_cluster = np.array([[ 1. ,10., 10.],[ 2., 10., 10.],[90., 10., 10.]])
+    test_two1two_side = np.array([[1.0,10.0,10.0],[2.0,10.0,10.0],[1.0,10.0,10.0]])
+    test_two1two = np.array([[ 1. ,2., 1.],[ 10., 10., 10.],[10., 10., 10.]])
     #[ 0.9632585   0.07715082 -0.0341807 ]
     test_cluster = np.array([[ 1., 0., -1.],[2.,1.,-1.],[10.,10.,-1.]])
 
@@ -138,6 +139,8 @@ def play_with_cluster():
     tensor([-141.2553], grad_fn=<SubBackward0>)
     '''
     test_cluster = np.array([[2.,2.,3.], [10., 10., 10.], [-1., -1., -1.]])
+    test_ninety = np.array([[1.,1.,1.], [1., 20., 2.], [2., 2., 20.]])
+    test_ninety2 = np.array([[1.,1.,1.], [1., 20., 2.], [2., 3., 20.]])
 
     #print(perform_eval(test_corner,neural_net_three))
     print(perform_eval(test_corner,cluster_net))
@@ -152,15 +155,22 @@ def play_with_cluster():
     #print(perform_eval(test_side,neural_net_three))
     print(perform_eval(test_side,cluster_net))
     print(perform_eval(test_side,cluster_net))
+    print("test two one two")
+    print(perform_eval(test_two1two,cluster_net))
+    print(perform_eval(test_two1two_side,cluster_net))
+    print("----")
+    print("test ninety")
+    print(perform_eval(test_ninety,cluster_net))
+    print(perform_eval(test_ninety2,cluster_net))
     print("-------------- test test_rewardig_false2: ")
     #print(perform_eval(test_empty,neural_net_three))
     cluster_ = perform_eval(test_cluster, cluster_net)
     print(cluster_[0])
-    clust1 = perform_eval(test_cluster, nets_clusters[0])
+    clust1 = perform_eval(test_two1two, nets_clusters[0])
     print(clust1)
-    clust2 = perform_eval(test_cluster, nets_clusters[1])
+    clust2 = perform_eval(test_two1two, nets_clusters[1])
     print(clust2)
-    clust3 = perform_eval(test_cluster, nets_clusters[2])
+    clust3 = perform_eval(test_two1two, nets_clusters[2])
     print(clust3)
     mult0 = 3.0
     mult1 = 0.5

@@ -43,14 +43,16 @@ def add_variance_and_cluster_three(backup_name="raw_net_three",
         rewards = reward_manager.reward_shaper_three(rewards,inputs)
         # make sure it is the same length as batch size
         input_len = len(inputs)
-        inputs_res = inputs.reshape([input_len, 3, 3])
-        rewards = rewards.reshape([input_len, 1])
+        inputs_res = inputs.reshape([input_len, 3, 3]).to(device)
+        rewards = rewards.reshape([input_len, 1]).to(torch.float).to(device)
         rewards_plot.append(rewards.item())
         result = neural_net.forward(inputs_res)
         results_plot.append(result.item())
         cluster = 0
 
         if abs(result - rewards) > thresh:
+            cluster = 1
+        if abs(rewards - result) > thresh:
             cluster = 1
         # cluster 2 trumps cluster 1 in terms of importance
         if result < -0.15 or rewards < -0.15:

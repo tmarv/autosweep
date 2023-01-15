@@ -196,7 +196,7 @@ def get_state_from_screen():
             test_hist_comp_flag = cv2.compareHist(grey_tile_hist, hist_flag_grey, 3)
 
             if test_hist_comp_flag < 0.8:
-                board_state[j, i] = 90
+                board_state[j, i] = 20
                 continue
             else:
                 board_state[j, i] = 10

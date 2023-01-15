@@ -8,6 +8,7 @@ import json
 import numpy as np
 from time import sleep
 from datetime import datetime
+from numpy import linalg
 
 # self made classes
 from src import data_gathering_histgrm as dg
@@ -101,16 +102,22 @@ def select_action_cluster(the_nets, state):
             mult1 = mult1_conf
             mult2 = mult2_conf
 
-            if cluster[0] < 0.05:
+            if cluster[0] < 0.1:
                 mult0 = 0
-            if cluster[1] < 0.4:
+            if cluster[1] < 0.1:
                 mult1 = 0
-            if cluster[2] < 0.2:
+            if cluster[2] < 0.1:
                 mult2 = 0
             result0 = the_nets[0].forward(local_tensor)[0]
             result1 = the_nets[1].forward(local_tensor)[0]
             result2 = the_nets[2].forward(local_tensor)[0]
-            score_board[i - 2, j - 2] = result0 * mult0 + (result1 * mult1) - abs(result2 * mult2)
+            '''
+            print(result0[0].item())
+            print(result1[0].item())
+            print(result2[0].item())
+            '''
+            norm_ret = torch.norm(torch.tensor([result0[0].item(), result1[0].item(), result2[0].item()]))
+            score_board[i - 2, j - 2] = (result0 * mult0/norm_ret) + (result1 * mult1)/norm_ret - abs(result2 * mult2)/norm_ret
     return prepare_return_values(score_board)
 
 

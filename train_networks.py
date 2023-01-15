@@ -51,6 +51,7 @@ def train_cluster_net_three(epoch=1000, batch_size=8192, plot_result=False,
             start_time = end_time
         for i, data in enumerate(cluster_loader_three):
             inputs, clusters = data
+            clusters = clusters.to(torch.float)
             result = cluster_net_three.forward(inputs)
             train_loss = cross_ent_loss(result, clusters)
             optimizer_cluster_three.zero_grad()

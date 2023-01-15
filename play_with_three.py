@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # Tim Marvel
+import json
 import os
 import torch
 import random
 import math
 import numpy as np
+from numpy import linalg
 from time import sleep
 
 # self made classes
@@ -77,7 +79,7 @@ def prepare_return_values(score_board):
         exit()
     return return_values
 
-
+# TODO remove this
 def select_action_five(neural_net, state):
     state = tools.extend_state_five(state)
     score_board = np.zeros((8, 8))
@@ -134,9 +136,11 @@ def select_action_cluster(the_nets, state):
             local_tensor = torch.from_numpy(local_cpy).to(dtype=torch.float)
             local_tensor = local_tensor.unsqueeze(0)
             cluster = clusters[i - 1, j - 1]
-            mult0 = 3.0
-            mult1 = 1.0
-            mult2 = 1.5
+            #norm=linalg.norm(cluster)
+            #cluster=cluster/norm
+            mult0 = mult0_conf
+            mult1 = mult1_conf
+            mult2 = mult2_conf
             if cluster[0] < 0.1:
                 mult0 = 0
             if cluster[1] < 0.1:
@@ -283,10 +287,10 @@ def play_with_nets(iterations, epoch='', is_test_set=False, random_percent=0.0):
                 counter += 1
     print("win" + str(win))
     print("lose" + str(lose))
+''''''
 
-
-def play_with_clustering(iterations=1, random_percent=0.0):
-    nets_clusters = init_the_cluster_nets("net_three_cluster_")
+def play_with_clustering(nets_clusters, iterations=1, random_percent=0.0, save_data=True):
+    #nets_clusters = init_the_cluster_nets("net_three_cluster_")
     print("playing with clusters")
     is_test_set = False
     i_episode = 0
@@ -332,8 +336,9 @@ def play_with_clustering(iterations=1, random_percent=0.0):
                 if dg.get_status():
                     print('hit mine')
                     losers += 1
-                    tools.save_action_neg_three(-64, sub_state_three, is_test_set)
-                    tools.save_action_neg_five(-64, sub_state_five, is_test_set)
+                    if save_data:
+                        tools.save_action_neg_three(-64, sub_state_three, is_test_set)
+                        tools.save_action_neg_five(-64, sub_state_five, is_test_set)
                     print(sub_state_three)
                     print(sub_state_five)
                     tools.move_and_click(1490, 900)
@@ -348,8 +353,9 @@ def play_with_clustering(iterations=1, random_percent=0.0):
                 if has_won:
                     winners += 1
                     print("has won with clusters")
-                    tools.save_action_three(10, sub_state_three, is_test_set)
-                    tools.save_action_five(10, sub_state_five, is_test_set)
+                    if save_data:
+                        tools.save_action_three(10, sub_state_three, is_test_set)
+                        tools.save_action_five(10, sub_state_five, is_test_set)
                     tools.move_and_click(1490, 900)
                     print("has won collect data with ml :" + str(counter))
                     counter += 1001
@@ -359,12 +365,12 @@ def play_with_clustering(iterations=1, random_percent=0.0):
                 else:
                     print("no win")
                     # save data from transition
-                    if reward > 0:
+                    if reward > 0 and save_data:
                         tools.save_action_three(reward, sub_state_three, is_test_set)
                         tools.save_action_five(reward, sub_state_five, is_test_set)
                         print("this is positive reward " + str(reward))
 
-                    elif reward <= 0:
+                    elif reward <= 0 and save_data:
                         print("this is negative reward " + str(reward))
                         tools.save_action_neg_three(reward, sub_state_three, is_test_set)
                         tools.save_action_neg_five(reward, sub_state_five, is_test_set)
@@ -468,25 +474,49 @@ def play_random(iterations=1):
                 counter += 1
 
 
-# device = tools.get_device()
+def play_with_config_file(cfg_file_name):
+    # load the config file name
+    config_file = open(cfg_file_name)
+    config = json.load(config_file)
+    # should be name_of_net_cluster_net
+    cluster_net_name = os.path.abspath(
+        os.path.join(tools.get_working_dir(),
+                     '../saved_nets/'+ config["name_of_net_cluster_net"]))
+    print(cluster_net_name)
+    cluster_net.load_state_dict(torch.load(cluster_net_name, map_location=device))
+    cluster_net.eval()
+    cluster_net.to(device)
+    loaded_nets_clusters = init_the_cluster_nets(config["base_name_of_individual_cluster_nets"])
+
+    # start minesweeper program
+    tools.launch_mines()
+    # can be slow
+    sleep(1)
+    # start 8 by 8 minesweeper
+    tools.move_and_click(739, 320)
+    torch.set_num_threads(4)
+    with torch.no_grad():
+        play_with_clustering(loaded_nets_clusters,
+                         iterations = config["iterations"],
+                         random_percent = config["random_percent"],
+                         save_data = config["save_data"])
+    config_file.close()
+    #play_with_clustering(iterations=1, random_percent=0.0)
+
+
 device = "cpu"
-
+#device = tools.get_device()
 cluster_net = neural_net_lib.ThreeByThreeCluster()
-cluster_net_name = os.path.abspath(
-    os.path.join(tools.get_working_dir(), '../saved_nets/cluster_net_three'))
-cluster_net.load_state_dict(torch.load(cluster_net_name, map_location=device))
-cluster_net.eval()
+mult0_conf = 1.0
+mult1_conf = 1.0
+mult2_conf = 1.0
 
-# start minesweeper program
-tools.launch_mines()
-#tools.move_and_click(33, 763)
-# can be slow
-sleep(1)
-# start 8 by 8 minesweeper
-tools.move_and_click(739, 320)
+
 # init
 # gui.click()
 
-play_with_clustering(iterations=1, random_percent = 0.0)
+
+
+play_with_config_file(cfg_file_name="config/play_3_fc.json")
 # play_with_nets(iterations=1)
 # play_random(iterations=10)
