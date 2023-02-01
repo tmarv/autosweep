@@ -133,7 +133,7 @@ def run_training(cfg_file_name):
     else:
         print("no known training dimensions mentioned in config: will exit/return")
 
-#cfg_file_name_l = "config/config_retrain_conv_5.json"
-cfg_file_name_l = "config/config_train_from_scratch_3.json"
+cfg_file_name_l = "config/config_retrain_conv_5.json"
+#cfg_file_name_l = "config/config_train_from_scratch_3.json"
 #cfg_file_name_l = "config/config_retrain_3.json"
 run_training(cfg_file_name_l)
