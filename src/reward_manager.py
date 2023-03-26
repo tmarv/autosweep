@@ -22,22 +22,19 @@ def compute_reward(before, after):
                 is_only_ten = False
             if after[i, j] == before[i, j]:
                 continue
-            if before[i, j] == 10 and (after[i, j] < 10 or after[i, j] == 90):
+            if before[i, j] == 10 and (after[i, j] < 10 or after[i, j] == 20):
                 total_sum += 1
                 has_acted = True
                 continue
 
     if not has_acted:
         total_sum = 0.0
-    # print("this is total sum: "+str(total_sum))
-    # print("this is before :"+str(before))
-    # print("this is after :"+str(after))
     #  if no ten is present this means the board has been cleared and the game has been won :)
     return total_sum, has_no_ten
 
 
 def reward_shaper_pos_three(reward, grid):
-    if reward > 0.5 and grid.sum() == 90:
+    if reward > 0.5 and grid.sum() == 20:
         reward = 0.25
     elif reward > 0.5 and grid.sum() == 6*10-3:
         reward = 0.25
@@ -49,8 +46,8 @@ def reward_shaper_pos_three(reward, grid):
 
 def reward_shaper_neg_three(reward, grid):
     grid_2d = grid.reshape(3,3)
-    if grid_2d[1, 1] == 90:
-        reward = -10.0
+    if grid_2d[1, 1] == 20:
+        reward = -20.0
     elif grid_2d[1, 1] == 0:
         reward = -10.0
     elif reward == -64:
@@ -76,7 +73,7 @@ def reward_shaper_pos_five(reward, grid):
 
 
 def reward_shaper_neg_five(reward, grid):
-    if grid[2, 2] == 90:
+    if grid[2, 2] == 20:
         reward = -10.0
     elif grid[2, 2] == 0:
         reward = -10.0
@@ -84,7 +81,6 @@ def reward_shaper_neg_five(reward, grid):
         reward = -64.0
     elif reward == 0:
         reward = -0.15
-
     return reward
 
 

@@ -1,0 +1,61 @@
+{
+ "dimensions":5,
+ "train_raw_net": 
+ [
+ {
+    "skip":false,
+    "epochs":30,
+    "batch_size":8192,
+    "plot_results":true,
+    "use_pretrained_net":true,
+    "learning_rate":0.007,
+    "net_backup_name":"raw_net_five_conv",
+    "pretrained_net_name":"raw_net_five_conv",
+    "training_loss_graph":"training_plots/train_raw.png"
+ }
+ ]
+ ,   
+ "train_clustering_net":
+ [
+ {
+    "skip":false,
+    "skip_variance_eval":false,
+    "variance_eval_graph_name":"training_plots/evaluate_variance.png",
+    "variance_threshold":0.5,
+    "epochs":30,
+    "batch_size":8192,
+    "learning_rate":0.007,
+    "raw_evaluation_net":"raw_net_five_conv",
+    "use_pretrained_net":true,
+    "plot_results":true,
+    "pretrained_net_name":"backup_net_cluster_five",
+    "net_backup_name":"backup_net_cluster_five",
+    "training_loss_graph":"training_plots/train_clustering.png"
+ }
+ ]
+ ,
+ "train_individual_cluster_net":
+ [
+ {
+    "skip":false,	
+    "learning_rate":0.007,
+    "use_pretrained_net":true,
+    "pretrained_net_name":"raw_net_five_conv",
+    "plot_results":true,
+    "batch_size":8192,
+  
+    "epochs_0":30,
+    "net_backup_name_0":"net_five_cluster_0",
+    "training_loss_graph_cluster_0":"training_plots/train_cluster_0.png",
+ 		
+    "epochs_1":30,
+    "net_backup_name_1":"net_five_cluster_1",
+    "training_loss_graph_cluster_1":"training_plots/train_cluster_1.png",
+  	
+    "epochs_2":30,
+    "net_backup_name_2":"net_five_cluster_2",
+    "training_loss_graph_cluster_2":"training_plots/train_cluster_2.png"
+
+  }
+  ]
+}

@@ -70,7 +70,7 @@ def get_training_set_pos_three():
     original = np.load((pos_location + "/" + list_pos[2 * r + 1]))
     reward = np.load((pos_location + "/" + list_pos[2 * r + 2]))
     # a bit of reward shaping
-    if reward > 0.5 and original.sum() == 90:
+    if reward > 0.5 and original.sum() == 20:
         # nonlocal reward
         reward = 0.25
 
@@ -91,7 +91,7 @@ def get_test_set_pos_three():
     original = np.load((pos_location_test + "/" + list_pos_test[2 * r + 1]))
     reward = np.load((pos_location_test + "/" + list_pos_test[2 * r + 2]))
 
-    if reward > 0.5 and original.sum() == 90:
+    if reward > 0.5 and original.sum() == 20:
         # nonlocal reward
         reward = 0.25
     elif reward > 0.5 and original.sum() == 6*10-3:
@@ -115,7 +115,7 @@ def get_test_set_neg_three():
     original = np.load((neg_location_test + "/" + list_neg_test[2 * r + 1]))
     reward = np.load((neg_location_test + "/" + list_neg_test[2 * r + 2]))
     # reward shaping
-    if original[1, 1] == 90:
+    if original[1, 1] == 20:
         # nonlocal reward
         reward = -10.0
     elif original[1, 1] == 0:
@@ -143,7 +143,7 @@ def get_training_set_neg_three():
     reward = np.load((neg_location + "/" + list_neg[2 * r + 2]))
     # print(reward)
     # reward shaping
-    if original[1, 1] == 90:
+    if original[1, 1] == 20:
         # nonlocal reward
         reward = -10.0
     elif original[1, 1] == 0:
