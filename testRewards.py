@@ -138,6 +138,8 @@ def play_with_cluster():
     tensor([-141.2553], grad_fn=<SubBackward0>)
     '''
     test_cluster = np.array([[2.,2.,3.], [10., 10., 10.], [-1., -1., -1.]])
+    test_cluster = np.array([[1., 2., 1.], [10., 10., 10.], [10., 10., 10.]])
+    test_cluster = np.array([[10.0, 10.0, 1.0], [10.0, 10.0, 2.0], [10.0, 10.0, 1.0]])
 
     #print(perform_eval(test_corner,neural_net_three))
     print(perform_eval(test_corner,cluster_net))
