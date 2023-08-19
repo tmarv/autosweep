@@ -1,7 +1,6 @@
 pyautogui 
 torch
-torchvision 
-torchaudio
 opencv-python
 pyscreenshot
 matplotlib
+tk
