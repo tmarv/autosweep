@@ -122,6 +122,8 @@ def train_cluster_net_five_conv(epoch = 1000,
         plt.clf()
         plt.plot(np.array(train_losses))
         plt.savefig(training_loss_graph)
+        
+        
 def train_three_by_three_raw_net(epoch = 1000,
                                  batch_size=8192,
                                  plot_result=False,

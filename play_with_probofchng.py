@@ -1,0 +1,223 @@
+#!/usr/bin/env python3
+# Tim Marvel
+import json
+import os
+import torch
+import random
+import math
+import numpy as np
+from numpy import linalg
+from time import sleep
+
+# self made classes
+from src import data_gathering_histgrm as dg
+from src import reward_manager
+from src import minesweeper_interface as min_int
+from src import neural_net_lib
+from src import tools
+
+#random_percent = 0.0
+VERBOSE = False
+NUM_ACTIONS = 64
+
+def init_mnswpr():
+    tools.launch_mines()
+    # can be slow
+    sleep(1)
+    # start 8 by 8 minesweeper
+    tools.move_and_click(739, 320)
+
+
+def select_action_three(neural_net, state):
+    state = tools.extend_state(state)
+    score_board = np.zeros((8, 8))
+    for i in range(1, 9):
+        for j in range(1, 9):
+            # todo adapt this
+            local_cpy = tools.grab_sub_state_noext(state, j, i)
+            local_tensor = torch.from_numpy(local_cpy).to(dtype=torch.float)
+            local_tensor = local_tensor.reshape([3, 3])
+            local_tensor = local_tensor.unsqueeze(0)
+            local_tensor = local_tensor.unsqueeze(0)
+            #print(local_tensor)
+            score_board[i - 1, j - 1] = neural_net.forward(local_tensor)
+
+    flat = score_board.flatten()
+    flat.sort()
+    flat = np.flipud(flat)
+    return_values = []
+    total_len = len(flat)
+    i = 0
+    while i < total_len:
+        # print("this is i at start: "+str(i))
+        local_range = np.where(score_board == flat[i])
+        local_sz = len(local_range[0])
+        for j in range(0, local_sz):
+            return_values.append([local_range[0][j], local_range[1][j]])
+            i = i + 1
+            # print("this is i after: " + str(i))
+    if len(return_values) != 64:
+        print("Catastrophic error: return values size is off " + str(len(return_values)))
+        exit()
+    # print("this is size:    "+str(len(return_values)))
+    return return_values
+
+
+def select_action_three_nozero(neural_net, state):
+    state = tools.extend_state(state)
+    score_board = np.zeros((8, 8))
+    for i in range(1, 9):
+        for j in range(1, 9):
+            # todo adapt this
+            local_cpy = tools.grab_sub_state_noext(state, j, i)
+            local_tensor = torch.from_numpy(local_cpy).to(dtype=torch.float)
+            local_tensor = local_tensor.reshape([3, 3])
+            local_tensor = local_tensor.unsqueeze(0)
+            local_tensor = local_tensor.unsqueeze(0)
+            #print(local_tensor)
+            neural_net_pred = neural_net.forward(local_tensor)
+            score_board[i - 1, j - 1] = neural_net_pred
+            if(abs(neural_net_pred)<0.00):
+                print("adfa")
+                score_board[i - 1, j - 1] = -80
+
+
+    flat = score_board.flatten()
+    flat.sort()
+    flat = np.flipud(flat)
+    return_values = []
+    total_len = len(flat)
+    i = 0
+    while i < total_len:
+        # print("this is i at start: "+str(i))
+        local_range = np.where(score_board == flat[i])
+        local_sz = len(local_range[0])
+        for j in range(0, local_sz):
+            return_values.append([local_range[0][j], local_range[1][j]])
+            i = i + 1
+            # print("this is i after: " + str(i))
+    if len(return_values) != 64:
+        print("Catastrophic error: return values size is off " + str(len(return_values)))
+        exit()
+    # print("this is size:    "+str(len(return_values)))
+    return return_values
+
+def play_with_probofchng(iterations, epoch='', is_test_set=False, random_percent=0.0):
+    print("starting three by three play")
+    main_net = neural_net_lib.ThreeByThreeProbofchng1ConvLayerLarger()
+    main_net_name = os.path.abspath(
+        os.path.join(tools.get_working_dir(), '../saved_nets/raw_net_three_probofchg'))
+    main_net.load_state_dict(torch.load(main_net_name, map_location=device))
+    main_net.eval()
+    ''''''
+    win = 0
+    lose = 0
+    # load the 3 by 3 kernel network
+    '''
+    neural_net_three = neural_net_lib.ThreeByThreeSig()
+    # TODO: fix this
+    net_name_three = os.path.abspath(
+        os.path.join(tools.get_working_dir(), '../saved_nets/neural_net_three_test_' + str(epoch)))
+    neural_net_three.load_state_dict(torch.load(net_name_three,  map_location=device))
+    neural_net_three.eval()
+    '''
+    # TODO fix incrementation bug
+    i_episode = 0
+    while i_episode < iterations:
+        print("-- restarted at while")
+        sleep(0.3)
+        print("this is i_episode " + str(i_episode))
+        tools.move_and_click(739, 320)
+        sleep(0.3)
+        state = dg.get_state_from_screen()
+        # run the flagging algorithm
+        state = min_int.mark_game(state)
+        # perform a deep copy
+        previous_state = state.copy()
+        sleep(0.3)
+        counter = 0
+        while not dg.get_status() and counter < 200:
+            #action = select_action_three(main_net, state)
+            action = select_action_three_nozero(main_net, state)
+            # action = select_action_fused(neural_net_three, neural_net_five, state)
+            counter += 1
+            for k in range(0, 64):
+                if random.random() < random_percent:
+                    print("random action")
+                    action[k][0] = random.randint(0, 7)
+                    action[k][1] = random.randint(0, 7)
+
+                min_int.move_and_click_to_ij(action[k][0], action[k][1])
+                # print(action[k])
+                tools.move_to(1490, 900)
+                # if hit a mine
+                sleep(0.5)
+                state = dg.get_state_from_screen()
+                if not dg.get_status():
+                    state = min_int.mark_game(state)
+                sub_state_three = tools.grab_sub_state_three(previous_state, action[k][1] + 1, action[k][0] + 1)
+                sub_state_five = tools.grab_sub_state_five(previous_state, action[k][1] + 2, action[k][0] + 2)
+
+                # we hit a mine
+                if dg.get_status():
+                    print('hit mine')
+                    tools.save_action_neg_three(-64, sub_state_three, is_test_set)
+                    # tools.save_action_neg_five(-64, sub_state_five, is_test_set)
+                    print(sub_state_three)
+                    print(sub_state_five)
+                    tools.move_and_click(1490, 900)
+                    counter += 1
+                    i_episode = i_episode + 1
+                    print("-- should restart")
+                    lose += 1
+                    break
+
+                # compute reward
+                reward, has_won = reward_manager.compute_reward(previous_state, state)
+
+                if has_won:
+                    print("has won collect data with ml")
+                    tools.save_action_three(10, sub_state_three, is_test_set)
+                    # tools.save_action_five(10, sub_state_five, is_test_set)
+                    tools.move_and_click(1490, 900)
+                    print("has won collect data with ml :" + str(counter))
+                    counter += 1001
+                    i_episode = i_episode + 1
+                    win += 1
+                    break
+                else:
+                    # save data from transition
+                    if reward > 0:
+                        tools.save_action_three(reward, sub_state_three, is_test_set)
+                        tools.save_action_five(reward, sub_state_five, is_test_set)
+                        #print("this is positive reward " + str(reward))
+
+                    elif reward <= 0:
+                        #print("this is negative reward " + str(reward))
+                        tools.save_action_neg_three(reward, sub_state_three, is_test_set)
+                        tools.save_action_neg_five(reward, sub_state_five, is_test_set)
+
+                previous_state = state.copy()
+                state = min_int.mark_game(state)
+                # if we didn't act -> k = 100
+                if reward != 0:
+                    #print("call ml again")
+                    break
+                counter += 1
+    print("win" + str(win))
+    print("lose" + str(lose))
+
+# TODO move this to play utilities
+def select_action():
+    random_action = random.randrange(NUM_ACTIONS)
+    # print('this is random action ', random_action)
+    return torch.tensor([[math.floor(random_action / 8), random_action % 8]], device=device, dtype=torch.int)
+
+
+device = tools.get_device()
+
+init_mnswpr()
+play_with_probofchng(iterations=1)
+# play_with_config_file(cfg_file_name="config/play_3_fc.json")
+# play_with_nets(iterations=1)
+# play_random(iterations=10)
