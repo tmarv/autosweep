@@ -35,10 +35,10 @@ def rotate_by_90_flat(state):
     rot = np.rot90(state.reshape(3,3), k=1, axes=(1, 0))
     return rot.flatten()
 
+
 def rotate_by_90_flat_five(state):
     rot = np.rot90(state.reshape(5, 5), k=1, axes=(1, 0))
     return rot.flatten()
-
 
 
 def grab_sub_state_three(state, i, j):

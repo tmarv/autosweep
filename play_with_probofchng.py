@@ -104,12 +104,18 @@ def select_action_three_nozero(neural_net, state):
 
 def play_with_probofchng(iterations, epoch='', is_test_set=False, random_percent=0.0):
     print("starting three by three play")
-    main_net = neural_net_lib.ThreeByThreeProbofchng1ConvLayerLarger()
+    #main_net = neural_net_lib.ThreeByThreeProbofchng1ConvLayerLarger()
+    #main_net = neural_net_lib.ThreeByThreeProbofchng1ConvLayer()
+    main_net = neural_net_lib.ThreeByThree1ConvLayer512(0.0)
+    '''
     main_net_name = os.path.abspath(
         os.path.join(tools.get_working_dir(), '../saved_nets/raw_net_three_probofchg'))
+    '''
+    main_net_name = os.path.abspath(
+        os.path.join(tools.get_working_dir(), '../saved_nets/three_conv_512_no_drop_bs_2048'))
     main_net.load_state_dict(torch.load(main_net_name, map_location=device))
     main_net.eval()
-    ''''''
+
     win = 0
     lose = 0
     # load the 3 by 3 kernel network
@@ -217,7 +223,7 @@ def select_action():
 device = tools.get_device()
 
 init_mnswpr()
-play_with_probofchng(iterations=1)
+play_with_probofchng(iterations=10)
 # play_with_config_file(cfg_file_name="config/play_3_fc.json")
 # play_with_nets(iterations=1)
 # play_random(iterations=10)

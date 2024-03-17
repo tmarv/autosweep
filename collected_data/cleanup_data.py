@@ -142,6 +142,35 @@ def rotate_data(backup_name_unique, backup_name_rotated):
             rotated_data.append(grid_values_270)
 
         dump_to_file(rotated_data, backup_name_rotated)
+
+
+def normalize_rewards(read_name, output_name):
+    with open(read_name) as file_obj:
+        csv_obj = csv.reader(file_obj)
+        raw_rewards = []
+        normalized_data = []
+
+        for line in csv_obj:
+            raw_rewards.append(np.float32(line[9]))
+            normalized_data.append(np.array(line))
+
+        min_val = np.min(raw_rewards)
+        max_val = np.max(raw_rewards)
+        print("this is min val: "+str(min_val))
+        print("this is max val: "+str(max_val))
+
+        for line in normalized_data:
+            scaled_reward = (np.float32(line[9]) - min_val) / (max_val - min_val)
+            line[9] = scaled_reward
+            #normalized_data.append(line)
+        print(len(normalized_data))
+        dump_to_file(normalized_data,output_name)
+        #avg = np.average(raw_rewards)
+        #mean = np.mean(raw_rewards)
+        #print("this is avg: "+str(avg))
+        #print("this is mean: "+str(mean))
+
 print("starting data comparison")
 #remove_duplicates("unique_pts.csv")
-rotate_data("unique_pts.csv","unique_rotated_pts.csv")
+#rotate_data("unique_pts.csv","unique_rotated_pts.csv")
+normalize_rewards("unique_rotated_pts.csv","unique_normalized_rewards.csv")
