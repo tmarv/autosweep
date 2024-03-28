@@ -63,13 +63,17 @@ def select_action_three(neural_net, state):
     return return_values
 
 
-def select_action_three_nozero(neural_net, state):
+def select_action_three_nozero(neural_net, state, normalize=False):
     state = tools.extend_state(state)
     score_board = np.zeros((8, 8))
     for i in range(1, 9):
         for j in range(1, 9):
             # todo adapt this
-            local_cpy = tools.grab_sub_state_noext(state, j, i)
+            local_cpy = tools.grab_sub_state_noext(state, j, i) # normalize of needed
+            if normalize:
+                local_cpy=local_cpy.flatten()
+                for k in range(9):
+                    local_cpy[k] = (local_cpy[k]+2.0)/12.0
             local_tensor = torch.from_numpy(local_cpy).to(dtype=torch.float)
             local_tensor = local_tensor.reshape([3, 3])
             local_tensor = local_tensor.unsqueeze(0)
@@ -102,17 +106,17 @@ def select_action_three_nozero(neural_net, state):
     # print("this is size:    "+str(len(return_values)))
     return return_values
 
-def play_with_probofchng(iterations, epoch='', is_test_set=False, random_percent=0.0):
+def play_with_probofchng(iterations, sz=32 ,epoch='', is_test_set=False, random_percent=0.0):
     print("starting three by three play")
     #main_net = neural_net_lib.ThreeByThreeProbofchng1ConvLayerLarger()
     #main_net = neural_net_lib.ThreeByThreeProbofchng1ConvLayer()
-    main_net = neural_net_lib.ThreeByThree1ConvLayer512(0.0)
-    '''
+    #main_net = neural_net_lib.ThreeByThree1ConvLayer512(0.0)
+    #main_net = neural_net_lib.ThreeByThree1ConvLayer2048(0.0)
+    #main_net = neural_net_lib.ThreeByThree1ConvLayer16BatchNorm()
+    #main_net = neural_net_lib.ThreeByThree1ConvLayerXBatchNorm(sz)
+    main_net = neural_net_lib.ThreeByThree1ConvLayerX(sz, 0.0)
     main_net_name = os.path.abspath(
-        os.path.join(tools.get_working_dir(), '../saved_nets/raw_net_three_probofchg'))
-    '''
-    main_net_name = os.path.abspath(
-        os.path.join(tools.get_working_dir(), '../saved_nets/three_conv_512_no_drop_bs_2048'))
+        os.path.join(tools.get_working_dir(), '../saved_nets/new_three_conv_512_drop_0_bs_32_m25_nd_l1'))
     main_net.load_state_dict(torch.load(main_net_name, map_location=device))
     main_net.eval()
 
@@ -136,16 +140,23 @@ def play_with_probofchng(iterations, epoch='', is_test_set=False, random_percent
         tools.move_and_click(739, 320)
         sleep(0.3)
         state = dg.get_state_from_screen()
+        # print(state)
+        # print(dg.get_status())
+        #exit()
         # run the flagging algorithm
         state = min_int.mark_game(state)
+        # print(state)
+        # print(dg.get_status())
+        # exit()
         # perform a deep copy
         previous_state = state.copy()
         sleep(0.3)
         counter = 0
         while not dg.get_status() and counter < 200:
             #action = select_action_three(main_net, state)
-            action = select_action_three_nozero(main_net, state)
-            # action = select_action_fused(neural_net_three, neural_net_five, state)
+            #print(state)
+            action = select_action_three_nozero(main_net, state, True)
+            #print(action)
             counter += 1
             for k in range(0, 64):
                 if random.random() < random_percent:
@@ -154,11 +165,13 @@ def play_with_probofchng(iterations, epoch='', is_test_set=False, random_percent
                     action[k][1] = random.randint(0, 7)
 
                 min_int.move_and_click_to_ij(action[k][0], action[k][1])
-                # print(action[k])
+                print(action[k])
                 tools.move_to(1490, 900)
                 # if hit a mine
                 sleep(0.5)
                 state = dg.get_state_from_screen()
+                # print(state)
+                # exit()
                 if not dg.get_status():
                     state = min_int.mark_game(state)
                 sub_state_three = tools.grab_sub_state_three(previous_state, action[k][1] + 1, action[k][0] + 1)
@@ -180,7 +193,7 @@ def play_with_probofchng(iterations, epoch='', is_test_set=False, random_percent
 
                 # compute reward
                 reward, has_won = reward_manager.compute_reward(previous_state, state)
-
+                # print("reward: "+str(reward))
                 if has_won:
                     print("has won collect data with ml")
                     tools.save_action_three(10, sub_state_three, is_test_set)
@@ -207,7 +220,7 @@ def play_with_probofchng(iterations, epoch='', is_test_set=False, random_percent
                 state = min_int.mark_game(state)
                 # if we didn't act -> k = 100
                 if reward != 0:
-                    #print("call ml again")
+                    print("call ml again")
                     break
                 counter += 1
     print("win" + str(win))
@@ -223,7 +236,7 @@ def select_action():
 device = tools.get_device()
 
 init_mnswpr()
-play_with_probofchng(iterations=10)
+play_with_probofchng(iterations=1, sz=512, random_percent = 0.0)
 # play_with_config_file(cfg_file_name="config/play_3_fc.json")
 # play_with_nets(iterations=1)
 # play_random(iterations=10)

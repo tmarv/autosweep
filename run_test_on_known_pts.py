@@ -20,28 +20,24 @@ from src import tools
 VERBOSE = False
 NUM_ACTIONS = 64
 
-three_by_three_data_filename = "test/three_by_three_testdata.txt"
+three_by_three_data_filename = "test/three_by_three_testdata_m55_tran.txt"
 
 # can read in the test data, specify the neural net size 3 or 5
 def readTestDataFile(net_size = 3):
     end_of_data = net_size*net_size
     data_array = []
     rewards = []
-
     f = open(three_by_three_data_filename, "r")
     for line in f:
         chunks = line.split(',')
-        # print(chunks[0:end_of_data])
-        # print(chunks[end_of_data])
         data_to_append = np.array(chunks[0:end_of_data]).astype(np.float32)
         data_to_append = data_to_append.reshape(net_size,net_size)
         data_array.append(data_to_append)
         rewards.append(float(chunks[end_of_data]))
-
     return data_array,rewards
 
-def loadAndPrepareNet(net_name = "saved_nets/raw_net_three_probofchg"):
-    main_net = neural_net_lib.ThreeByThreeProbofchng1ConvLayerLarger()
+def loadAndPrepareNet(net_name = "saved_nets/new_three_conv_512_drop_0_bs_32_m25_nd_l1"):
+    main_net = neural_net_lib.ThreeByThree1ConvLayerX(512,0.0)
     main_net.load_state_dict(torch.load(net_name, map_location='cpu'))
     main_net.eval()
     return main_net

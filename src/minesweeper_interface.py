@@ -73,10 +73,10 @@ def click_on_cells(i, j, state, num):
             if k == 0 and l == 0:
                 continue
 
-            if state[i + k, j + l] == 10:
+            if state[i + k, j + l] == -1:
                 unmarked_cells += 1
 
-            if state[i + k, j + l] == 20:
+            if state[i + k, j + l] == 10:
                 marked_cells += 1
 
             if marked_cells > num:
@@ -98,11 +98,11 @@ def mark_cells(i, j, state, num):
             if k == 0 and l == 0:
                 continue
 
-            if state[i + k, j + l] == 10:
+            if state[i + k, j + l] == -1:
                 marked_cells += 1
                 last_ind.append([i + k, j + l])
 
-            if state[i + k, j + l] == 20:
+            if state[i + k, j + l] == 10:
                 marked_cells += 1
 
             if marked_cells > num:
@@ -124,5 +124,5 @@ def mark_game(field_state):
                 is_flag, last_ind = mark_cells(j, i, field_state, current_state)
                 if is_flag:
                     for index in last_ind:
-                        field_state[index[0], index[1]] = 20
+                        field_state[index[0], index[1]] = 10
     return field_state

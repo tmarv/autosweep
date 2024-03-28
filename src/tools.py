@@ -15,13 +15,13 @@ def move_and_click(w, h):
 
 
 def extend_state(state):
-    extended = -1 * np.ones((10, 10))
+    extended = -2 * np.ones((10, 10))
     extended[1:9, 1:9] = state
     return extended
 
 
 def extend_state_five(state):
-    extended_five = -1 * np.ones((12, 12))
+    extended_five = -2 * np.ones((12, 12))
     extended_five[2:10, 2:10] = state
     return extended_five
 
@@ -194,12 +194,12 @@ dir_path = os.path.dirname(real_path)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 _data_pts_3_filename_small = os.path.join(dir_path, "../collected_data/rewards3_short.txt")
-_data_pts_3_filename = os.path.join(dir_path, "../collected_data/rewards3.txt")
+_data_pts_3_filename = os.path.join(dir_path, "../collected_data/rewards3_new.txt")
 _data_pts_3_filename_var = os.path.join(dir_path, "../collected_data/rewards3_var.txt")
 _data_pts_3_filename_clean = os.path.join(dir_path, "../collected_data/rewards3_clean.txt")
 
 _data_pts_5_filename_small = os.path.join(dir_path, "../collected_data/rewards5_short.txt")
-_data_pts_5_filename = os.path.join(dir_path, "../collected_data/rewards5.txt")
+_data_pts_5_filename = os.path.join(dir_path, "../collected_data/rewards5_new.txt")
 _data_pts_5_filename_var = os.path.join(dir_path, "../collected_data/rewards5_var.txt")
 _data_pts_5_filename_clean = os.path.join(dir_path, "../collected_data/rewards5_clean.txt")
 

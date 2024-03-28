@@ -181,6 +181,7 @@ def get_state_from_screen():
             mine_comp = cv2.compareHist(hist_mine, hist_tile, HIST_COMPARE_MTHD)
             if mine_ex_comp > 0.9 or mine_comp > 0.9:
                 is_exploded = True
+                board_state[j, i] = 99
                 # TODO look into this
                 return board_state
 
@@ -196,10 +197,10 @@ def get_state_from_screen():
             test_hist_comp_flag = cv2.compareHist(grey_tile_hist, hist_flag_grey, 3)
 
             if test_hist_comp_flag < 0.8:
-                board_state[j, i] = 20
+                board_state[j, i] = 10
                 continue
             else:
-                board_state[j, i] = 10
+                board_state[j, i] = -1
                 unknown_counter += 1
                 continue
 

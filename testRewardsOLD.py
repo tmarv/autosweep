@@ -102,9 +102,10 @@ def play_with_cluster():
     nets_clusters = init_the_cluster_nets("net_three_cluster_")
     # load the 3 by 3 kernel network
     #cluster_net = neural_net_lib.ThreeByThreeProbofchng1ConvLayer()
-    cluster_net = neural_net_lib.ThreeByThree1ConvLayer512(0.0)
+    #cluster_net = neural_net_lib.ThreeByThree1ConvLayer512(0.0)
+    cluster_net = neural_net_lib.ThreeByThree1ConvLayer2048(0.0)
     net_name_cluster = os.path.abspath(
-        os.path.join(tools.get_working_dir(), '../saved_nets/three_conv_512_no_drop_bs_2048'))
+        os.path.join(tools.get_working_dir(), '../saved_nets/three_conv_2048_drop_02_bs_2048'))
     device = tools.get_device()
     cluster_net.load_state_dict(torch.load(net_name_cluster, map_location=device))
     cluster_net.eval()
