@@ -7,7 +7,7 @@ import math
 import json
 import csv
 
-
+# TODO removeS
 def open_and_sort()->pd.DataFrame:
     df = pd.read_csv("rewards3.txt")
     df.columns.values[0] = 'd1'
@@ -267,10 +267,10 @@ def old_to_new(read_name, output_name):
 
 
 print("starting data comparison")
-old_to_new("rewards3.txt","new_rewards3.txt")
+#old_to_new("rewards3.txt","new_rewards3.txt")
 rotate_data("new_rewards3.txt","new_rotated_pts.csv")
 remove_duplicates("new_rotated_pts.csv")
-normalize_rewards_and_inputs("new_rotated_pts.csv", "new_unique_normalized_rewards_m55.csv", -2, 5)
+normalize_rewards_and_inputs("new_rotated_pts.csv", "new_unique_normalized_rewards_m25.csv", -2, 5)
 # normalize_rewards_and_inputs("three_by_three_testdata_m55.txt", "three_by_three_testdata_m55_tran.txt", -1, 4)
 # normalize_rewards_m11("unique_rotated_pts.csv","unique_normalized_m11_rewards.csv")
 # standardize_rewards("unique_rotated_pts.csv","unique_standardized_rewards.csv")

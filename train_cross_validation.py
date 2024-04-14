@@ -70,9 +70,9 @@ def train_net(epoch = 20,
     # keep both loss functions available for experimentation
     l1_loss = nn.SmoothL1Loss()
     l2_loss = nn.MSELoss()
-    
+
     # these datasets contain different types of normalization / standardization
-    dataset = CustomDatasetFromCSV('collected_data/unique_normalized_rewards_m55.csv')
+    dataset = CustomDatasetFromCSV('collected_data/new_unique_normalized_rewards_m25.csv')
     # dataset = CustomDatasetFromCSV('collected_data/unique_standardized_rewards.csv')
     # dataset = CustomDatasetFromCSV('collected_data/unique_normalized_m11_rewards.csv')
 
@@ -120,4 +120,4 @@ def train_net(epoch = 20,
     torch.save(net.state_dict(), backup_net_name)
 
 device = tools.get_device()
-train_net(epoch = 101, neural_net_size = 512, batch_size = 32)
+train_net(epoch = 101, neural_net_size = 64, batch_size = 32)
