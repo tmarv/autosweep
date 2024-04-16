@@ -17,7 +17,7 @@ def plot_bar(rewards,label="title"):
     plt.legend()
     plt.show()
 
-def quantitize_rewards(read_name):
+def quantitize_rewards3by3(read_name):
     with open(read_name) as file_obj:
         csv_obj = csv.reader(file_obj)
         raw_feature_points = []
@@ -39,7 +39,27 @@ def quantitize_rewards(read_name):
         print("this is max valr: "+str(max_val_f))
         plot_bar(raw_rewards,"rewards")
 
-# quantitize_rewards("unique_pts.csv")
-# quantitize_rewards("unique_normalized_rewards.csv")
-# quantitize_rewards("unique_standardized_rewards.csv")
-quantitize_rewards("unique_normalized_rewards_m55.csv")
+
+def quantitize_rewards5by5(read_name):
+    with open(read_name) as file_obj:
+        csv_obj = csv.reader(file_obj)
+        raw_feature_points = []
+        raw_rewards = []
+
+        for line in csv_obj:
+            raw_rewards.append(np.float32(line[25]))
+            for i in range(24):
+                raw_feature_points.append(np.float32(line[i]))
+
+        min_val_r = np.min(raw_rewards)
+        max_val_r = np.max(raw_rewards)
+        print("this is min val r: "+str(min_val_r))
+        print("this is max valr: "+str(max_val_r))
+
+        min_val_f = np.min(raw_feature_points)
+        max_val_f = np.max(raw_feature_points)
+        print("this is min val r: "+str(min_val_f))
+        print("this is max valr: "+str(max_val_f))
+        plot_bar(raw_rewards,"rewards")
+        
+quantitize_rewards5by5("unique_normalized_5_rewards_m25.csv")

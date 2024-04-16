@@ -7,21 +7,6 @@ import math
 import json
 import csv
 
-# TODO removeS
-def open_and_sort()->pd.DataFrame:
-    df = pd.read_csv("rewards3.txt")
-    df.columns.values[0] = 'd1'
-    df.columns.values[1] = 'd2'
-    df.columns.values[2] = 'd3'
-    df.columns.values[3] = 'd4'
-    df.columns.values[4] = 'd5'
-    df.columns.values[5] = 'd6'
-    df.columns.values[6] = 'd7'
-    df.columns.values[7] = 'd8'
-    df.columns.values[8] = 'd9'
-    df.columns.values[9] = 'reward'
-    df = df.sort_values(by=['d1','d2','d3','d4','d5','d6','d7','d8','d9'], ascending=True)
-    return df
 
 def open_and_sort(backup_name_unique)->pd.DataFrame:
     df = pd.read_csv(backup_name_unique)
