@@ -28,8 +28,8 @@ class CustomDatasetFromCSV(Dataset):
         with open(path_to_file) as file_obj:
             csv_obj = csv.reader(file_obj)
             for line in csv_obj:
-                self.rewards.append(np.float32(line[9]))
-                self.grid_values.append([line[0:3], line[3:6],line[6:9]])
+                self.rewards.append(np.float32(line[25]))
+                self.grid_values.append([line[0:5], line[5:10], line[10:15], line[15:20], line[20:25]])
         self.len = len(self.rewards)
         self.grid_values = torch.Tensor(np.array(np.float32(self.grid_values))).to(device)
         self.rewards = torch.Tensor(np.array(np.float32(self.rewards))).to(device)
@@ -60,11 +60,10 @@ def train_net(epoch = 20,
     k_folds = 5
     kf_split = 1.0/k_folds
     kf = KFold(n_splits=k_folds, shuffle=True)
-    backup_name = 'new_three_conv_{}_drop_{}_bs_{}_m25_nd_l1'.format(neural_net_size, int(100.0*dropout), batch_size)
+    backup_name = 'five_conv_{}_drop_{}_bs_{}_m25_nd_l1'.format(neural_net_size, int(100.0*dropout), batch_size)
     training_loss_graph = backup_name+".png"
     print(backup_name)
-    #net = neural_net_lib.ThreeByThree1ConvLayerXBatchNorm(neural_net_size, dropout).to(device)
-    net = neural_net_lib.ThreeByThree1ConvLayerX(neural_net_size, dropout).to(device)
+    net = neural_net_lib.FiveByFive1ConvLayerX(neural_net_size, dropout).to(device)
     optimizer_three = optim.Adam(net.parameters(), lr=learning_rate)
 
     # keep both loss functions available for experimentation
@@ -72,23 +71,21 @@ def train_net(epoch = 20,
     l2_loss = nn.MSELoss()
 
     # these datasets contain different types of normalization / standardization
-    dataset = CustomDatasetFromCSV('collected_data/new_unique_normalized_rewards_m25.csv')
-    # dataset = CustomDatasetFromCSV('collected_data/unique_standardized_rewards.csv')
-    # dataset = CustomDatasetFromCSV('collected_data/unique_normalized_m11_rewards.csv')
+    dataset = CustomDatasetFromCSV('collected_data/unique_normalized_5_rewards_m25.csv')
 
     train_losses = []
     eval_losses = []
     for j in range(2):
         for fold, (train_idx, test_idx) in enumerate(kf.split(dataset)):
             print("fold f: {}".format(fold))
-            train_loader_three = DataLoader(dataset, batch_size = batch_size, sampler=torch.utils.data.SubsetRandomSampler(train_idx))
-            test_loader_three = DataLoader(dataset, batch_size = batch_size, sampler=torch.utils.data.SubsetRandomSampler(test_idx))
-            train_len = len(train_loader_three.dataset)
+            train_loader_five = DataLoader(dataset, batch_size = batch_size, sampler=torch.utils.data.SubsetRandomSampler(train_idx))
+            test_loader_five = DataLoader(dataset, batch_size = batch_size, sampler=torch.utils.data.SubsetRandomSampler(test_idx))
+            train_len = len(train_loader_five.dataset)
 
             for e in range(epoch):
                 train_loss_e = 0
                 net.train()
-                for i, data in enumerate(train_loader_three):
+                for i, data in enumerate(train_loader_five):
                     inputs, rewards = data
                     inputs = inputs.unsqueeze(1)
                     rewards = rewards.to(torch.float)
@@ -103,7 +100,7 @@ def train_net(epoch = 20,
 
                 net.eval()
                 eval_loss_e = 0
-                for i, data in enumerate(test_loader_three):
+                for i, data in enumerate(test_loader_five):
                     inputs, rewards = data
                     inputs = inputs.unsqueeze(1)
                     rewards = rewards.to(torch.float)
@@ -120,4 +117,5 @@ def train_net(epoch = 20,
     torch.save(net.state_dict(), backup_net_name)
 
 device = tools.get_device()
-train_net(epoch = 101, neural_net_size = 64, batch_size = 32)
+print('training with device {}'.format(device))
+train_net(epoch = 51, neural_net_size = 64, batch_size = 32)
