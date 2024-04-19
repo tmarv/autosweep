@@ -118,4 +118,4 @@ def train_net(epoch = 20,
 
 device = tools.get_device()
 print('training with device {}'.format(device))
-train_net(epoch = 51, neural_net_size = 64, batch_size = 32)
+train_net(epoch = 101, neural_net_size = 256, batch_size = 64)
