@@ -63,3 +63,4 @@ def quantitize_rewards5by5(read_name):
         plot_bar(raw_rewards,"rewards")
         
 quantitize_rewards5by5("unique_normalized_5_rewards_m25.csv")
+quantitize_rewards3by3("unique_normalized_3_rewards_m25.csv")

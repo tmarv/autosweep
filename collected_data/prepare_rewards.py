@@ -346,6 +346,6 @@ def run_pre_processing_five():
     print("starting data pre-processing of 5 by 5 data")
     rotate_data_5by5("rewards5.txt", "rotated_pts5.csv")
     remove_duplicates_5by5("rotated_pts5.csv")
-    normalize_rewards_and_inputs("rotated_pts5.csv", "unique_normalized_5_rewards_m25.csv", 25, -2, 5)
+    normalize_rewards_and_inputs("rotated_pts5.csv", "unique_normalized_5_rewards_m25.csv", 25, -5, 3)
 
 run_pre_processing_five()

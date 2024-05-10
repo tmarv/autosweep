@@ -184,6 +184,31 @@ class FiveByFive1ConvLayerX(nn.Module):
         return x
 
 
+class FiveByFive2ConvLayerX(nn.Module):
+    def __init__(self, sz, dp):
+        super(FiveByFive2ConvLayerX, self).__init__()
+        self.convolutional_layer = nn.Sequential(
+            nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, stride=1),
+            nn.LeakyReLU(),
+            nn.Conv2d(in_channels=16, out_channels=sz, kernel_size=3, stride=1),
+            nn.LeakyReLU(),
+        )
+
+        self.linear_layer = nn.Sequential(
+            nn.Linear(in_features=sz, out_features=sz),
+            nn.LeakyReLU(),
+            nn.Dropout(dp),
+            nn.Linear(in_features=sz, out_features=sz),
+            nn.LeakyReLU(),
+            nn.Dropout(dp),
+            nn.Linear(sz, 1))
+
+    def forward(self, x):
+        x = self.convolutional_layer(x)
+        x = torch.flatten(x, 1)
+        x = self.linear_layer(x)
+        return x
+
 
 class ThreeByThree1ConvLayer64BatchNorm(nn.Module):
     def __init__(self):

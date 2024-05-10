@@ -64,6 +64,7 @@ def train_net(epoch = 20,
     training_loss_graph = backup_name+".png"
     print(backup_name)
     net = neural_net_lib.FiveByFive1ConvLayerX(neural_net_size, dropout).to(device)
+    #net = neural_net_lib.FiveByFive2ConvLayerX(neural_net_size, dropout).to(device)
     optimizer_three = optim.Adam(net.parameters(), lr=learning_rate)
 
     # keep both loss functions available for experimentation
@@ -118,4 +119,5 @@ def train_net(epoch = 20,
 
 device = tools.get_device()
 print('training with device {}'.format(device))
-train_net(epoch = 101, neural_net_size = 256, batch_size = 64)
+
+train_net(epoch = 61, learning_rate=0.0008, neural_net_size = 256, batch_size = 16)

@@ -42,11 +42,13 @@ def select_action_five(neural_net, state, normalize = False, norm_a = 2.0, norm_
             local_tensor = local_tensor.unsqueeze(0)
             local_tensor = local_tensor.unsqueeze(0)
             neural_net_pred = neural_net.forward(local_tensor)
+
             score_board[i - 2, j - 2] = neural_net_pred
 
     flat = score_board.flatten()
     flat.sort()
     flat = np.flipud(flat)
+    #print(flat)
     return_values = []
     total_len = len(flat)
     i = 0
@@ -59,12 +61,15 @@ def select_action_five(neural_net, state, normalize = False, norm_a = 2.0, norm_
     if len(return_values) != 64:
         print("Catastrophic error: return values size is off " + str(len(return_values)))
         exit()
+    #print('-------')
+    #print(return_values)
     return return_values
 
 
 def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False, random_percent = 0.0):
-    print("starting to play minesweeper with three by three network")
+    print("starting to play minesweeper with five by five network")
     main_net = neural_net_lib.FiveByFive1ConvLayerX(sz, 0.0)
+    #main_net = neural_net_lib.FiveByFive2ConvLayerX(sz, 0.0)
     main_net_name = os.path.abspath(
         os.path.join(tools.get_working_dir(), '../saved_nets/{}'.format(net_name)))
     main_net.load_state_dict(torch.load(main_net_name, map_location=device))
@@ -151,4 +156,7 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
 device = tools.get_device()
 print('this is the device: {}'.format(device))
 init_mnswpr()
-play_mnswpr(iterations=10, sz=256, net_name='five_conv_256_drop_0_bs_64_m25_nd_l1', random_percent = 0.0)
+#play_mnswpr(iterations=50, sz=256, net_name='five_conv_256_drop_0_bs_32_m25_nd_l1', random_percent = 0.0)
+#play_mnswpr(iterations=50, sz=256, net_name='five_conv_256_drop_0_bs_64_m25_nd_l1', random_percent = 0.0)
+#play_mnswpr(iterations=100, sz=32, net_name='five_2conv_32_drop_0_bs_32_m25_nd_l1', random_percent = 0.0)
+play_mnswpr(iterations=10, sz=256, net_name='five_conv_256_drop_0_bs_16_m25_nd_l1', random_percent = 0.0)
