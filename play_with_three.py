@@ -2,6 +2,7 @@
 # Tim Marvel
 import json
 import os
+import logging
 import torch
 import random
 import math
@@ -18,6 +19,11 @@ from src import tools
 VERBOSE = False
 NUM_ACTIONS = 64
 
+# Silence external libs
+logging.basicConfig(level=logging.CRITICAL, filename='logs/play_with_three.log', encoding='utf-8')
+logger = logging.getLogger('play_with_three')
+# enable logs for current lib
+logger.setLevel(level=logging.INFO)
 
 def init_mnswpr():
     tools.launch_mines()
@@ -63,7 +69,8 @@ def select_action_three(neural_net, state, normalize = False, norm_a = 2.0, norm
 
 
 def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False, random_percent = 0.0):
-    print("starting to play minesweeper with three by three network")
+    logger.info("starting to play minesweeper with three by three network")
+    logger.info('Name of the net: {}'.format(net_name))
     main_net = neural_net_lib.ThreeByThree1ConvLayerX(sz, 0.0)
     main_net_name = os.path.abspath(
         os.path.join(tools.get_working_dir(), '../saved_nets/{}'.format(net_name)))
@@ -76,7 +83,7 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
     lose = 0
     while i_episode < iterations:
         sleep(0.3)
-        print("episode {}".format(i_episode))
+        logger.info("episode {}".format(i_episode))
         tools.move_and_click(739, 320)
         sleep(0.3)
         state = dg.get_state_from_screen()
@@ -106,11 +113,11 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
 
                 # we hit a mine
                 if dg.get_status():
-                    print('lost: hit mine')
+                    logger.info('LOST: hit mine')
                     tools.save_action_neg_three(-64, sub_state_three, is_test_set)
                     tools.save_action_neg_five(-64, sub_state_five, is_test_set)
-                    print(sub_state_three)
-                    print(sub_state_five)
+                    logger.info(' \n '+str(sub_state_three))
+                    logger.info(' \n '+str(sub_state_five))
                     tools.move_and_click(1490, 900)
                     counter += 1
                     i_episode = i_episode + 1
@@ -123,7 +130,7 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
                     tools.save_action_three(10, sub_state_three, is_test_set)
                     tools.save_action_five(10, sub_state_five, is_test_set)
                     tools.move_and_click(1490, 900)
-                    print('has won in {} strikes'.format(counter))
+                    logger.info('has won in {} strikes'.format(counter))
                     counter += 1001
                     i_episode = i_episode + 1
                     win += 1
@@ -144,11 +151,13 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
                     break
                 counter += 1
 
+    logger.info('won {} games'.format(win))
+    logger.info('lost {} games'.format(lose))
     print('won {} games'.format(win))
     print('lost {} games'.format(lose))
 
 
 device = tools.get_device()
-print('this is the device: {}'.format(device))
+logger.info('this is the device: {}'.format(device))
 init_mnswpr()
 play_mnswpr(iterations=1, sz=128, net_name='new_three_conv_128_drop_0_bs_32_m25_nd_l1', random_percent = 0.0)

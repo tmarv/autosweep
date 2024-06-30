@@ -1,7 +1,9 @@
-pyautogui 
-torch
 opencv-python
-pyscreenshot
-matplotlib
-tk
 pandas
+matplotlib
+numpy
+pyautogui
+pyscreenshot
+pytorch
+scikit-learn
+tk

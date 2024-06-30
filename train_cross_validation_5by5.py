@@ -21,6 +21,13 @@ import src.tools
 from src import reward_manager, tools, neural_net_lib, custom_data_loader_text
 
 
+# Silence external libs
+logging.basicConfig(level=logging.CRITICAL, filename='logs/training_corss_validation_5by5.log', encoding='utf-8')
+logger = logging.getLogger('train_cross_validation_5by5')
+# enable logs for current lib
+logger.setLevel(level=logging.INFO)
+
+
 class CustomDatasetFromCSV(Dataset):
     def __init__(self, path_to_file):
         self.grid_values = []
@@ -63,6 +70,7 @@ def train_net(epoch = 20,
     backup_name = 'five_conv_{}_drop_{}_bs_{}_m25_nd_l1'.format(neural_net_size, int(100.0*dropout), batch_size)
     training_loss_graph = backup_name+".png"
     print(backup_name)
+    logger.info('Training net name: {}'.format(backup_name))
     net = neural_net_lib.FiveByFive1ConvLayerX(neural_net_size, dropout).to(device)
     #net = neural_net_lib.FiveByFive2ConvLayerX(neural_net_size, dropout).to(device)
     optimizer_three = optim.Adam(net.parameters(), lr=learning_rate)
@@ -78,7 +86,7 @@ def train_net(epoch = 20,
     eval_losses = []
     for j in range(2):
         for fold, (train_idx, test_idx) in enumerate(kf.split(dataset)):
-            print("fold f: {}".format(fold))
+            logger.info("fold f: {}".format(fold))
             train_loader_five = DataLoader(dataset, batch_size = batch_size, sampler=torch.utils.data.SubsetRandomSampler(train_idx))
             test_loader_five = DataLoader(dataset, batch_size = batch_size, sampler=torch.utils.data.SubsetRandomSampler(test_idx))
             train_len = len(train_loader_five.dataset)
@@ -118,6 +126,6 @@ def train_net(epoch = 20,
     torch.save(net.state_dict(), backup_net_name)
 
 device = tools.get_device()
-print('training with device {}'.format(device))
+logger.info('training with device {}'.format(device))
 
 train_net(epoch = 61, learning_rate=0.0008, neural_net_size = 256, batch_size = 16)

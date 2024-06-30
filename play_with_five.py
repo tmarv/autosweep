@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # Tim Marvel
 import json
-import os
-import torch
-import random
+import logging
 import math
 import numpy as np
 from numpy import linalg
+import os
+import random
+import torch
 from time import sleep
 
 from src import data_gathering_histgrm as dg
@@ -15,8 +16,13 @@ from src import minesweeper_interface as min_int
 from src import neural_net_lib
 from src import tools
 
-VERBOSE = False
 NUM_ACTIONS = 64
+
+# Silence external libs
+logging.basicConfig(level=logging.CRITICAL, filename='logs/play_with_five.log', encoding='utf-8')
+logger = logging.getLogger('play_with_five')
+# enable logs for current lib
+logger.setLevel(level=logging.INFO)
 
 
 def init_mnswpr():
@@ -42,13 +48,11 @@ def select_action_five(neural_net, state, normalize = False, norm_a = 2.0, norm_
             local_tensor = local_tensor.unsqueeze(0)
             local_tensor = local_tensor.unsqueeze(0)
             neural_net_pred = neural_net.forward(local_tensor)
-
             score_board[i - 2, j - 2] = neural_net_pred
 
     flat = score_board.flatten()
     flat.sort()
     flat = np.flipud(flat)
-    #print(flat)
     return_values = []
     total_len = len(flat)
     i = 0
@@ -60,14 +64,13 @@ def select_action_five(neural_net, state, normalize = False, norm_a = 2.0, norm_
             i = i + 1
     if len(return_values) != 64:
         print("Catastrophic error: return values size is off " + str(len(return_values)))
+        logger.critical('Catastrophic error: return values size is off: {}'.format(len(return_values)))
         exit()
-    #print('-------')
-    #print(return_values)
     return return_values
 
 
 def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False, random_percent = 0.0):
-    print("starting to play minesweeper with five by five network")
+    logger.info('playing with net: {}'.format(net_name))
     main_net = neural_net_lib.FiveByFive1ConvLayerX(sz, 0.0)
     #main_net = neural_net_lib.FiveByFive2ConvLayerX(sz, 0.0)
     main_net_name = os.path.abspath(
@@ -81,7 +84,7 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
     lose = 0
     while i_episode < iterations:
         sleep(0.3)
-        print("episode {}".format(i_episode))
+        logger.info("episode {}".format(i_episode))
         tools.move_and_click(739, 320)
         sleep(0.3)
         state = dg.get_state_from_screen()
@@ -111,11 +114,11 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
 
                 # we hit a mine
                 if dg.get_status():
-                    print('lost: hit mine')
+                    logger.info('LOST: hit mine')
                     tools.save_action_neg_three(-64, sub_state_three, is_test_set)
                     tools.save_action_neg_five(-64, sub_state_five, is_test_set)
-                    print(sub_state_three)
-                    print(sub_state_five)
+                    logger.info(' \n '+str(sub_state_three))
+                    logger.info(' \n '+str(sub_state_five))
                     tools.move_and_click(1490, 900)
                     counter += 1
                     i_episode = i_episode + 1
@@ -128,7 +131,7 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
                     tools.save_action_three(10, sub_state_three, is_test_set)
                     tools.save_action_five(10, sub_state_five, is_test_set)
                     tools.move_and_click(1490, 900)
-                    print('has won in {} strikes'.format(counter))
+                    logger.info('has won in {} strikes'.format(counter))
                     counter += 1001
                     i_episode = i_episode + 1
                     win += 1
@@ -148,15 +151,16 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
                 if reward != 0:
                     break
                 counter += 1
-
+    
+    logger.info('won {} games'.format(win))
+    logger.info('lost {} games'.format(lose))
     print('won {} games'.format(win))
     print('lost {} games'.format(lose))
 
 
 device = tools.get_device()
-print('this is the device: {}'.format(device))
 init_mnswpr()
-#play_mnswpr(iterations=50, sz=256, net_name='five_conv_256_drop_0_bs_32_m25_nd_l1', random_percent = 0.0)
-#play_mnswpr(iterations=50, sz=256, net_name='five_conv_256_drop_0_bs_64_m25_nd_l1', random_percent = 0.0)
-#play_mnswpr(iterations=100, sz=32, net_name='five_2conv_32_drop_0_bs_32_m25_nd_l1', random_percent = 0.0)
-play_mnswpr(iterations=10, sz=256, net_name='five_conv_256_drop_0_bs_16_m25_nd_l1', random_percent = 0.0)
+logger.info('-- starting to play --')
+logger.info('this is the device: {}'.format(device))
+play_mnswpr(iterations=100, sz=256, net_name='five_conv_256_drop_0_bs_16_m25_nd_l1', random_percent = 0.0)
+logger.info('------ finished playing ------')
