@@ -13,7 +13,7 @@ from time import sleep
 from src import data_gathering_histgrm as dg
 from src import reward_manager
 from src import minesweeper_interface as min_int
-from src import neural_net_lib
+from src import model_zoo
 from src import tools
 
 #random_percent = 0.0
@@ -37,7 +37,7 @@ def readTestDataFile(net_size = 3):
     return data_array,rewards
 
 def loadAndPrepareNet(net_name = "saved_nets/new_three_conv_512_drop_0_bs_32_m25_nd_l1"):
-    main_net = neural_net_lib.ThreeByThree1ConvLayerX(512,0.0)
+    main_net = model_zoo.ThreeByThree1ConvLayerX(512,0.0)
     main_net.load_state_dict(torch.load(net_name, map_location='cpu'))
     main_net.eval()
     return main_net

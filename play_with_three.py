@@ -13,7 +13,7 @@ from time import sleep
 from src import data_gathering_histgrm as dg
 from src import reward_manager
 from src import minesweeper_interface as min_int
-from src import neural_net_lib
+from src import model_zoo
 from src import tools
 
 VERBOSE = False
@@ -71,7 +71,7 @@ def select_action_three(neural_net, state, normalize = False, norm_a = 2.0, norm
 def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False, random_percent = 0.0):
     logger.info("starting to play minesweeper with three by three network")
     logger.info('Name of the net: {}'.format(net_name))
-    main_net = neural_net_lib.ThreeByThree1ConvLayerX(sz, 0.0)
+    main_net = model_zoo.ThreeByThree1ConvLayerX(sz, 0.0)
     main_net_name = os.path.abspath(
         os.path.join(tools.get_working_dir(), '../saved_nets/{}'.format(net_name)))
     main_net.load_state_dict(torch.load(main_net_name, map_location=device))

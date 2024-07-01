@@ -18,7 +18,7 @@ from torch.utils.data import random_split
 from sklearn.model_selection import KFold
 # custom
 import src.tools
-from src import reward_manager, tools, neural_net_lib, custom_data_loader_text
+from src import reward_manager, tools, model_zoo, custom_data_loader_text
 
 
 class CustomDatasetFromCSV(Dataset):
@@ -63,8 +63,8 @@ def train_net(epoch = 20,
     backup_name = 'new_three_conv_{}_drop_{}_bs_{}_m25_nd_l1'.format(neural_net_size, int(100.0*dropout), batch_size)
     training_loss_graph = backup_name+".png"
     print(backup_name)
-    #net = neural_net_lib.ThreeByThree1ConvLayerXBatchNorm(neural_net_size, dropout).to(device)
-    net = neural_net_lib.ThreeByThree1ConvLayerX(neural_net_size, dropout).to(device)
+    #net = model_zoo.ThreeByThree1ConvLayerXBatchNorm(neural_net_size, dropout).to(device)
+    net = model_zoo.ThreeByThree1ConvLayerX(neural_net_size, dropout).to(device)
     optimizer_three = optim.Adam(net.parameters(), lr=learning_rate)
 
     # keep both loss functions available for experimentation

@@ -13,7 +13,7 @@ from time import sleep
 from src import data_gathering_histgrm as dg
 from src import reward_manager
 from src import minesweeper_interface as min_int
-from src import neural_net_lib
+from src import model_zoo
 from src import tools
 
 NUM_ACTIONS = 64
@@ -71,8 +71,8 @@ def select_action_five(neural_net, state, normalize = False, norm_a = 2.0, norm_
 
 def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False, random_percent = 0.0):
     logger.info('playing with net: {}'.format(net_name))
-    main_net = neural_net_lib.FiveByFive1ConvLayerX(sz, 0.0)
-    #main_net = neural_net_lib.FiveByFive2ConvLayerX(sz, 0.0)
+    main_net = model_zoo.FiveByFive1ConvLayerX(sz, 0.0)
+    #main_net = model_zoo.FiveByFive2ConvLayerX(sz, 0.0)
     main_net_name = os.path.abspath(
         os.path.join(tools.get_working_dir(), '../saved_nets/{}'.format(net_name)))
     main_net.load_state_dict(torch.load(main_net_name, map_location=device))
@@ -162,5 +162,5 @@ device = tools.get_device()
 init_mnswpr()
 logger.info('-- starting to play --')
 logger.info('this is the device: {}'.format(device))
-play_mnswpr(iterations=100, sz=256, net_name='five_conv_256_drop_0_bs_16_m25_nd_l1', random_percent = 0.0)
+play_mnswpr(iterations=1, sz=256, net_name='five_conv_256_drop_0_bs_16_m25_nd_l1', random_percent = 0.7)
 logger.info('------ finished playing ------')

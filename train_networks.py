@@ -15,7 +15,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 # custom
 import src.tools
-from src import reward_manager, tools, neural_net_lib, custom_data_loader_text
+from src import reward_manager, tools, model_zoo, custom_data_loader_text
 
 
 def train_three_by_three_raw_net(epoch = 1000,
@@ -26,7 +26,7 @@ def train_three_by_three_raw_net(epoch = 1000,
                                  graph_name = "training_plots/train.png",
                                  use_pretrained_net = False,
                                  pretrained_net_name = "none"):
-    neural_net_three = neural_net_lib.ThreeByThreeSig().to(device)
+    neural_net_three = model_zoo.ThreeByThreeSig().to(device)
     params_three = {'batch_size': batch_size, 'shuffle': True, 'num_workers': 0}
     train_dataset_three = custom_data_loader_text.CustomDatasetFromTextFiles3(is_small=False, is_clean=False,
                                                                             with_var=False, cluster_num=-2,
@@ -64,7 +64,7 @@ def train_three_by_three_raw_net(epoch = 1000,
 
 
 def train_five_by_five_raw_net(epoch = 1000, batch_size=8192, plot_result=False, backup_name="backup_net_five", learning_rate=0.001):
-    neural_net_five = neural_net_lib.FiveByFiveSig().to(device)
+    neural_net_five = model_zoo.FiveByFiveSig().to(device)
     params = {'batch_size': batch_size, 'shuffle': True, 'num_workers': 0}
     train_dataset_five = custom_data_loader_text.CustomDatasetFromTextFiles5(is_small=False)
     train_loader_five = DataLoader(train_dataset_five, **params)
@@ -110,7 +110,7 @@ def train_five_by_five_conv(epoch=1000,
                             pretrained_name="raw_net_five_conv",
                             training_loss_graph="training_plots/plot.png"):
     print("training convolution net 5 by 5")
-    neural_net_five_conv = neural_net_lib.FiveByFiveConv().to(device)
+    neural_net_five_conv = model_zoo.FiveByFiveConv().to(device)
 
     if use_pretrained:
         backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(), ("../saved_nets/" + pretrained_name)))

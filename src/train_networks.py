@@ -11,7 +11,7 @@ import torch.optim as optim
 import torch.nn as nn
 
 import src.tools
-from src import custom_data_loader_text, tools, neural_net_lib, reward_manager
+from src import custom_data_loader_text, tools, model_zoo, reward_manager
 
 class trainThreeByThree():
     train_losses = []
@@ -22,7 +22,7 @@ class trainThreeByThree():
         self.dataset = custom_data_loader_text.CustomDatasetFromTextFiles3()
         self.data_loader = DataLoader(self.dataset, **self.train_param)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.neural_net = neural_net_lib.ThreeByThreeSig().to(self.device)
+        self.neural_net = model_zoo.ThreeByThreeSig().to(self.device)
         self.optimizer = optim.Adam(self.neural_net.parameters(), lr=learning_rate)
         self.train_losses = []
         self.lossfunction = nn.SmoothL1Loss()
@@ -65,7 +65,7 @@ class trainFiveByFive():
         self.dataset = custom_data_loader_text.CustomDatasetFromTextFiles5()
         self.data_loader = DataLoader(self.dataset, **self.train_param)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.neural_net = neural_net_lib.FiveByFiveSig().to(self.device)
+        self.neural_net = model_zoo.FiveByFiveSig().to(self.device)
         self.optimizer = optim.Adam(self.neural_net.parameters(), lr=learning_rate)
         self.train_losses = []
         self.lossfunction = nn.SmoothL1Loss()
@@ -116,10 +116,10 @@ train_loader_five = DataLoader(custom_set_five, **params_three)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-neural_net_three = neural_net_lib.ThreeByThreeSig().to(device)
+neural_net_three = model_zoo.ThreeByThreeSig().to(device)
 optimizer_three = optim.Adam(neural_net_three.parameters(), lr=0.005)
 
-neural_net_five = neural_net_lib.FiveByFiveSig().to(device)
+neural_net_five = model_zoo.FiveByFiveSig().to(device)
 optimizer_five = optim.Adam(neural_net_five.parameters(), lr=0.005)
 
 l1_loss = nn.SmoothL1Loss()

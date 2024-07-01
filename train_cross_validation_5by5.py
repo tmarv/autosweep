@@ -4,6 +4,7 @@ import math
 import os
 import time
 import random
+import logging
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -18,7 +19,7 @@ from torch.utils.data import random_split
 from sklearn.model_selection import KFold
 # custom
 import src.tools
-from src import reward_manager, tools, neural_net_lib, custom_data_loader_text
+from src import reward_manager, tools, model_zoo, custom_data_loader_text
 
 
 # Silence external libs
@@ -71,8 +72,7 @@ def train_net(epoch = 20,
     training_loss_graph = backup_name+".png"
     print(backup_name)
     logger.info('Training net name: {}'.format(backup_name))
-    net = neural_net_lib.FiveByFive1ConvLayerX(neural_net_size, dropout).to(device)
-    #net = neural_net_lib.FiveByFive2ConvLayerX(neural_net_size, dropout).to(device)
+    net = model_zoo.FiveByFive1ConvLayerX(neural_net_size, dropout).to(device)
     optimizer_three = optim.Adam(net.parameters(), lr=learning_rate)
 
     # keep both loss functions available for experimentation
