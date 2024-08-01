@@ -111,12 +111,15 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
                     state = min_int.mark_game(state)
                 sub_state_three = tools.grab_sub_state_three(previous_state, action[k][1] + 1, action[k][0] + 1)
                 sub_state_five = tools.grab_sub_state_five(previous_state, action[k][1] + 2, action[k][0] + 2)
-
+                sub_state_seven = tools.grab_sub_state_seven(previous_state, action[k][1] + 3, action[k][0] + 3)
+                #print(sub_state_seven)
+                #exit()
                 # we hit a mine
                 if dg.get_status():
                     logger.info('LOST: hit mine')
                     tools.save_action_neg_three(-64, sub_state_three, is_test_set)
                     tools.save_action_neg_five(-64, sub_state_five, is_test_set)
+                    tools.save_action_neg_seven(-64, sub_state_seven, is_test_set)
                     logger.info(' \n '+str(sub_state_three))
                     logger.info(' \n '+str(sub_state_five))
                     tools.move_and_click(1490, 900)
@@ -130,6 +133,7 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
                 if has_won:
                     tools.save_action_three(10, sub_state_three, is_test_set)
                     tools.save_action_five(10, sub_state_five, is_test_set)
+                    tools.save_action_seven(10, sub_state_seven, is_test_set)
                     tools.move_and_click(1490, 900)
                     logger.info('has won in {} strikes'.format(counter))
                     counter += 1001
@@ -141,9 +145,11 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
                     if reward > 0:
                         tools.save_action_three(reward, sub_state_three, is_test_set)
                         tools.save_action_five(reward, sub_state_five, is_test_set)
+                        tools.save_action_seven(reward, sub_state_seven, is_test_set)
                     elif reward <= 0:
                         tools.save_action_neg_three(reward, sub_state_three, is_test_set)
                         tools.save_action_neg_five(reward, sub_state_five, is_test_set)
+                        tools.save_action_neg_seven(reward, sub_state_seven, is_test_set)
 
                 previous_state = state.copy()
                 state = min_int.mark_game(state)
@@ -162,5 +168,8 @@ device = tools.get_device()
 init_mnswpr()
 logger.info('-- starting to play --')
 logger.info('this is the device: {}'.format(device))
-play_mnswpr(iterations=1, sz=256, net_name='five_conv_256_drop_0_bs_16_m25_nd_l1', random_percent = 0.7)
+
+play_mnswpr(iterations=1, sz=32, net_name='five_conv_32_drop_0_bs_64_m25_nd_l2', random_percent = 0.0)
+#play_mnswpr(iterations=300, sz=256, net_name='five_conv_256_drop_0_bs_131072_m25_nd_l1', random_percent = 0.0)
+#play_mnswpr(iterations=300, sz=512, net_name='five_conv_512_drop_0_bs_131072_m25_nd_l1', random_percent = 0.0)
 logger.info('------ finished playing ------')

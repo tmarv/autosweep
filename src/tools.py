@@ -26,6 +26,12 @@ def extend_state_five(state):
     return extended_five
 
 
+def extend_state_seven(state):
+    extended_seven = -2 * np.ones((14, 14))
+    extended_seven[3:11, 3:11] = state
+    return extended_seven    
+
+
 def rotate_by_90(state):
     rot = np.rot90(state, k=1, axes=(1, 0))
     return rot
@@ -49,7 +55,13 @@ def grab_sub_state_three(state, i, j):
 
 def grab_sub_state_five(state, i, j):
     sub_state = extend_state_five(state)
-    sub_state = sub_state[[i - 2, i - 1, i, i + 1, i + 2], :][:, [j - 2, j-1, j, j + 1, j + 2]]
+    sub_state = sub_state[[i - 2, i - 1, i, i + 1, i + 2], :][:, [j - 2, j - 1, j, j + 1, j + 2]]
+    return sub_state
+
+
+def grab_sub_state_seven(state, i, j):
+    sub_state = extend_state_seven(state)
+    sub_state = sub_state[[i - 3, i - 2, i - 1, i, i + 1, i + 2, i + 3], :][:, [j - 3, j - 2, j - 1, j, j + 1, j + 2, j + 3]]
     return sub_state
 
 
@@ -129,20 +141,33 @@ def save_action_text_five(reward, before):
     _rewards5_text_file.write('\n')
 
 
+def save_action_text_seven(reward, before):
+    # turn the grid into a csv
+    list = before.flatten().tolist()
+    list = ','.join(str(v) for v in list)
+    _rewards7_text_file.write(list)
+    _rewards7_text_file.write(','+str(reward))
+    _rewards7_text_file.write('\n')
+
+
 def save_action_three(reward, before, is_test_set):
     save_action_text_three(reward, before)
-
 
 def save_action_five(reward, before, is_test_set):
     save_action_text_five(reward, before)
 
+def save_action_seven(reward, before, is_test_set):
+    save_action_text_seven(reward, before)
 
 def save_action_neg_three(reward, before, is_test_set):
     save_action_text_three(reward, before)
 
-
 def save_action_neg_five(reward, before, is_test_set):
     save_action_text_five(reward, before)
+
+def save_action_neg_seven(reward, before, is_test_set):
+    save_action_text_seven(reward, before)
+
 
 
 def get_device():
@@ -203,13 +228,17 @@ _data_pts_5_filename = os.path.join(dir_path, "../collected_data/rewards5.txt")
 _data_pts_5_filename_var = os.path.join(dir_path, "../collected_data/rewards5_var.txt")
 _data_pts_5_filename_clean = os.path.join(dir_path, "../collected_data/rewards5_clean.txt")
 
+_data_pts_7_filename = os.path.join(dir_path, "../collected_data/rewards7.txt")
 
 _rewards3_text_file = open(_data_pts_3_filename, 'a')
 _rewards5_text_file = open(_data_pts_5_filename, 'a')
+_rewards7_text_file = open(_data_pts_7_filename, 'a')
 
 def __del__(self):
     _rewards3_text_file.close()
-    _rewards5_text_file_with_var.close()
+    _rewards5_text_file.close()
+    _rewards7_text_file.close()
+
 
 '''
 just making sure the five by five works
