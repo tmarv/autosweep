@@ -88,6 +88,11 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
         tools.move_and_click(739, 320)
         sleep(0.3)
         state = dg.get_state_from_screen()
+        if dg.gotTopTimes():
+            tools.move_and_click(1200,320)
+            sleep(0.3)
+            #exit()
+            state = dg.get_state_from_screen()
         # run the flagging algorithm
         state = min_int.mark_game(state)
         # perform a deep copy
@@ -104,9 +109,14 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
                     action[k][1] = random.randint(0, 7)
                 min_int.move_and_click_to_ij(action[k][0], action[k][1])
                 tools.move_to(1490, 900)
-                # if hit a mine
-                sleep(0.5)
+                # if hit a mine or got into best times
+                sleep(0.2)
                 state = dg.get_state_from_screen()
+                if dg.gotTopTimes():
+                    tools.move_and_click(1200, 320)
+                    sleep(0.3)
+                    #exit()
+                    state = dg.get_state_from_screen()
                 if not dg.get_status():
                     state = min_int.mark_game(state)
                 sub_state_three = tools.grab_sub_state_three(previous_state, action[k][1] + 1, action[k][0] + 1)
@@ -169,7 +179,8 @@ init_mnswpr()
 logger.info('-- starting to play --')
 logger.info('this is the device: {}'.format(device))
 
-play_mnswpr(iterations=1, sz=32, net_name='five_conv_32_drop_0_bs_64_m25_nd_l2', random_percent = 0.0)
+play_mnswpr(iterations=5, sz=32, net_name='five_conv_32_drop_0_bs_64_m25_nd_l2', random_percent = 0.0)
+#play_mnswpr(iterations=100, sz=32, net_name='five_conv_32_drop_0_bs_64_m25_nd_l2', random_percent = 0.7)
 #play_mnswpr(iterations=300, sz=256, net_name='five_conv_256_drop_0_bs_131072_m25_nd_l1', random_percent = 0.0)
 #play_mnswpr(iterations=300, sz=512, net_name='five_conv_512_drop_0_bs_131072_m25_nd_l1', random_percent = 0.0)
 logger.info('------ finished playing ------')

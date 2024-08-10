@@ -87,7 +87,11 @@ unkw_grey = cv2.cvtColor(unkw_template, cv2.COLOR_BGR2GRAY)
 hist_unkw_grey = cv2.calcHist([unkw_grey], [0], None, [8], [0, 80])
 cv2.normalize(hist_unkw_grey, hist_unkw_grey).flatten()
 
+best_times = cv2.imread(os.path.join(dir_path, "../templates/best_times.png"))
+hist_best_times = cv2.calcHist([best_times], HIST_LAYERS, None, HIST_BINS, HIST_RANGE)
+
 is_exploded = False
+is_bestTimes = False
 unknown_counter = 0
 delta_px = 2
 tile_dx = 59
@@ -97,6 +101,8 @@ def reset():
     global is_exploded
     is_exploded = False
 
+def gotTopTimes():
+    return is_bestTimes
 
 def get_unknown_counter():
     return unknown_counter
@@ -109,18 +115,40 @@ def get_status():
 def get_state_from_screen():
     global is_exploded
     global unknown_counter
+    global is_bestTimes
     board_state = np.ones((8, 8))
     is_exploded = False
     unknown_counter = 0
     screen_shot = pyscreenshot.grab(bbox=(0, 0, 1920, 1080))
     numpy_image = cv2.cvtColor(np.array(screen_shot), cv2.COLOR_RGB2BGR)
-    #cv2.imshow("numpy_image", numpy_image)
-    #cv2.imwrite("backup40.png", numpy_image)
-    #cv2.waitKey()
-    #exit()
     smaller_size = (960, 540)
     resized = cv2.resize(numpy_image, smaller_size, interpolation=cv2.INTER_AREA)
+
     img = resized[47:533, 213:699]
+
+    # check if we have a best times dialog
+    best_times_tile = img[102:119, 369:404]
+    hist_best_times_tile = cv2.calcHist([best_times_tile], HIST_LAYERS, None, HIST_BINS, HIST_RANGE)
+    cv2.normalize(hist_best_times_tile, hist_best_times_tile).flatten()
+    comp_best_times = cv2.compareHist(hist_best_times, hist_best_times_tile, HIST_COMPARE_MTHD)
+    
+    if(comp_best_times>0.95):
+        is_bestTimes=True
+        return
+
+    is_bestTimes = False
+    '''
+    print("this is best times comp: "+str(comp_best_times))
+    cv2.imshow("best_times_tile", best_times_tile)
+
+    cv2.imshow("numpy_image", numpy_image)
+    cv2.imwrite("backup40.png", numpy_image)
+    
+    cv2.imshow("img", img)
+    cv2.imwrite("backup.png", img)
+    cv2.waitKey()
+    exit()
+    '''
 
     for i in range(0, 8):
         for j in range(0, 8):
@@ -204,6 +232,4 @@ def get_state_from_screen():
                 unknown_counter += 1
                 continue
 
-    # TODO remove this once stable
-    # print(board_state)
     return board_state
