@@ -349,7 +349,7 @@ def remove_duplicates_5by5(backup_name_unique):
 
 
 def remove_duplicates_7by7(backup_name_unique):
-    print("started remove_duplicates for 5 by 5")
+    print("started remove_duplicates for 7 by 7")
     data = open_and_sort_7by7(backup_name_unique)
     print("----- data sample -----")
     print(data)
