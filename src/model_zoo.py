@@ -5,6 +5,54 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+class SevenBySeven1ConvLayerXSigmoidSigmoidEnd(nn.Module):
+    def __init__(self, sz, dp=0.0):
+        super(SevenBySeven1ConvLayerXSigmoidSigmoidEnd, self).__init__()
+        self.convolutional_layer = nn.Sequential(
+            nn.Conv2d(in_channels=1, out_channels=sz, kernel_size=7, stride=1),
+            nn.Sigmoid())
+
+        self.linear_layer = nn.Sequential(
+            nn.Linear(in_features=sz, out_features=sz),
+            nn.Sigmoid(),
+            nn.Dropout(dp),
+            nn.Linear(in_features=sz, out_features=sz),
+            nn.Sigmoid(),
+            nn.Dropout(dp),
+            nn.Linear(sz, 1),
+            nn.Sigmoid())
+
+    def forward(self, x):
+        x = self.convolutional_layer(x)
+        x = torch.flatten(x, 1)
+        x = self.linear_layer(x)
+        return x
+
+
+class SevenBySeven1ConvLayerXLeakyReLUSigmoidEnd(nn.Module):
+    def __init__(self, sz, dp=0.0):
+        super(SevenBySeven1ConvLayerXLeakyReLUSigmoidEnd, self).__init__()
+        self.convolutional_layer = nn.Sequential(
+            nn.Conv2d(in_channels=1, out_channels=sz, kernel_size=7, stride=1),
+            nn.LeakyReLU())
+
+        self.linear_layer = nn.Sequential(
+            nn.Linear(in_features=sz, out_features=sz),
+            nn.LeakyReLU(),
+            nn.Dropout(dp),
+            nn.Linear(in_features=sz, out_features=sz),
+            nn.LeakyReLU(),
+            nn.Dropout(dp),
+            nn.Linear(sz, 1),
+            nn.Sigmoid())
+
+    def forward(self, x):
+        x = self.convolutional_layer(x)
+        x = torch.flatten(x, 1)
+        x = self.linear_layer(x)
+        return x
+
+
 class ThreeByThreeProbofchng1ConvLayer(nn.Module):
     def __init__(self):
         super(ThreeByThreeProbofchng1ConvLayer, self).__init__()

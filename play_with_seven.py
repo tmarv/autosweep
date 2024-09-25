@@ -179,8 +179,8 @@ init_mnswpr()
 logger.info('-- starting to play --')
 logger.info('this is the device: {}'.format(device))
 
-play_mnswpr(iterations=10, sz=64, net_name='seven_conv_64_drop_0_bs_128_m25_nd_l1_best', random_percent = 0.6)
-play_mnswpr(iterations=10, sz=64, net_name='seven_conv_64_drop_0_bs_128_m25_nd_l1', random_percent = 0.6)
+play_mnswpr(iterations=1, sz=64, net_name='seven_conv_64_drop_0_bs_128_m25_nd_l1_best', random_percent = 0.0)
+#play_mnswpr(iterations=10, sz=64, net_name='seven_conv_64_drop_0_bs_128_m25_nd_l1', random_percent = 0.6)
 #play_mnswpr(iterations=200, sz=32, net_name='seven_conv_32_drop_0_bs_16_m25_nd_l1_best', random_percent = 0.5)
 #play_mnswpr(iterations=200, sz=32, net_name='seven_conv_32_drop_0_bs_16_m25_nd_l1', random_percent = 0.5)
 

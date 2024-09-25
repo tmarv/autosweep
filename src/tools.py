@@ -74,6 +74,9 @@ def grab_sub_state_noext_five(state, i, j):
     sub_state = state[[i - 2, i - 1, i, i +1, i + 2], :][:, [j - 2, j-1, j, j + 1, j + 2]]
     return sub_state
 
+def grab_sub_state_noext_seven(state, i, j):
+    sub_state = state[[i - 3, i - 2, i - 1, i, i +1, i + 2, i + 3], :][:, [j - 3, j - 2, j-1, j, j + 1, j + 2, j + 3]]
+    return sub_state
 
 def augment_data(rewards, data_points):
     aug_rewards = []
