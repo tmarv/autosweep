@@ -92,7 +92,6 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
         if dg.gotTopTimes():
             tools.move_and_click(1200,320)
             sleep(0.3)
-            #exit()
             state = dg.get_state_from_screen()
         # run the flagging algorithm
         state = min_int.mark_game(state)
@@ -116,15 +115,12 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
                 if dg.gotTopTimes():
                     tools.move_and_click(1200, 320)
                     sleep(0.3)
-                    #exit()
                     state = dg.get_state_from_screen()
                 if not dg.get_status():
                     state = min_int.mark_game(state)
                 sub_state_three = tools.grab_sub_state_three(previous_state, action[k][1] + 1, action[k][0] + 1)
                 sub_state_five = tools.grab_sub_state_five(previous_state, action[k][1] + 2, action[k][0] + 2)
                 sub_state_seven = tools.grab_sub_state_seven(previous_state, action[k][1] + 3, action[k][0] + 3)
-                # print(sub_state_seven)
-                # exit()
                 # we hit a mine
                 if dg.get_status():
                     logger.info('LOST: hit mine')
@@ -175,7 +171,9 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
     print('lost {} games'.format(lose))
 
 
-device = 'cpu'#tools.get_device()
+# cpu inference is faster
+# tools.get_device()
+device = 'cpu'
 init_mnswpr()
 logger.info('-- starting to play --')
 logger.info('this is the device: {}'.format(device))
@@ -185,37 +183,5 @@ print('this is the device: {}'.format(device))
 #play_mnswpr(iterations=100, sz=16, net_name='seven_conv_16_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
 #play_mnswpr(iterations=400, sz=16, net_name='seven_conv_16_drop_0_bs_128_m25_nd_l1', random_percent = 0.6)
 play_mnswpr(iterations=10, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
-
-#play_mnswpr(iterations=400, sz=16, net_name='seven_conv_16_drop_1_bs_64_m25_nd_l1', random_percent = 0.0)
-
-#play_mnswpr(iterations=10, sz=32, net_name='seven_conv_32_drop_0_bs_1024_m25_nd_l2', random_percent = 0.0)
-#play_mnswpr(iterations=10, sz=64, net_name='seven_conv_64_drop_0_bs_128_m25_nd_l1', random_percent = 0.6)
-#play_mnswpr(iterations=200, sz=32, net_name='seven_conv_32_drop_0_bs_16_m25_nd_l1_best', random_percent = 0.5)
-#play_mnswpr(iterations=200, sz=32, net_name='seven_conv_32_drop_0_bs_16_m25_nd_l1', random_percent = 0.5)
-
-#play_mnswpr(iterations=10, sz=64, net_name='seven_conv_64_drop_20_bs_16_m25_nd_l1', random_percent = 0.0)
-#play_mnswpr(iterations=10, sz=32, net_name='seven_conv_32_drop_21_bs_16_m25_nd_l1', random_percent = 0.0)
-#play_mnswpr(iterations=3, sz=16, net_name='seven_conv_16_drop_20_bs_16_m25_nd_l1', random_percent = 0.2)
-#play_mnswpr(iterations=3, sz=16, net_name='seven_conv_16_drop_20_bs_16_m25_nd_l1', random_percent = 0.6)
-#play_mnswpr(iterations=100, sz=8, net_name='seven_conv_8_drop_20_bs_64_m25_nd_l1', random_percent = 0.0)
-
-#play_mnswpr(iterations=100, sz=8, net_name='seven_conv_8_drop_0_bs_64_m25_nd_l1', random_percent = 0.4)
-#play_mnswpr(iterations=100, sz=8, net_name='seven_conv_8_drop_20_bs_64_m25_nd_l1', random_percent = 0.4)
-
-#play_mnswpr(iterations=10, sz=32, net_name='seven_conv_32_drop_20_bs_64_m25_nd_l1', random_percent = 0.0)
-#play_mnswpr(iterations=300, sz=32, net_name='seven_conv_32_drop_30_bs_64_m25_nd_l1', random_percent = 0.4)
-#play_mnswpr(iterations=100, sz=32, net_name='seven_conv_32_drop_40_bs_64_m25_nd_l1', random_percent = 0.7)
-
-'''
-play_mnswpr(iterations=100, sz=16, net_name='seven_conv_16_drop_0_bs_32_m25_nd_l1', random_percent = 0.0)
-play_mnswpr(iterations=100, sz=16, net_name='seven_conv_16_drop_0_bs_256_m25_nd_l1', random_percent = 0.0)
-play_mnswpr(iterations=100, sz=16, net_name='seven_conv_16_drop_0_bs_2048_m25_nd_l1', random_percent = 0.0)
-play_mnswpr(iterations=100, sz=16, net_name='seven_conv_16_drop_0_bs_16384_m25_nd_l1', random_percent = 0.0)
-
-play_mnswpr(iterations=100, sz=32, net_name='seven_conv_32_drop_0_bs_32_m25_nd_l1', random_percent = 0.0)
-play_mnswpr(iterations=100, sz=32, net_name='seven_conv_32_drop_0_bs_256_m25_nd_l1', random_percent = 0.0)
-play_mnswpr(iterations=100, sz=32, net_name='seven_conv_32_drop_0_bs_2048_m25_nd_l1', random_percent = 0.0)
-play_mnswpr(iterations=100, sz=32, net_name='seven_conv_32_drop_0_bs_16384_m25_nd_l1', random_percent = 0.0)
-'''
 
 logger.info('------ finished playing ------')
