@@ -36,9 +36,6 @@ class trainThreeByThree():
         for e in range(iterations):
             for i, data in enumerate(self.data_loader):
                 inputs, rewards = data
-                #print(rewards)
-                #print(inputs)
-                # reward shaping
                 input_len = len(inputs)
                 inputs = inputs.reshape([input_len, 3, 3])
                 rewards = reward_manager.reward_shaper_three(rewards,inputs)
@@ -79,8 +76,6 @@ class trainFiveByFive():
         for e in range(iterations):
             for i, data in enumerate(self.data_loader):
                 inputs, rewards = data
-                # reward shaping
-                # rewards =
                 input_len = len(inputs)
                 inputs = inputs.reshape([input_len, 5, 5]).to(self.device)
                 rewards = rewards.reshape([input_len, 1]).to(self.device)
