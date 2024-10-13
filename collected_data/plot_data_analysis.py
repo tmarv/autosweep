@@ -87,5 +87,5 @@ def quantitize_rewards7by7(read_name):
 
 
 quantitize_rewards5by5("unique_normalized_7_rewards_m25.csv")
-quantitize_rewards5by5("unique_normalized_5_rewards_m25.csv")
-quantitize_rewards3by3("unique_normalized_3_rewards_m25.csv")
+#quantitize_rewards5by5("unique_normalized_5_rewards_m25.csv")
+#quantitize_rewards3by3("unique_normalized_3_rewards_m25.csv")

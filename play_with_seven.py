@@ -71,8 +71,9 @@ def select_action_seven(neural_net, state, normalize = False, norm_a = 2.0, norm
 
 def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False, random_percent = 0.0):
     logger.info('playing with net: {}'.format(net_name))
-    #main_net = model_zoo.SevenBySeven1ConvLayerXLeakyReLU(sz, 0.0)
-    main_net = model_zoo.SevenBySeven1ConvLayerXLeakyReLUSigmoidEnd(sz, 0.0)
+    # main_net = model_zoo.SevenBySeven1ConvLayerXLeakyReLU(sz, 0.0)
+    # main_net = model_zoo.SevenBySeven1ConvLayerXLeakyReLUSigmoidEnd(sz, 0.0)
+    main_net = model_zoo.SevenBySeven2ConvLayerXLeakyReLUSigmoidEnd(sz, 0.0)
     main_net_name = os.path.abspath(
         os.path.join(tools.get_working_dir(), '../saved_nets/{}'.format(net_name)))
     main_net.load_state_dict(torch.load(main_net_name, map_location=device))
@@ -99,7 +100,7 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
         previous_state = state.copy()
         sleep(0.3)
         counter = 0
-        while not dg.get_status() and counter < 200:
+        while not dg.get_status() and counter < 500:
             action = select_action_seven(main_net, state, True)
             counter += 1
             # replace some good shots by randomness to collect more data
@@ -174,12 +175,20 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
     print('lost {} games'.format(lose))
 
 
-device = tools.get_device()
+device = 'cpu'#tools.get_device()
 init_mnswpr()
 logger.info('-- starting to play --')
 logger.info('this is the device: {}'.format(device))
+print('this is the device: {}'.format(device))
 
-play_mnswpr(iterations=1, sz=64, net_name='seven_conv_64_drop_0_bs_128_m25_nd_l1_best', random_percent = 0.0)
+#play_mnswpr(iterations=10, sz=32, net_name='seven_conv_32_drop_0_bs_32_m25_nd_l2', random_percent = 0.0)
+#play_mnswpr(iterations=100, sz=16, net_name='seven_conv_16_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
+#play_mnswpr(iterations=400, sz=16, net_name='seven_conv_16_drop_0_bs_128_m25_nd_l1', random_percent = 0.6)
+play_mnswpr(iterations=10, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
+
+#play_mnswpr(iterations=400, sz=16, net_name='seven_conv_16_drop_1_bs_64_m25_nd_l1', random_percent = 0.0)
+
+#play_mnswpr(iterations=10, sz=32, net_name='seven_conv_32_drop_0_bs_1024_m25_nd_l2', random_percent = 0.0)
 #play_mnswpr(iterations=10, sz=64, net_name='seven_conv_64_drop_0_bs_128_m25_nd_l1', random_percent = 0.6)
 #play_mnswpr(iterations=200, sz=32, net_name='seven_conv_32_drop_0_bs_16_m25_nd_l1_best', random_percent = 0.5)
 #play_mnswpr(iterations=200, sz=32, net_name='seven_conv_32_drop_0_bs_16_m25_nd_l1', random_percent = 0.5)

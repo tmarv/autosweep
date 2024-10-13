@@ -53,6 +53,39 @@ class SevenBySeven1ConvLayerXLeakyReLUSigmoidEnd(nn.Module):
         return x
 
 
+class SevenBySeven2ConvLayerXLeakyReLUSigmoidEnd(nn.Module):
+    def __init__(self, sz, dp=0.0):
+        super(SevenBySeven2ConvLayerXLeakyReLUSigmoidEnd, self).__init__()
+        self.convolutional_layer = nn.Sequential(
+            nn.Conv2d(in_channels=1, out_channels=sz, kernel_size=3, stride=1),
+            nn.LeakyReLU()
+            )
+        self.conv_layer2 = nn.Sequential(
+            nn.Conv2d(in_channels=sz, out_channels=sz, kernel_size=3, stride=1),
+            nn.LeakyReLU()
+            )    
+
+        self.linear_layer = nn.Sequential(
+            nn.Linear(in_features=9*sz, out_features=sz),
+            nn.LeakyReLU(),
+            nn.Dropout(dp),
+            nn.Linear(in_features=sz, out_features=sz),
+            nn.LeakyReLU(),
+            nn.Dropout(dp),
+            nn.Linear(sz, 1),
+            nn.Sigmoid())
+
+    def forward(self, x):
+        x = self.convolutional_layer(x)
+        #print(x.size())
+        x = self.conv_layer2(x)
+        #print(x.size())
+        x = torch.flatten(x, 1)
+        #print(x.size())
+        x = self.linear_layer(x)
+        return x
+
+
 class ThreeByThreeProbofchng1ConvLayer(nn.Module):
     def __init__(self):
         super(ThreeByThreeProbofchng1ConvLayer, self).__init__()

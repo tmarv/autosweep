@@ -227,6 +227,28 @@ def dump_to_file(dataList, filename):
     csv_file.close()
 
 
+def add_to_file(dataList, filename):
+    csv_file = open(filename,'a')
+    for pdframe in dataList:
+        df = pdframe.transpose()
+        data_line = ''
+        for val in df:
+            data_line+=str(val)+","
+        csv_file.write(data_line[:-1])
+        csv_file.write("\n")
+    csv_file.close()
+
+
+def add_to_file_line(line, filename):
+    csv_file = open(filename,'a')
+    data_line = ''
+    for val in line:
+        data_line+=str(val)+","
+    csv_file.write(data_line[:-1])
+    csv_file.write("\n")
+    csv_file.close()
+
+
 def remove_duplicates_3by3(backup_name_unique):
     print("started remove_duplicates for 3 by 3")
     data = open_and_sort_3by3(backup_name_unique)
@@ -346,7 +368,6 @@ def remove_duplicates_5by5(backup_name_unique):
                 total_reward = 0
                 reward_cntr = 1
     dump_to_file(unique_datapts, backup_name_unique)
-
 
 def remove_duplicates_7by7(backup_name_unique):
     print("started remove_duplicates for 7 by 7")
@@ -473,73 +494,104 @@ def rotate_data_5by5(backup_name_unique, backup_name_rotated):
         dump_to_file(rotated_data, backup_name_rotated)
 
 
-
 def rotate_data_7by7(backup_name_unique, backup_name_rotated):
     with open(backup_name_unique) as file_obj:
         csv_obj = csv.reader(file_obj)
         rotated_data = []
+        # clears out the old file
+        dump_to_file(rotated_data, backup_name_rotated)
         for line in csv_obj:
+            rotated_data = []
             reward =  np.float32(line[49])
+            # greed reduction
+            if reward > 9:
+                reward = 3
             grid_values_0 = np.array([line[0:7], line[7:14], line[14:21], line[21:28], line[28:35], line[35:42], line[42:49]])
+            grid_values_flipped_h_0 = np.flip(grid_values_0)
+            grid_values_flipped_v_0 = np.flip(grid_values_0, 1)
             grid_values_90 = np.rot90(grid_values_0, 1)
+            grid_values_flipped_h_90 = np.flip(grid_values_90)
+            grid_values_flipped_v_90 = np.flip(grid_values_90, 1)
             grid_values_180 = np.rot90(grid_values_0, 2)
+            grid_values_flipped_h_180 = np.flip(grid_values_180)
+            grid_values_flipped_v_180 = np.flip(grid_values_180, 1)
             grid_values_270 = np.rot90(grid_values_0, 3)
+            grid_values_flipped_h_270 = np.flip(grid_values_270)
+            grid_values_flipped_v_270 = np.flip(grid_values_270, 1)
 
             grid_values_0 = grid_values_0.flatten()
-            grid_values_0 = np.append(grid_values_0, line[49])
+            grid_values_flipped_h_0 = grid_values_flipped_h_0.flatten()
+            grid_values_flipped_v_0 = grid_values_flipped_v_0.flatten()
+            grid_values_0 = np.append(grid_values_0, reward)
+            grid_values_flipped_h_0 = np.append(grid_values_flipped_h_0, reward)
+            grid_values_flipped_v_0 = np.append(grid_values_flipped_v_0, reward)
 
             grid_values_90 = grid_values_90.flatten()
-            grid_values_90 = np.append(grid_values_90, line[49])
+            grid_values_flipped_h_90 = grid_values_flipped_h_90.flatten()
+            grid_values_flipped_v_90 = grid_values_flipped_v_90.flatten()
+            grid_values_90 = np.append(grid_values_90, reward)
+            grid_values_flipped_h_90 = np.append(grid_values_flipped_h_90, reward)
+            grid_values_flipped_v_90 = np.append(grid_values_flipped_v_90, reward)
 
             grid_values_180 = grid_values_180.flatten()
-            grid_values_180 = np.append(grid_values_180, line[49])
+            grid_values_flipped_h_180 = grid_values_flipped_h_180.flatten()
+            grid_values_flipped_v_180 = grid_values_flipped_v_180.flatten()
+            grid_values_180 = np.append(grid_values_180, reward)
+            grid_values_flipped_h_180 = np.append(grid_values_flipped_h_180, reward)
+            grid_values_flipped_v_180 = np.append(grid_values_flipped_v_180, reward)
 
             grid_values_270 = grid_values_270.flatten()
-            grid_values_270 = np.append(grid_values_270, line[49])
+            grid_values_flipped_h_270 = grid_values_flipped_h_270.flatten()
+            grid_values_flipped_v_270 = grid_values_flipped_v_270.flatten()
+            grid_values_270 = np.append(grid_values_270, reward)
+            grid_values_flipped_h_270 = np.append(grid_values_flipped_h_270, reward)
+            grid_values_flipped_v_270 = np.append(grid_values_flipped_v_270, reward)
 
             rotated_data.append(grid_values_0)
-            rotated_data.append(grid_values_90)
-            rotated_data.append(grid_values_180)
-            rotated_data.append(grid_values_270)
+            rotated_data.append(grid_values_flipped_h_0)
+            rotated_data.append(grid_values_flipped_v_0)
 
-        dump_to_file(rotated_data, backup_name_rotated)
+            rotated_data.append(grid_values_90)
+            rotated_data.append(grid_values_flipped_h_90)
+            rotated_data.append(grid_values_flipped_v_90)
+
+            rotated_data.append(grid_values_180)
+            rotated_data.append(grid_values_flipped_h_180)
+            rotated_data.append(grid_values_flipped_v_180)
+            
+            rotated_data.append(grid_values_270)
+            rotated_data.append(grid_values_flipped_h_270)
+            rotated_data.append(grid_values_flipped_v_270)
+            add_to_file(rotated_data, backup_name_rotated)
+
 
 
 def normalize_rewards_and_inputs(read_name, output_name, index, min_val_i = -100, max_val_i = 100):
     with open(read_name) as file_obj:
         csv_obj = csv.reader(file_obj)
-        raw_rewards = []
-        raw_data = []
-        raw_lines = []
-
-        for line in csv_obj:
-            #adjusting the reward for a smoother spread
-            adjusted_val = max(min_val_i, np.float32(line[index]))
-            adjusted_val = min(max_val_i, adjusted_val)
-            raw_rewards.append(adjusted_val)
-            line[index] = adjusted_val
-            raw_lines.append(np.array(line))
-            for i in range(index):
-                raw_data.append(np.array(np.float32(line[i])))
-
-        min_val_r = np.min(raw_rewards)
-        max_val_r = np.max(raw_rewards)
+        
+        max_val_r = max_val_i
+        min_val_r = min_val_i
         print("this is min val reward: "+str(min_val_r))
         print("this is max val reward: "+str(max_val_r))
 
-        min_val_d = np.min(raw_data)
-        max_val_d = np.max(raw_data)
+        min_val_d = -2
+        max_val_d = 10
         print("this is min val data: " + str(min_val_d))
         print("this is max val data: " + str(max_val_d))
 
-        for line in raw_lines:
+        # clears the output
+        dump_to_file([], output_name)
+        raw_lines = 0
+        for line in csv_obj:
+            raw_lines += 1
             scaled_reward = (np.float32(line[index]) - min_val_r) / (max_val_r - min_val_r)
             line[index] = scaled_reward
             for i in range(index):
                 line[i] = (np.float32(line[i]) - min_val_d) / (max_val_d - min_val_d)
-
-        print('there are {} normalized lines'.format(len(raw_lines)))
-        dump_to_file(raw_lines, output_name)
+            
+            add_to_file_line(line, output_name)
+        print('there are {} normalized lines'.format(raw_lines))
 
 
 def run_pre_processing_three():
