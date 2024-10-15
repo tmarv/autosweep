@@ -182,6 +182,6 @@ print('this is the device: {}'.format(device))
 #play_mnswpr(iterations=10, sz=32, net_name='seven_conv_32_drop_0_bs_32_m25_nd_l2', random_percent = 0.0)
 #play_mnswpr(iterations=100, sz=16, net_name='seven_conv_16_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
 #play_mnswpr(iterations=400, sz=16, net_name='seven_conv_16_drop_0_bs_128_m25_nd_l1', random_percent = 0.6)
-play_mnswpr(iterations=10, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
+play_mnswpr(iterations=1000, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
 
 logger.info('------ finished playing ------')
