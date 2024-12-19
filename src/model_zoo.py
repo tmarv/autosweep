@@ -64,7 +64,42 @@ class SevenBySeven2ConvLayerXLeakyReLUSigmoidEnd(nn.Module):
         return x
 
 
+
+# net used for 7 by 7 input grid and 2 convolutional layer
+# the impact of the second convolutional layer significantly improves the performance
+class SevenBySeven2ConvLayerXLeakyReLUSigmoidEndV2(nn.Module):
+    def __init__(self, sz, dp=0.0):
+        super(SevenBySeven2ConvLayerXLeakyReLUSigmoidEndV2, self).__init__()
+        self.convolutional_layer = nn.Sequential(
+            nn.Conv2d(in_channels=1, out_channels=sz, kernel_size=5, stride=1),
+            nn.LeakyReLU()
+            )
+        self.conv_layer2 = nn.Sequential(
+            nn.Conv2d(in_channels=sz, out_channels=sz, kernel_size=3, stride=1),
+            nn.LeakyReLU()
+            )    
+
+        self.linear_layer = nn.Sequential(
+            nn.Linear(in_features=sz, out_features=sz),
+            nn.LeakyReLU(),
+            nn.Dropout(dp),
+            nn.Linear(in_features=sz, out_features=sz),
+            nn.LeakyReLU(),
+            nn.Dropout(dp),
+            nn.Linear(sz, 1),
+            nn.Sigmoid())            
+
+    def forward(self, x):
+        x = self.convolutional_layer(x)
+        x = self.conv_layer2(x)
+        x = torch.flatten(x, 1)
+        x = self.linear_layer(x)
+        return x
+
+
  # can be removed?
+
+
 class ThreeByThree1ConvLayerXBatchNorm(nn.Module):
     def __init__(self, sz, dp):
         super(ThreeByThree1ConvLayerXBatchNorm, self).__init__()
@@ -88,6 +123,7 @@ class ThreeByThree1ConvLayerXBatchNorm(nn.Module):
         x = torch.flatten(x, 1)
         x = self.linear_layer(x)
         return x
+
 
 class ThreeByThree1ConvLayerX(nn.Module):
     def __init__(self, sz, dp):
@@ -232,7 +268,6 @@ class FiveByFiveSig(nn.Module):
         x = self.active3(x)
         x = self.layer4(x)
         return x
-
 
 
 class FiveByFiveConv(nn.Module):

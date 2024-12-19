@@ -57,7 +57,7 @@ def plot_train_loss_curves(resluts_array, test_array, name_of_plot):
     plt.savefig("training_plots/"+name_of_plot)
 
 
-def train_net(epoch = 20,
+def train_net_kfolds(epoch = 20,
               batch_size = 32,
               neural_net_size = 32,
               dropout = 0.0,
@@ -90,8 +90,8 @@ def train_net(epoch = 20,
     for j in range(2):
         for fold, (train_idx, test_idx) in enumerate(kf.split(dataset)):
             logger.info("fold f: {}".format(fold))
-            train_loader_five = DataLoader(dataset, batch_size = batch_size, sampler=torch.utils.data.SubsetRandomSampler(train_idx), shuffle = True)
-            test_loader_five = DataLoader(dataset, batch_size = batch_size, sampler=torch.utils.data.SubsetRandomSampler(test_idx), shuffle = True)
+            train_loader_five = DataLoader(dataset, batch_size = batch_size, sampler=torch.utils.data.SubsetRandomSampler(train_idx))
+            test_loader_five = DataLoader(dataset, batch_size = batch_size, sampler=torch.utils.data.SubsetRandomSampler(test_idx))
             train_len = len(train_loader_five.dataset)
 
             for e in range(epoch):
@@ -128,7 +128,7 @@ def train_net(epoch = 20,
                 
                 eval_losses.append(eval_loss_e/(kf_split*train_len))
 
-                if plot_result and e%5==0 and e>0:
+                if plot_result and e%3==0 and e>0:
                     plot_train_loss_curves(train_losses, eval_losses, "iter_"+str(j)+"kfold_"+str(fold)+ "_epoch_" + str(e) +"_" + training_loss_graph)
                     plot_train_loss_curves(train_losses, train_losses, "iter_"+str(j)+"kfold_"+str(fold)+ "_epoch_" + str(e) +"_onlytrain_" + training_loss_graph)
     backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(), ("../saved_nets/" + backup_name)))
@@ -148,6 +148,7 @@ def train_net_simple(epoch = 20,
     training_loss_graph = backup_name+".png"
     print(backup_name)
     logger.info('Training net name: {} without kfolds'.format(backup_name))
+    #net = model_zoo.SevenBySeven2ConvLayerXLeakyReLUSigmoidEnd(neural_net_size, dropout).to(device)
     net = model_zoo.SevenBySeven2ConvLayerXLeakyReLUSigmoidEnd(neural_net_size, dropout).to(device)
     
     optimizer = optim.Adam(net.parameters(), lr=learning_rate)
@@ -191,22 +192,5 @@ def train_net_simple(epoch = 20,
 device = tools.get_device()
 logger.info('training with device {}'.format(device))
 
-
-#train_net(epoch = 6, learning_rate=0.0008, neural_net_size = 32, batch_size = 32)
-#train_net(epoch = 6, learning_rate=0.0008, neural_net_size = 32, batch_size = 128)
-#train_net_simple(epoch = 51, learning_rate=0.001, neural_net_size = 32, dropout=0.00, batch_size = 128)
-train_net_simple(epoch = 41, learning_rate=0.001, neural_net_size = 32, dropout=0.00, batch_size = 128)
-#train_net_simple(epoch = 31, learning_rate=0.001, neural_net_size = 32, dropout=0.00, batch_size = 128)
-#train_net_simple(epoch = 51, learning_rate=0.001, neural_net_size = 16, dropout=0.00, batch_size = 16384)
-
-#train_net_simple(epoch = 141, learning_rate=0.0005, neural_net_size = 16, dropout=0.01, batch_size = 32)
-
-#train_net(epoch = 21, learning_rate=0.0008, neural_net_size = 8, batch_size = 32)
-#train_net(epoch = 61, learning_rate=0.0008, neural_net_size = 32, batch_size = 64)
-#train_net(epoch = 61, learning_rate=0.0008, neural_net_size = 32, batch_size = 1024*32)
-#train_net(epoch = 41, learning_rate=0.0008, neural_net_size = 8, batch_size = 2048*32)
-#train_net(epoch = 41, learning_rate=0.0008, neural_net_size = 32, batch_size = 32)
-#train_net(epoch = 41, learning_rate=0.008, neural_net_size = 32, batch_size = 32)
-#train_net(epoch = 121, learning_rate=0.0008, neural_net_size = 256, batch_size = 16384)
-#train_net(epoch = 61, learning_rate=0.00008, neural_net_size = 64, batch_size = 131072)
-#train_net(epoch = 121, learning_rate=0.0008, neural_net_size = 512, batch_size = 8*16384)
+train_net_kfolds(epoch = 11, learning_rate=0.0005, neural_net_size = 16, dropout=0.00, batch_size = 64)
+#train_net_simple(epoch = 51, learning_rate=0.001, neural_net_size = 16, dropout=0.00, batch_size = 128)

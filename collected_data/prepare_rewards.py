@@ -504,7 +504,7 @@ def rotate_data_7by7(backup_name_unique, backup_name_rotated):
             rotated_data = []
             reward =  np.float32(line[49])
             # greed reduction
-            if reward > 9:
+            if reward > 4:
                 reward = 3
             grid_values_0 = np.array([line[0:7], line[7:14], line[14:21], line[21:28], line[28:35], line[35:42], line[42:49]])
             grid_values_flipped_h_0 = np.flip(grid_values_0)

@@ -38,7 +38,7 @@ def select_action_seven(neural_net, state, normalize = False, norm_a = 2.0, norm
     score_board = np.zeros((8, 8))
     for i in range(3, 11):
         for j in range(3, 11):
-            local_cpy = tools.grab_sub_state_noext_seven(state, j, i) # normalize of needed
+            local_cpy = tools.grab_sub_state_noext_seven(state, j, i)
             if normalize:
                 local_cpy = local_cpy.flatten()
                 for k in range(49):
@@ -84,20 +84,20 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
     win = 0
     lose = 0
     while i_episode < iterations:
-        sleep(0.3)
+        sleep(0.1)
         logger.info("episode {}".format(i_episode))
         tools.move_and_click(739, 320)
-        sleep(0.3)
+        sleep(0.1)
         state = dg.get_state_from_screen()
         if dg.gotTopTimes():
             tools.move_and_click(1200,320)
-            sleep(0.3)
+            sleep(0.1)
             state = dg.get_state_from_screen()
         # run the flagging algorithm
         state = min_int.mark_game(state)
         # perform a deep copy
         previous_state = state.copy()
-        sleep(0.3)
+        sleep(0.05)
         counter = 0
         while not dg.get_status() and counter < 500:
             action = select_action_seven(main_net, state, True)
@@ -110,11 +110,11 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
                 min_int.move_and_click_to_ij(action[k][0], action[k][1])
                 tools.move_to(1490, 900)
                 # if hit a mine or got into best times
-                sleep(0.2)
+                sleep(0.05)
                 state = dg.get_state_from_screen()
                 if dg.gotTopTimes():
                     tools.move_and_click(1200, 320)
-                    sleep(0.3)
+                    sleep(0.05)
                     state = dg.get_state_from_screen()
                 if not dg.get_status():
                     state = min_int.mark_game(state)
@@ -179,9 +179,11 @@ logger.info('-- starting to play --')
 logger.info('this is the device: {}'.format(device))
 print('this is the device: {}'.format(device))
 
-#play_mnswpr(iterations=10, sz=32, net_name='seven_conv_32_drop_0_bs_32_m25_nd_l2', random_percent = 0.0)
-#play_mnswpr(iterations=100, sz=16, net_name='seven_conv_16_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
-#play_mnswpr(iterations=400, sz=16, net_name='seven_conv_16_drop_0_bs_128_m25_nd_l1', random_percent = 0.6)
-play_mnswpr(iterations=1000, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
+
+play_mnswpr(iterations=10, sz=16, net_name='seven_conv_16_drop_0_bs_64_m25_nd_l1', random_percent = 0.0)
+#play_mnswpr(iterations=300, sz=16, net_name='seven_conv_16_drop_0_bs_64_m25_nd_l1', random_percent = 0.5)
+#play_mnswpr(iterations=500, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
+#play_mnswpr(iterations=200, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
+#play_mnswpr(iterations=100, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
 
 logger.info('------ finished playing ------')
