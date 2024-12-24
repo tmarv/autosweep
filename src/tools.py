@@ -31,6 +31,11 @@ def extend_state_seven(state):
     extended_seven[3:11, 3:11] = state
     return extended_seven    
 
+# 16 by 30 -> 22 by 36
+def extend_state_seven_large(state):
+    extended_seven = -2 * np.ones((22, 36))
+    extended_seven[3:19, 3:33] = state
+    return extended_seven   
 
 def rotate_by_90(state):
     rot = np.rot90(state, k=1, axes=(1, 0))
