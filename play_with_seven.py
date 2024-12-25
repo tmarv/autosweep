@@ -19,7 +19,7 @@ from src import tools
 NUM_ACTIONS = 64
 
 # Silence external libs
-logging.basicConfig(level=logging.CRITICAL, filename='logs/play_with_seven.log', encoding='utf-8')
+logging.basicConfig(level=logging.CRITICAL, filename='logs/play_with_seven.log')
 logger = logging.getLogger('play_with_seven')
 # enable logs for current lib
 logger.setLevel(level=logging.INFO)
@@ -171,8 +171,7 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
     print('lost {} games'.format(lose))
 
 
-# cpu inference is faster
-# tools.get_device()
+# cpu inference is faster for small batches
 device = 'cpu'
 init_mnswpr()
 logger.info('-- starting to play --')

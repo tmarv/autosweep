@@ -5,6 +5,7 @@ import pyautogui
 from time import sleep
 import os
 import uuid
+import signal
 import subprocess
 import torch
 
@@ -186,6 +187,13 @@ def get_device():
 
 
 def launch_mines():
+    # restart if already running
+    result = subprocess.run(["pgrep", "gnome-mines"], capture_output=True, text=True)
+    
+    if result.stdout: 
+            pid = int(result.stdout.strip())
+            os.kill(pid, signal.SIGTERM)
+
     # start the game directly
     start_game = "/usr/games/gnome-mines"
     res = subprocess.Popen(start_game, shell=False)
