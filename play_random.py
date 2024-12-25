@@ -23,6 +23,7 @@ def select_action():
     random_action = random.randrange(NUM_ACTIONS)
     return torch.tensor([[math.floor(random_action / 8), random_action % 8]], device=device, dtype=torch.int)
 
+# TODO find and fix behavior bug
 def play_random(iterations=1, save_data=True):
     print("playing randomly")
     is_test_set = False
@@ -31,7 +32,7 @@ def play_random(iterations=1, save_data=True):
     losers = 0
     while i_episode < iterations:
         sleep(0.3)
-        #print("this is i_episode " + str(i_episode))
+        print("this is i_episode " + str(i_episode))
         i_episode = i_episode + 1
         tools.move_and_click(739, 320)
         sleep(0.3)
@@ -42,7 +43,7 @@ def play_random(iterations=1, save_data=True):
         previous_state = state.copy()
         sleep(0.3)
         counter = 0
-        while not dg.get_status() and counter < 200:
+        while not dg.get_status() and counter < 500:
             counter += 1
             for k in range(0, 64):
                 action = select_action()
@@ -73,7 +74,7 @@ def play_random(iterations=1, save_data=True):
                         tools.save_action_three(10, sub_state_three, is_test_set)
                         tools.save_action_five(10, sub_state_five, is_test_set)
                     tools.move_and_click(1490, 900)
-                    counter += 1001
+                    counter += 1
                     break
                 else:
                     if save_data:
@@ -85,8 +86,8 @@ def play_random(iterations=1, save_data=True):
                 # if we didn't act -> k = 100
                 if reward != 0:
                     break
-                counter += 1
-
+                #counter += 1
+    print('counter {}'.format(counter))
     print("winners: " + str(winners) + " losers: " + str(losers))
 
 def play_the_game(cfg_file_name):
