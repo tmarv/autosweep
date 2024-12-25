@@ -31,11 +31,13 @@ def extend_state_seven(state):
     extended_seven[3:11, 3:11] = state
     return extended_seven    
 
-# 16 by 30 -> 22 by 36
+
+# 16 by 30 pad by 3 on each side -> 22 by 36
 def extend_state_seven_large(state):
     extended_seven = -2 * np.ones((22, 36))
     extended_seven[3:19, 3:33] = state
     return extended_seven   
+
 
 def rotate_by_90(state):
     rot = np.rot90(state, k=1, axes=(1, 0))
@@ -79,9 +81,11 @@ def grab_sub_state_noext_five(state, i, j):
     sub_state = state[[i - 2, i - 1, i, i +1, i + 2], :][:, [j - 2, j-1, j, j + 1, j + 2]]
     return sub_state
 
+
 def grab_sub_state_noext_seven(state, i, j):
     sub_state = state[[i - 3, i - 2, i - 1, i, i +1, i + 2, i + 3], :][:, [j - 3, j - 2, j-1, j, j + 1, j + 2, j + 3]]
     return sub_state
+
 
 def augment_data(rewards, data_points):
     aug_rewards = []
@@ -104,6 +108,7 @@ def augment_data(rewards, data_points):
     print(len(aug_data_pts))
     return np.array(aug_rewards), np.array(aug_data_pts)
 
+
 def augment_data_five(rewards, data_points):
     aug_rewards = []
     aug_data_pts = []
@@ -125,7 +130,6 @@ def augment_data_five(rewards, data_points):
     return np.array(aug_rewards), np.array(aug_data_pts)
 
 
-### Todo remove duplicate
 def move_to(w, h):
     pyautogui.moveTo(w, h)
     sleep(0.02)
@@ -177,27 +181,19 @@ def save_action_neg_seven(reward, before, is_test_set):
     save_action_text_seven(reward, before)
 
 
-
 def get_device():
     return device
-
-
-def start_minesweeper_game():
-    # start minesweeper program
-    move_and_click(33, 763)
-    # can be slow
-    sleep(2)
-    # start 8 by 8 minesweeper
-    move_and_click(739, 320)
-    # init
-    pyautogui.click()
 
 
 def launch_mines():
     # start the game directly
     start_game = "/usr/games/gnome-mines"
     res = subprocess.Popen(start_game, shell=False)
-    # os.system(start_game)
+
+
+def stop_mines():
+    print("checking if minesweeper is already running")
+
 
 def get_working_dir():
     return dir_path
@@ -208,13 +204,12 @@ def get_text_file_names():
 
 
 def get_text_file_names_small():
-    # just to try it out
-    #return [_data_pts_3_filename_var, _data_pts_5_filename_small]
     return [_data_pts_3_filename_small, _data_pts_5_filename_small]
 
 
 def get_text_file_names_var():
     return [_data_pts_3_filename_var, _data_pts_5_filename_var]
+
 
 def get_text_file_names_clean():
     return [_data_pts_3_filename_clean, _data_pts_5_filename_clean]
@@ -246,11 +241,3 @@ def __del__(self):
     _rewards3_text_file.close()
     _rewards5_text_file.close()
     _rewards7_text_file.close()
-
-
-'''
-just making sure the five by five works
-mytest = np.array([1,2,3,4,5,1,2,3,4,5,1,2,3,4,5,1,2,3,4,5,1,2,3,4,5])
-my_result = rotate_by_90_flat_five(mytest)
-print(my_result)
-'''

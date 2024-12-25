@@ -16,10 +16,11 @@ from src import minesweeper_interface as min_int
 from src import model_zoo
 from src import tools
 
+# playing on a 16*30 tile game
 NUM_ACTIONS = 480
 
 # Silence external libs
-logging.basicConfig(level=logging.CRITICAL, filename='logs/play_large_with_seven.log')#', encoding='utf-8'
+logging.basicConfig(level=logging.CRITICAL, filename='logs/play_large_with_seven.log')
 logger = logging.getLogger('play_large_with_seven')
 # enable logs for current lib
 logger.setLevel(level=logging.INFO)
@@ -78,10 +79,8 @@ def select_action_large_seven(neural_net, state, normalize = False, norm_a = 2.0
     return return_values
 
 
-def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False, random_percent = 0.0):
+def play_mnswpr(iterations, net_name, sz):
     logger.info('playing with net: {}'.format(net_name))
-    # main_net = model_zoo.SevenBySeven1ConvLayerXLeakyReLU(sz, 0.0)
-    # main_net = model_zoo.SevenBySeven1ConvLayerXLeakyReLUSigmoidEnd(sz, 0.0)
     main_net = model_zoo.SevenBySeven2ConvLayerXLeakyReLUSigmoidEnd(sz, 0.0)
     main_net_name = os.path.abspath(
         os.path.join(tools.get_working_dir(), '../saved_nets/{}'.format(net_name)))
@@ -107,6 +106,7 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
         # perform a deep copy
         previous_state = state.copy()
         sleep(0.02)
+        # count the strikes
         counter = 0
         while not dg.get_status() and counter < 500:
             action = select_action_large_seven(main_net, state, True)
@@ -120,24 +120,15 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
                 state = dg.get_state_from_screen_large()
                 if dg.gotTopTimes():
                     print("got top times")
-                    #win+=1
                     tools.move_and_click(1200, 320)
                     sleep(0.02)
                     state = dg.get_state_from_screen_large()
                 if not dg.get_status():
                     state = min_int.mark_game_large(state)
-                #sub_state_three = tools.grab_sub_state_three(previous_state, action[k][1] + 1, action[k][0] + 1)
-                #sub_state_five = tools.grab_sub_state_five(previous_state, action[k][1] + 2, action[k][0] + 2)
-                #sub_state_seven = tools.grab_sub_state_seven(previous_state, action[k][1] + 3, action[k][0] + 3)
                 # we hit a mine
                 if dg.get_status():
                     print("LOST")
                     logger.info('LOST: hit mine')
-                    #tools.save_action_neg_three(-64, sub_state_three, is_test_set)
-                    #tools.save_action_neg_five(-64, sub_state_five, is_test_set)
-                    #tools.save_action_neg_seven(-64, sub_state_seven, is_test_set)
-                    #logger.info(' \n '+str(sub_state_three))
-                    #logger.info(' \n '+str(sub_state_five))
                     tools.move_and_click(1830, 860)
                     counter += 1
                     i_episode = i_episode + 1
@@ -147,25 +138,13 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
                 # compute reward
                 reward, has_won = reward_manager.compute_reward(previous_state, state)
                 if has_won:
-                    #tools.save_action_three(10, sub_state_three, is_test_set)
-                    #tools.save_action_five(10, sub_state_five, is_test_set)
-                    #tools.save_action_seven(10, sub_state_seven, is_test_set)
                     tools.move_and_click(1830, 860)
                     logger.info('has won in {} strikes'.format(counter))
+                    # trigger the while condition
                     counter += 1001
                     i_episode = i_episode + 1
                     win += 1
                     break
-                #else:
-                    # save data from transition
-                    #if reward > 0:
-                        #tools.save_action_three(reward, sub_state_three, is_test_set)
-                        #tools.save_action_five(reward, sub_state_five, is_test_set)
-                        #tools.save_action_seven(reward, sub_state_seven, is_test_set)
-                    #elif reward <= 0:
-                        #tools.save_action_neg_three(reward, sub_state_three, is_test_set)
-                        #tools.save_action_neg_five(reward, sub_state_five, is_test_set)
-                        #tools.save_action_neg_seven(reward, sub_state_seven, is_test_set)
 
                 previous_state = state.copy()
                 state = min_int.mark_game_large(state)
@@ -180,19 +159,14 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
     print('lost {} games'.format(lose))
 
 
-# cpu inference is faster
-device = tools.get_device() #'cpu'
-#device = 'cpu'
+# cpu inference is faster for smaller loads, not here 
+device = tools.get_device()
 init_mnswpr_large()
 logger.info('-- starting to play --')
-logger.info('this is the device: {}'.format(device))
+logger.info('this is the device used for inference: {}'.format(device))
 print('this is the device: {}'.format(device))
 
 
-play_mnswpr(iterations=1, sz=16, net_name='seven_conv_16_drop_0_bs_64_m25_nd_l1', random_percent = 0.0)
-#play_mnswpr(iterations=300, sz=16, net_name='seven_conv_16_drop_0_bs_64_m25_nd_l1', random_percent = 0.5)
-#play_mnswpr(iterations=500, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
-#play_mnswpr(iterations=200, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
-#play_mnswpr(iterations=100, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
+play_mnswpr(iterations=1, net_name='seven_conv_16_drop_0_bs_64_m25_nd_l1', sz=16)
 
 logger.info('------ finished playing ------')
