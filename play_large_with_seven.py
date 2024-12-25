@@ -181,15 +181,15 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
 
 
 # cpu inference is faster
-# device = tools.get_device() #'cpu'
-device = 'cpu'
+device = tools.get_device() #'cpu'
+#device = 'cpu'
 init_mnswpr_large()
 logger.info('-- starting to play --')
 logger.info('this is the device: {}'.format(device))
 print('this is the device: {}'.format(device))
 
 
-play_mnswpr(iterations=10, sz=16, net_name='seven_conv_16_drop_0_bs_64_m25_nd_l1', random_percent = 0.0)
+play_mnswpr(iterations=1, sz=16, net_name='seven_conv_16_drop_0_bs_64_m25_nd_l1', random_percent = 0.0)
 #play_mnswpr(iterations=300, sz=16, net_name='seven_conv_16_drop_0_bs_64_m25_nd_l1', random_percent = 0.5)
 #play_mnswpr(iterations=500, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
 #play_mnswpr(iterations=200, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)

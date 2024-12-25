@@ -180,7 +180,7 @@ logger.info('this is the device: {}'.format(device))
 print('this is the device: {}'.format(device))
 
 
-play_mnswpr(iterations=20, sz=16, net_name='seven_conv_16_drop_0_bs_64_m25_nd_l1', random_percent = 0.0)
+play_mnswpr(iterations=1, sz=16, net_name='seven_conv_16_drop_0_bs_64_m25_nd_l1', random_percent = 0.0)
 #play_mnswpr(iterations=300, sz=16, net_name='seven_conv_16_drop_0_bs_64_m25_nd_l1', random_percent = 0.5)
 #play_mnswpr(iterations=500, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
 #play_mnswpr(iterations=200, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
