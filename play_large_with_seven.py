@@ -19,7 +19,7 @@ from src import tools
 NUM_ACTIONS = 480
 
 # Silence external libs
-logging.basicConfig(level=logging.CRITICAL, filename='logs/play_large_with_seven.log', encoding='utf-8')
+logging.basicConfig(level=logging.CRITICAL, filename='logs/play_large_with_seven.log')#', encoding='utf-8'
 logger = logging.getLogger('play_large_with_seven')
 # enable logs for current lib
 logger.setLevel(level=logging.INFO)
