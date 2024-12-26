@@ -614,5 +614,6 @@ def run_pre_processing_seven():
     remove_duplicates_7by7("rotated_pts7.csv")
     normalize_rewards_and_inputs("rotated_pts7.csv", "unique_normalized_7_rewards_m25.csv", 49, -5, 3)
 
-
+#run_pre_processing_three()
+#run_pre_processing_five()
 run_pre_processing_seven()

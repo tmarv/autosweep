@@ -16,10 +16,8 @@ from src import minesweeper_interface as min_int
 from src import model_zoo
 from src import tools
 
-NUM_ACTIONS = 64
-
 # Silence external libs
-logging.basicConfig(level=logging.CRITICAL, filename='logs/play_with_five.log', encoding='utf-8')
+logging.basicConfig(level=logging.CRITICAL, filename='logs/play_with_five.log')
 logger = logging.getLogger('play_with_five')
 # enable logs for current lib
 logger.setLevel(level=logging.INFO)
@@ -73,7 +71,7 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
     logger.info('playing with net: {}'.format(net_name))
     main_net = model_zoo.FiveByFive1ConvLayerX(sz, 0.0)
     main_net_name = os.path.abspath(
-        os.path.join(tools.get_working_dir(), '../saved_nets/{}'.format(net_name)))
+        os.path.join(tools.get_working_dir(), '../best_nets/{}'.format(net_name)))
     main_net.load_state_dict(torch.load(main_net_name, map_location=device))
     main_net.eval()
 
@@ -179,7 +177,4 @@ logger.info('-- starting to play --')
 logger.info('this is the device: {}'.format(device))
 
 play_mnswpr(iterations=1, sz=32, net_name='five_conv_32_drop_0_bs_64_m25_nd_l2', random_percent = 0.0)
-#play_mnswpr(iterations=100, sz=32, net_name='five_conv_32_drop_0_bs_64_m25_nd_l2', random_percent = 0.7)
-#play_mnswpr(iterations=300, sz=256, net_name='five_conv_256_drop_0_bs_131072_m25_nd_l1', random_percent = 0.0)
-#play_mnswpr(iterations=300, sz=512, net_name='five_conv_512_drop_0_bs_131072_m25_nd_l1', random_percent = 0.0)
 logger.info('------ finished playing ------')
