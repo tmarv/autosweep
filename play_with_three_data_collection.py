@@ -20,7 +20,7 @@ VERBOSE = False
 NUM_ACTIONS = 64
 
 # Silence external libs
-logging.basicConfig(level=logging.CRITICAL, filename='logs/play_with_three.log', encoding='utf-8')
+logging.basicConfig(level=logging.CRITICAL, filename='logs/play_with_three.log')
 logger = logging.getLogger('play_with_three')
 # enable logs for current lib
 logger.setLevel(level=logging.INFO)
@@ -73,7 +73,7 @@ def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False,
     logger.info('Name of the net: {}'.format(net_name))
     main_net = model_zoo.ThreeByThree1ConvLayerX(sz, 0.0)
     main_net_name = os.path.abspath(
-        os.path.join(tools.get_working_dir(), '../saved_nets/{}'.format(net_name)))
+        os.path.join(tools.get_working_dir(), '../best_nets/{}'.format(net_name)))
     main_net.load_state_dict(torch.load(main_net_name, map_location=device))
     main_net.eval()
 
