@@ -40,6 +40,7 @@ def skip_empty(local_cpy):
         return False
     return True
 
+
 def select_action_large_seven(neural_net, state, normalize = False, norm_a = 2.0, norm_b = 12.0):
     state = tools.extend_state_seven_large(state)
     score_board = np.zeros((16, 30))

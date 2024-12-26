@@ -33,22 +33,12 @@ def init_mnswpr():
 
 
 
-def skip_empty(local_cpy):
-    inner_3by3 = local_cpy[[2, 3, 4], :][:, [2, 3, 4]]
-    if -1 in inner_3by3:
-        return False
-    return True
-
-
 def select_action_seven(neural_net, state, normalize = False, norm_a = 2.0, norm_b = 12.0):
     state = tools.extend_state_seven(state)
     score_board = np.zeros((8, 8))
     for i in range(3, 11):
         for j in range(3, 11):
             local_cpy = tools.grab_sub_state_noext_seven(state, j, i)
-            # avoid going to empty places/ running inference on empty
-            if skip_empty(local_cpy):
-                continue
             if normalize:
                 local_cpy = local_cpy.flatten()
                 for k in range(49):
@@ -79,7 +69,7 @@ def select_action_seven(neural_net, state, normalize = False, norm_a = 2.0, norm
     return return_values
 
 
-def play_mnswpr(iterations, net_name, sz = 64 ):
+def play_mnswpr(iterations, net_name, sz = 64 , epoch = '', is_test_set = False, random_percent = 0.0):
     logger.info('playing with net: {}'.format(net_name))
     # main_net = model_zoo.SevenBySeven1ConvLayerXLeakyReLU(sz, 0.0)
     # main_net = model_zoo.SevenBySeven1ConvLayerXLeakyReLUSigmoidEnd(sz, 0.0)
@@ -114,6 +104,9 @@ def play_mnswpr(iterations, net_name, sz = 64 ):
             counter += 1
             # replace some good shots by randomness to collect more data
             for k in range(0, 64):
+                if random.random() < random_percent:
+                    action[k][0] = random.randint(0, 7)
+                    action[k][1] = random.randint(0, 7)
                 min_int.move_and_click_to_ij(action[k][0], action[k][1])
                 tools.move_to(1490, 900)
                 # if hit a mine or got into best times
@@ -131,6 +124,9 @@ def play_mnswpr(iterations, net_name, sz = 64 ):
                 # we hit a mine
                 if dg.get_status():
                     logger.info('LOST: hit mine')
+                    tools.save_action_neg_three(-64, sub_state_three, is_test_set)
+                    tools.save_action_neg_five(-64, sub_state_five, is_test_set)
+                    tools.save_action_neg_seven(-64, sub_state_seven, is_test_set)
                     logger.info(' \n '+str(sub_state_three))
                     logger.info(' \n '+str(sub_state_five))
                     tools.move_and_click(1490, 900)
@@ -142,12 +138,25 @@ def play_mnswpr(iterations, net_name, sz = 64 ):
                 # compute reward
                 reward, has_won = reward_manager.compute_reward(previous_state, state)
                 if has_won:
+                    tools.save_action_three(10, sub_state_three, is_test_set)
+                    tools.save_action_five(10, sub_state_five, is_test_set)
+                    tools.save_action_seven(10, sub_state_seven, is_test_set)
                     tools.move_and_click(1490, 900)
                     logger.info('has won in {} strikes'.format(counter))
                     counter += 1001
                     i_episode = i_episode + 1
                     win += 1
                     break
+                else:
+                    # save data from transition
+                    if reward > 0:
+                        tools.save_action_three(reward, sub_state_three, is_test_set)
+                        tools.save_action_five(reward, sub_state_five, is_test_set)
+                        tools.save_action_seven(reward, sub_state_seven, is_test_set)
+                    elif reward <= 0:
+                        tools.save_action_neg_three(reward, sub_state_three, is_test_set)
+                        tools.save_action_neg_five(reward, sub_state_five, is_test_set)
+                        tools.save_action_neg_seven(reward, sub_state_seven, is_test_set)
 
                 previous_state = state.copy()
                 state = min_int.mark_game(state)
@@ -170,10 +179,10 @@ logger.info('this is the device: {}'.format(device))
 print('this is the device: {}'.format(device))
 
 
-play_mnswpr(iterations=1, sz=16, net_name='seven_conv_16_drop_0_bs_64_m25_nd_l1')
-#play_mnswpr(iterations=300, sz=16, net_name='seven_conv_16_drop_0_bs_64_m25_nd_l1')
-#play_mnswpr(iterations=500, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1')
-#play_mnswpr(iterations=200, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1')
-#play_mnswpr(iterations=100, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1')
+play_mnswpr(iterations=1, sz=16, net_name='seven_conv_16_drop_0_bs_64_m25_nd_l1', random_percent = 0.0)
+#play_mnswpr(iterations=300, sz=16, net_name='seven_conv_16_drop_0_bs_64_m25_nd_l1', random_percent = 0.5)
+#play_mnswpr(iterations=500, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
+#play_mnswpr(iterations=200, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
+#play_mnswpr(iterations=100, sz=32, net_name='seven_conv_32_drop_0_bs_128_m25_nd_l1', random_percent = 0.0)
 
 logger.info('------ finished playing ------')
