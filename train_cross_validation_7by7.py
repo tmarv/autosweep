@@ -90,14 +90,15 @@ def train_net_kfolds(epoch = 20,
     for j in range(2):
         for fold, (train_idx, test_idx) in enumerate(kf.split(dataset)):
             logger.info("fold f: {}".format(fold))
-            train_loader_five = DataLoader(dataset, batch_size = batch_size, sampler=torch.utils.data.SubsetRandomSampler(train_idx))
-            test_loader_five = DataLoader(dataset, batch_size = batch_size, sampler=torch.utils.data.SubsetRandomSampler(test_idx))
-            train_len = len(train_loader_five.dataset)
+            train_loader_seven = DataLoader(dataset, batch_size = batch_size, sampler=torch.utils.data.SubsetRandomSampler(train_idx))
+            test_loader_seven = DataLoader(dataset, batch_size = batch_size, sampler=torch.utils.data.SubsetRandomSampler(test_idx))
+            train_len = len(train_loader_seven.dataset)
+            test_len = len(test_loader_seven.dataset)
 
             for e in range(epoch):
                 train_loss_e = 0
                 net.train()
-                for i, data in enumerate(train_loader_five):
+                for i, data in enumerate(train_loader_seven):
                     inputs, rewards = data
                     inputs = inputs.unsqueeze(1)
                     rewards = rewards.to(torch.float)
@@ -108,11 +109,11 @@ def train_net_kfolds(epoch = 20,
                     train_loss.backward()
                     optimizer.step()
                     train_loss_e += train_loss.detach().cpu()
-                train_losses.append(train_loss_e/(kf_split*(k_folds-1)*train_len))
+                train_losses.append(train_loss_e/train_len)
 
                 net.eval()
                 eval_loss_e = 0
-                for i, data in enumerate(test_loader_five):
+                for i, data in enumerate(test_loader_seven):
                     inputs, rewards = data
                     inputs = inputs.unsqueeze(1)
                     rewards = rewards.to(torch.float)
@@ -126,7 +127,7 @@ def train_net_kfolds(epoch = 20,
                     backup_net_name = os.path.abspath(os.path.join(tools.get_working_dir(), ("../saved_nets/" + backup_name+"_best")))
                     torch.save(net.state_dict(), backup_net_name)
                 
-                eval_losses.append(eval_loss_e/(kf_split*train_len))
+                eval_losses.append(eval_loss_e/test_len)
 
                 if plot_result and e%3==0 and e>0:
                     plot_train_loss_curves(train_losses, eval_losses, "iter_"+str(j)+"kfold_"+str(fold)+ "_epoch_" + str(e) +"_" + training_loss_graph)
@@ -192,5 +193,5 @@ def train_net_simple(epoch = 20,
 device = tools.get_device()
 logger.info('training with device {}'.format(device))
 
-train_net_kfolds(epoch = 11, learning_rate=0.0005, neural_net_size = 16, dropout=0.00, batch_size = 64)
+train_net_kfolds(epoch = 6, learning_rate=0.00001, neural_net_size = 16, dropout=0.00, batch_size = 64)
 #train_net_simple(epoch = 51, learning_rate=0.001, neural_net_size = 16, dropout=0.00, batch_size = 128)
