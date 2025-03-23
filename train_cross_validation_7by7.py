@@ -193,5 +193,5 @@ def train_net_simple(epoch = 20,
 device = tools.get_device()
 logger.info('training with device {}'.format(device))
 
-train_net_kfolds(epoch = 6, learning_rate=0.00001, neural_net_size = 16, dropout=0.00, batch_size = 64)
+train_net_kfolds(epoch = 11, learning_rate=0.00001, neural_net_size = 16, dropout=0.00, batch_size = 128)
 #train_net_simple(epoch = 51, learning_rate=0.001, neural_net_size = 16, dropout=0.00, batch_size = 128)
